@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GetGo — Driver Login</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="auth-wrap">
+
+        <!-- Hero -->
+        <div class="auth-hero">
+            <div class="auth-hero-icon"><i class="fa-solid fa-steering-wheel"></i></div>
+            <div class="auth-hero-title">Driver Portal</div>
+            <div class="auth-hero-sub">Sign in to broadcast your live location to commuters</div>
+        </div>
+
+        <!-- Body -->
+        <div class="auth-body">
+
+            <!-- Back link -->
+            <a href="index.html" class="back-link" style="justify-content:flex-start; margin-bottom:18px;">
+                <i class="fa-solid fa-arrow-left"></i> Back to role select
+            </a>
+
+            <div class="auth-card">
+
+                <!-- PHONE STEP -->
+                <div id="phoneStep">
+                    <div class="auth-card-title">Enter your phone number</div>
+                    <div class="auth-card-sub">We'll send a one-time verification code to your number.</div>
+
+                    <label class="form-label">Mobile Number</label>
+                    <div class="phone-row">
+                        <div class="country-chip">
+                            <span>🇮🇳</span>
+                            <span>+91</span>
+                            <span style="font-size:.7rem; color:var(--text-500);"><i
+                                    class="fa-solid fa-chevron-down"></i></span>
+                        </div>
+                        <input type="tel" id="phone" class="field" placeholder="10-digit number" maxlength="10">
+                    </div>
+
+                    <!-- Promo banner -->
+                    <div class="promo-banner">
+                        <span class="promo-eyebrow">GetGo Driver App</span>
+                        <span class="promo-title">Track routes &amp; trips seamlessly</span>
+                        <span class="promo-feature"><i class="fa-solid fa-circle-check"></i> Live coordinates
+                            broadcasting</span>
+                        <div class="store-row">
+                            <a class="store-btn" href="#"><i class="fa-brands fa-google-play"></i> Google Play</a>
+                            <a class="store-btn" href="#"><i class="fa-brands fa-apple"></i> App Store</a>
+                        </div>
+                    </div>
+
+                    <button id="sendOtpBtn" class="btn btn-primary" onclick="handleSendOtp()">
+                        <span>Get OTP</span> <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+
+                <!-- OTP STEP -->
+                <div id="otpStep" class="hidden">
+                    <div class="auth-card-title">Verify your number</div>
+                    <div class="auth-card-sub" id="otp-desc">Code sent to +91 00000 00000</div>
+
+                    <label class="form-label" style="text-align:center; display:block;">Enter 4-digit code</label>
+                    <div class="otp-row">
+                        <input type="text" class="otp-box" id="o1" maxlength="1" pattern="[0-9]">
+                        <input type="text" class="otp-box" id="o2" maxlength="1" pattern="[0-9]">
+                        <input type="text" class="otp-box" id="o3" maxlength="1" pattern="[0-9]">
+                        <input type="text" class="otp-box" id="o4" maxlength="1" pattern="[0-9]">
+                    </div>
+
+                    <button id="verifyOtpBtn" class="btn btn-primary" onclick="handleVerifyOtp()">
+                        <span>Verify &amp; Login</span> <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    </button>
+                    <button id="changeNumberBtn" class="btn btn-ghost" onclick="showPhoneStep()">
+                        <i class="fa-solid fa-chevron-left"></i> Change Number
+                    </button>
+                </div>
+
+                <div id="message" class="msg-box"></div>
+            </div>
+
+            <a href="index.html" class="back-link">
+                <i class="fa-solid fa-house"></i> Back to Home
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const ROLE = "driver";
+        const messageEl = document.getElementById("message");
+
+        // Skip to dashboard if session token exists
+        if (localStorage.getItem("getgo_token") && localStorage.getItem("getgo_role") === ROLE) {
+            window.location.href = "driver-dashboard.html";
+        }
+
+        const showMessage = (text, type = "") => {
+            messageEl.textContent = text;
+            messageEl.className = "msg-box " + type;
+        };
+
+        // Manage OTP digit input focus jumping
+        const otpBoxes = document.querySelectorAll(".otp-box");
+        otpBoxes.forEach((box, index) => {
+            box.addEventListener("input", (e) => {
+                if (e.target.value.length === 1 && index < otpBoxes.length - 1) {
+                    otpBoxes[index + 1].focus();
+                }
+            });
+            box.addEventListener("keydown", (e) => {
+                if (e.key === "Backspace" && e.target.value.length === 0 && index > 0) {
+                    otpBoxes[index - 1].focus();
+                }
+            });
+        });
+
+        // Send OTP handler
+        async function handleSendOtp() {
+            const phone = document.getElementById("phone").value.trim();
+
+            if (!/^\d{10}$/.test(phone)) {
+                return showMessage("Enter a valid 10-digit phone number", "error");
+            }
+
+            const sendBtn = document.getElementById("sendOtpBtn");
+            sendBtn.disabled = true;
+            sendBtn.innerText = "Sending...";
+
+            try {
+                const res = await fetch("/api/auth/send-otp", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ countryCode: "91", phone }),
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showMessage(data.message || "OTP sent successfully", "success");
+                    document.getElementById("otp-desc").innerText = `Verification code sent to +91 ${phone}`;
+                    document.getElementById("phoneStep").classList.add("hidden");
+                    document.getElementById("otpStep").classList.remove("hidden");
+                    setTimeout(() => document.getElementById("o1").focus(), 100);
+                } else {
+                    showMessage(data.message || "Failed to send OTP", "error");
+                }
+            } catch (err) {
+                showMessage("Network error: " + err.message, "error");
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.innerText = "Get OTP";
+            }
+        }
+
+        // Verify OTP handler
+        async function handleVerifyOtp() {
+            const phone = document.getElementById("phone").value.trim();
+            const otp = ["o1", "o2", "o3", "o4"].map(id => document.getElementById(id).value.trim()).join("");
+
+            if (otp.length !== 4) {
+                return showMessage("Enter a valid 4-digit OTP", "error");
+            }
+
+            const verifyBtn = document.getElementById("verifyOtpBtn");
+            verifyBtn.disabled = true;
+            verifyBtn.innerText = "Verifying...";
+
+            try {
+                const res = await fetch("/api/auth/verify-otp", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ countryCode: "91", phone, otp, role: ROLE }),
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    localStorage.setItem("getgo_token", data.token);
+                    localStorage.setItem("getgo_role", data.role);
+                    localStorage.setItem("getgo_phone", data.phone);
+                    showMessage("Login successful!", "success");
+                    setTimeout(() => {
+                        window.location.href = "driver-dashboard.html";
+                    }, 500);
+                } else {
+                    showMessage(data.message || "Invalid OTP", "error");
+                }
+            } catch (err) {
+                showMessage("Network error: " + err.message, "error");
+            } finally {
+                verifyBtn.disabled = false;
+                verifyBtn.innerText = "Verify & Login";
+            }
+        }
+
+        // Change number navigation
+        function showPhoneStep() {
+            document.getElementById("otpStep").classList.add("hidden");
+            document.getElementById("phoneStep").classList.remove("hidden");
+            ["o1", "o2", "o3", "o4"].forEach(id => document.getElementById(id).value = "");
+            showMessage("");
+        }
+    </script>
+</body>
+
+</html>

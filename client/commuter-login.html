@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GetGo — Commuter Login</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="auth-wrap">
+
+        <!-- Hero -->
+        <div class="auth-hero">
+            <div class="auth-hero-icon"><i class="fa-solid fa-person-walking"></i></div>
+            <div class="auth-hero-title">Commuter Portal</div>
+            <div class="auth-hero-sub">Sign in to track buses live and plan your daily commute</div>
+        </div>
+
+        <!-- Body -->
+        <div class="auth-body">
+
+            <a href="index.html" class="back-link" style="justify-content:flex-start; margin-bottom:18px;">
+                <i class="fa-solid fa-arrow-left"></i> Back to role select
+            </a>
+
+            <div class="auth-card">
+
+                <!-- PHONE STEP -->
+                <div id="phone-panel">
+                    <div class="auth-card-title">Commuter Login</div>
+                    <div class="auth-card-sub">Authenticate via your phone number to track buses in real time.</div>
+
+                    <label class="form-label">Mobile Number</label>
+                    <div class="phone-row">
+                        <div class="country-chip">
+                            <span>🇮🇳</span>
+                            <span>+91</span>
+                            <span style="font-size:.7rem; color:var(--text-500);"><i
+                                    class="fa-solid fa-chevron-down"></i></span>
+                        </div>
+                        <input type="tel" id="phone-number" class="field" placeholder="10-digit number" maxlength="10">
+                    </div>
+
+                    <!-- Promo -->
+                    <div class="promo-banner">
+                        <span class="promo-eyebrow">GetGo Live App</span>
+                        <span class="promo-title">Never miss your bus again</span>
+                        <span class="promo-feature"><i class="fa-solid fa-circle-check"></i> Live bus tracking on
+                            map</span>
+                        <span class="promo-feature"><i class="fa-solid fa-circle-check"></i> Nearest stop arrival
+                            times</span>
+                        <div class="store-row">
+                            <a class="store-btn" href="#"><i class="fa-brands fa-google-play"></i> Google Play</a>
+                            <a class="store-btn" href="#"><i class="fa-brands fa-apple"></i> App Store</a>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-teal" id="req-btn" onclick="handleRequestOtp()">
+                        <span>Send OTP</span> <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+
+                <!-- OTP STEP -->
+                <div id="otp-panel" class="hidden">
+                    <div class="auth-card-title">Verify your number</div>
+                    <div class="auth-card-sub" id="otp-desc">Code sent to +91 00000 00000</div>
+
+                    <label class="form-label" style="text-align:center; display:block;">Enter 4-digit code</label>
+                    <div class="otp-row" id="otp-row">
+                        <input type="text" class="otp-box" maxlength="1" pattern="[0-9]">
+                        <input type="text" class="otp-box" maxlength="1" pattern="[0-9]">
+                        <input type="text" class="otp-box" maxlength="1" pattern="[0-9]">
+                        <input type="text" class="otp-box" maxlength="1" pattern="[0-9]">
+                    </div>
+
+                    <button class="btn btn-teal" id="verify-btn" onclick="handleVerifyOtp()">
+                        <span>Confirm &amp; Access</span> <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    </button>
+                    <button class="btn btn-ghost" onclick="showPhonePanel()">
+                        <i class="fa-solid fa-chevron-left"></i> Change Number
+                    </button>
+                </div>
+
+                <div id="toast-msg" class="msg-box"></div>
+            </div>
+
+            <a href="index.html" class="back-link">
+                <i class="fa-solid fa-house"></i> Back to Home
+            </a>
+        </div>
+    </div>
+    <script>
+        // Check if already logged in
+        if (localStorage.getItem("getgo_token") && localStorage.getItem("getgo_role") === "commuter") {
+            window.location.href = "commuter-dashboard.html";
+        }
+
+        // Manage OTP digit input focus jumping
+        const otpBoxes = document.querySelectorAll(".otp-box");
+        otpBoxes.forEach((box, index) => {
+            box.addEventListener("input", (e) => {
+                if (e.target.value.length === 1 && index < otpBoxes.length - 1) {
+                    otpBoxes[index + 1].focus();
+                }
+            });
+            box.addEventListener("keydown", (e) => {
+                if (e.key === "Backspace" && e.target.value.length === 0 && index > 0) {
+                    otpBoxes[index - 1].focus();
+                }
+            });
+        });
+
+        // Form navigation helpers
+        function showPhonePanel() {
+            document.getElementById("phone-panel").classList.remove("hidden");
+            document.getElementById("otp-panel").classList.add("hidden");
+        }
+
+        function showOtpPanel(phone) {
+            document.getElementById("phone-panel").classList.add("hidden");
+            document.getElementById("otp-panel").classList.remove("hidden");
+            document.getElementById("otp-desc").innerText = `Verification code sent to +91 ${phone}`;
+            setTimeout(() => otpBoxes[0].focus(), 100);
+        }
+
+        // Toast notifications logic (uses existing msg-box)
+        function showToast(message, type = "success") {
+            const msgEl = document.getElementById("toast-msg");
+            if (msgEl) {
+                msgEl.textContent = message;
+                msgEl.className = "msg-box " + (type === "error" ? "error" : "success");
+            }
+        }
+
+        let currentPhone = "";
+
+        // Send OTP API logic
+        async function handleRequestOtp(event) {
+            if (event && event.preventDefault) event.preventDefault();
+            const phoneInput = document.getElementById("phone-number");
+            if (!phoneInput) return;
+            
+            const phone = phoneInput.value.trim();
+            const reqBtn = document.getElementById("req-btn");
+
+            if (phone.length !== 10) {
+                showToast("Please enter a valid 10-digit number", "error");
+                return;
+            }
+
+            reqBtn.disabled = true;
+            reqBtn.innerHTML = '<span>Sending...</span> <i class="fa-solid fa-spinner fa-spin"></i>';
+
+            try {
+                const response = await fetch("/api/auth/send-otp", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ countryCode: "91", phone: phone })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentPhone = phone;
+                    showToast(data.message || "OTP sent successfully!", "success");
+                    showOtpPanel(phone);
+                } else {
+                    showToast(data.message || "Failed to send OTP", "error");
+                }
+            } catch (err) {
+                console.error("Error calling send-otp:", err);
+                showToast("Network connection error", "error");
+            } finally {
+                reqBtn.disabled = false;
+                reqBtn.innerHTML = '<span>Send OTP</span> <i class="fa-solid fa-paper-plane"></i>';
+            }
+        }
+
+        // Verify OTP API logic
+        async function handleVerifyOtp(event) {
+            if (event && event.preventDefault) event.preventDefault();
+            const verifyBtn = document.getElementById("verify-btn");
+
+            let otpCode = "";
+            otpBoxes.forEach(box => otpCode += box.value);
+
+            if (otpCode.length !== 4) {
+                showToast("Please enter all 4 OTP digits", "error");
+                return;
+            }
+
+            verifyBtn.disabled = true;
+            verifyBtn.innerHTML = '<span>Verifying...</span> <i class="fa-solid fa-spinner fa-spin"></i>';
+
+            try {
+                const response = await fetch("/api/auth/verify-otp", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        countryCode: "91",
+                        phone: currentPhone,
+                        otp: otpCode,
+                        role: "commuter"
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast("Login approved! Redirecting...", "success");
+                    // Store token & session metadata
+                    localStorage.setItem("getgo_token", data.token);
+                    localStorage.setItem("getgo_role", data.user.role);
+                    localStorage.setItem("getgo_phone", data.user.phone);
+
+                    setTimeout(() => {
+                        window.location.href = "commuter-dashboard.html";
+                    }, 1000);
+                } else {
+                    showToast(data.message || "Incorrect OTP. Try again.", "error");
+                    otpBoxes.forEach(box => box.value = "");
+                    otpBoxes[0].focus();
+                }
+            } catch (err) {
+                console.error("Error calling verify-otp:", err);
+                showToast("Network connection error", "error");
+            } finally {
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = '<span>Confirm & Access</span> <i class="fa-solid fa-arrow-right-to-bracket"></i>';
+            }
+        }
+    </script>
+</body>
+
+</html>

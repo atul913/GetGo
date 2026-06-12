@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GetGo — Commuter Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        /* ─ MAP PANEL ──────────────────────────── */
+        #live-map-panel {
+            position: fixed;
+            inset: 0;
+            z-index: 500;
+            background: #fff;
+        }
+
+        .map-topbar {
+            height: 56px;
+            background: #fff;
+            border-bottom: 1.5px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 14px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 900;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .map-back-btn {
+            width: 34px;
+            height: 34px;
+            background: var(--surface-1);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: var(--text-100);
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .map-back-btn:hover {
+            background: var(--surface-2);
+        }
+
+        .map-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-100);
+        }
+
+        .map-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 6px;
+        }
+
+        .map-icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--r-full);
+            border: 1.5px solid var(--border);
+            background: var(--surface-0);
+            color: var(--text-200);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background .15s, color .15s, border-color .15s;
+        }
+
+        .map-icon-btn.active {
+            background: #D1FAE5;
+            color: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .map-icon-btn:hover {
+            background: var(--surface-1);
+        }
+
+        #map {
+            position: absolute;
+            inset: 56px 0 0 0;
+            z-index: 1;
+        }
+
+        /* Layer panel */
+        .layer-panel {
+            position: absolute;
+            top: 68px;
+            right: 12px;
+            z-index: 850;
+            background: var(--surface-0);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r-md);
+            box-shadow: var(--shadow-lg);
+            padding: 8px;
+            display: none;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 150px;
+        }
+
+        .layer-panel.open {
+            display: flex;
+        }
+
+        .layer-eyebrow {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--text-500);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 4px 8px 6px;
+        }
+
+        .layer-item {
+            padding: 9px 10px;
+            border-radius: var(--r-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 0.83rem;
+            font-weight: 600;
+            color: var(--text-400);
+            transition: background .1s, color .1s;
+        }
+
+        .layer-item:hover {
+            background: var(--surface-1);
+            color: var(--text-100);
+        }
+
+        .layer-item.active {
+            background: #D1FAE5;
+            color: var(--accent-green);
+        }
+
+        .layer-swatch {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* Map float controls */
+        .map-float-group {
+            position: absolute;
+            right: 12px;
+            bottom: 84px;
+            z-index: 800;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .float-btns {
+            background: var(--surface-0);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r-md);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .float-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-100);
+            font-size: 1.1rem;
+            font-weight: 700;
+            transition: background .1s;
+        }
+
+        .float-btn:hover {
+            background: var(--surface-1);
+        }
+
+        .float-btn+.float-btn {
+            border-top: 1.5px solid var(--border);
+        }
+
+        .locate-btn {
+            position: absolute;
+            right: 12px;
+            bottom: 24px;
+            z-index: 800;
+            width: 46px;
+            height: 46px;
+            border-radius: var(--r-full);
+            background: var(--surface-0);
+            border: 1.5px solid var(--border);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--accent-teal);
+            font-size: 1rem;
+            transition: background .15s, transform .15s;
+        }
+
+        .locate-btn:hover {
+            background: #CCFBF1;
+            transform: scale(1.05);
+        }
+
+        .locate-btn.locating {
+            animation: locate-pulse 1.2s infinite;
+        }
+
+        @keyframes locate-pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(14, 165, 160, .4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(14, 165, 160, 0);
+            }
+        }
+
+        /* Traffic legend */
+        .traffic-legend {
+            position: absolute;
+            bottom: 84px;
+            right: 60px;
+            z-index: 800;
+            background: var(--surface-0);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r-md);
+            box-shadow: var(--shadow-md);
+            padding: 10px 14px;
+            display: none;
+            flex-direction: column;
+            gap: 7px;
+            min-width: 120px;
+        }
+
+        .traffic-legend.visible {
+            display: flex;
+        }
+
+        .traffic-legend-title {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--text-500);
+            text-transform: uppercase;
+            letter-spacing: .6px;
+        }
+
+        .t-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78rem;
+            color: var(--text-400);
+            font-weight: 600;
+        }
+
+        .t-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* Map scale */
+        .map-scale {
+            position: absolute;
+            left: 12px;
+            bottom: 14px;
+            z-index: 800;
+            background: var(--surface-0);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r-sm);
+            padding: 4px 10px;
+            font-size: 10px;
+            color: var(--text-400);
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Map toast */
+        .map-toast {
+            position: absolute;
+            bottom: 84px;
+            left: 50%;
+            transform: translateX(-50%) translateY(14px);
+            background: var(--text-100);
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: var(--r-full);
+            font-size: 0.82rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: all .25s;
+            pointer-events: none;
+            z-index: 9999;
+            white-space: nowrap;
+        }
+
+        .map-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Popup */
+        .leaflet-popup-content-wrapper {
+            background: var(--surface-0) !important;
+            border: 1.5px solid var(--border) !important;
+            border-radius: var(--r-md) !important;
+            box-shadow: var(--shadow-lg) !important;
+            color: var(--text-100) !important;
+        }
+
+        .leaflet-popup-tip {
+            background: var(--surface-0) !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ════ HOME FEED PANEL ════════════════════ -->
+    <div id="home-feed-panel">
+        <div class="page-wrap">
+
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-logo">
+                    <i class="fa-solid fa-route"></i> GetGo
+                </div>
+                <button class="topbar-action" onclick="handleLogout()" title="Logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </header>
+
+            <!-- Hero Search -->
+            <div class="hero-search">
+                <div class="search-pill" onclick="showMapPanel()">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <span class="search-hint">Enter destination or bus number</span>
+                </div>
+            </div>
+
+            <!-- Tickets -->
+            <div class="section">
+                <div class="section-head">
+                    <span class="section-title">Buy bus ticket / pass</span>
+                    <a class="section-link" onclick="showMapPanel(); return false;" href="#">See All</a>
+                </div>
+                <div class="tile-row">
+                    <div class="tile" onclick="showMapPanel()">
+                        <div class="tile-icon icon-amber"><i class="fa-solid fa-ticket"></i></div>
+                        <div class="tile-label">One way ticket</div>
+                    </div>
+                    <div class="tile" onclick="showMapPanel()">
+                        <div class="tile-icon icon-teal"><i class="fa-solid fa-id-card"></i></div>
+                        <div class="tile-label">Bus pass</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nearest Stop -->
+            <div class="section" style="padding-bottom:80px;">
+                <div class="section-head">
+                    <span class="section-title">Nearest bus stop</span>
+                </div>
+
+                <div class="stop-card">
+                    <div class="stop-card-head">
+                        <div class="stop-id-pill">
+                            <div class="stop-dot"><i class="fa-solid fa-bus" style="font-size:.7rem;"></i></div>
+                            <span class="stop-name">Dawa Bazaar</span>
+                        </div>
+                        <div class="stop-walk"><i class="fa-solid fa-person-walking"></i> 6 min</div>
+                    </div>
+
+                    <div
+                        style="padding: 8px 18px 2px; font-size:0.7rem; font-weight:800; color:var(--text-500); text-transform:uppercase; letter-spacing:.7px;">
+                        Next Buses
+                    </div>
+
+                    <div class="bus-rows" id="dynamic-bus-list">
+                        <div class="bus-row" onclick="showMapPanel()">
+                            <div class="bus-row-left">
+                                <i class="bus-row-icon fa-solid fa-bus-simple"></i>
+                                <div>
+                                    <div class="bus-num">M-22</div>
+                                    <div class="bus-dir">To Rajwada Circle</div>
+                                </div>
+                            </div>
+                            <div class="bus-time">10:00 PM</div>
+                        </div>
+                        <div class="bus-row" onclick="showMapPanel()">
+                            <div class="bus-row-left">
+                                <i class="bus-row-icon fa-solid fa-bus-simple"></i>
+                                <div>
+                                    <div class="bus-num">C-4(M-34)</div>
+                                    <div class="bus-dir">To Aurobindo</div>
+                                </div>
+                            </div>
+                            <div class="bus-time na">Timing not available</div>
+                        </div>
+                    </div>
+
+                    <div class="see-all-row">
+                        <a onclick="showMapPanel(); return false;" href="#">See all buses</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom CTA -->
+            <button class="bottom-cta" onclick="showMapPanel()">
+                <i class="fa-solid fa-map-location-dot"></i>
+                SEE ALL BUSES AROUND YOU
+            </button>
+
+        </div><!-- /page-wrap -->
+    </div><!-- /home-feed-panel -->
+
+
+    <!-- ════ LIVE MAP PANEL ═════════════════════ -->
+    <div id="live-map-panel" style="display:none;">
+
+        <header class="map-topbar">
+            <button class="map-back-btn" onclick="showFeedPanel()">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <span class="map-title" id="commuter-phone-display">Live Tracking</span>
+
+            <div class="map-actions">
+                <button class="map-icon-btn" id="layers-btn" title="Map style" onclick="toggleLayerPanel()">
+                    <i class="fa-solid fa-layer-group"></i>
+                </button>
+                <button class="map-icon-btn" id="traffic-btn" title="Traffic" onclick="toggleTraffic()">
+                    <i class="fa-solid fa-traffic-light"></i>
+                </button>
+            </div>
+        </header>
+
+        <div id="map"></div>
+
+        <!-- Layer panel -->
+        <div class="layer-panel" id="layer-panel">
+            <div class="layer-eyebrow">Map Style</div>
+            <div class="layer-item active" onclick="setTile('standard',this)">
+                <div class="layer-swatch" style="background:var(--brand-amber);"></div> Standard
+            </div>
+            <div class="layer-item" onclick="setTile('satellite',this)">
+                <div class="layer-swatch" style="background:#0f9d58;"></div> Satellite
+            </div>
+            <div class="layer-item" onclick="setTile('topo',this)">
+                <div class="layer-swatch" style="background:#f9ab00;"></div> Terrain
+            </div>
+            <div class="layer-item" onclick="setTile('dark',this)">
+                <div class="layer-swatch" style="background:var(--text-100);"></div> Dark
+            </div>
+        </div>
+
+        <!-- Float controls -->
+        <div class="map-float-group">
+            <div class="float-btns">
+                <button class="float-btn" onclick="map.zoomIn()" title="Zoom in">+</button>
+                <button class="float-btn" onclick="map.zoomOut()" title="Zoom out">−</button>
+            </div>
+            <div class="float-btns">
+                <button class="float-btn" onclick="map.setZoom(13)" title="Reset" style="font-size:.85rem;">↺</button>
+            </div>
+        </div>
+
+        <!-- Locate -->
+        <button class="locate-btn" id="locate-btn" onclick="locateMe()">
+            <i class="fa-solid fa-location-crosshairs"></i>
+        </button>
+
+        <!-- Traffic legend -->
+        <div class="traffic-legend" id="traffic-legend">
+            <div class="traffic-legend-title">Traffic</div>
+            <div class="t-item">
+                <div class="t-dot" style="background:#0f9d58;"></div> Flowing
+            </div>
+            <div class="t-item">
+                <div class="t-dot" style="background:#f9ab00;"></div> Moderate
+            </div>
+            <div class="t-item">
+                <div class="t-dot" style="background:#ea4335;"></div> Heavy
+            </div>
+        </div>
+
+        <!-- Scale -->
+        <div class="map-scale" id="map-scale">— m</div>
+
+        <!-- Map toast -->
+        <div class="map-toast" id="map-toast"></div>
+
+    </div><!-- /live-map-panel -->
+
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // ── ROUTE GUARD ──────────────────────────
+        const token = localStorage.getItem('getgo_token');
+        const role = localStorage.getItem('getgo_role');
+        const phone = localStorage.getItem('getgo_phone');
+
+        if (!token || role !== 'commuter') handleLogout();
+
+        if (phone) {
+            document.getElementById('commuter-phone-display').textContent = `Live: +91 ${phone.slice(-10)}`;
+        }
+
+        // ── PANEL SWITCH ─────────────────────────
+        function showMapPanel() {
+            document.getElementById('home-feed-panel').style.display = 'none';
+            document.getElementById('live-map-panel').style.display = 'block';
+            if (map) setTimeout(() => map.invalidateSize(), 150);
+        }
+
+        function showFeedPanel() {
+            document.getElementById('home-feed-panel').style.display = 'block';
+            document.getElementById('live-map-panel').style.display = 'none';
+        }
+
+        // ── MAP STATE ────────────────────────────
+        let map, tileLayer, userMarker;
+        const busMarkers = new Map();
+        let isFirstLoad = true;
+        let trafficOn = false;
+        let trafficLayer = null;
+
+        const TILES = {
+            standard: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            satellite: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+            topo: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+            dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        };
+
+        // ── MAP INIT ─────────────────────────────
+        function initMap() {
+            map = L.map('map', {
+                center: [22.7196, 75.8577],
+                zoom: 13,
+                zoomControl: false,
+                attributionControl: false
+            });
+            tileLayer = L.tileLayer(TILES.standard, { maxZoom: 19 }).addTo(map);
+            map.on('click', () => document.getElementById('layer-panel').classList.remove('open'));
+            map.on('zoomend moveend', updateScale);
+            map.whenReady(updateScale);
+            locateMe();
+        }
+
+        // Scale
+        function updateScale() {
+            const zoom = map.getZoom();
+            const m = Math.round(156543.03392 * Math.cos(map.getCenter().lat * Math.PI / 180) / Math.pow(2, zoom) * 100);
+            document.getElementById('map-scale').textContent = m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${m} m`;
+        }
+
+        // ── MAP TOAST ────────────────────────────
+        let _mToastT;
+        function showMapToast(msg) {
+            const el = document.getElementById('map-toast');
+            el.textContent = msg; el.classList.add('show');
+            clearTimeout(_mToastT);
+            _mToastT = setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        // ── LOCATE ───────────────────────────────
+        function locateMe(fly = true) {
+            const btn = document.getElementById('locate-btn');
+            btn.classList.add('locating');
+            if (!navigator.geolocation) { showMapToast('Geolocation not supported'); btn.classList.remove('locating'); return; }
+
+            navigator.geolocation.getCurrentPosition(pos => {
+                const { latitude: lat, longitude: lng } = pos.coords;
+                btn.classList.remove('locating');
+                if (userMarker) map.removeLayer(userMarker);
+
+                const icon = L.divIcon({
+                    html: `<div style="position:relative;width:20px;height:20px;">
+          <div style="position:absolute;inset:0;border-radius:50%;background:rgba(14,165,160,.2);animation:locate-pulse 1.5s infinite;"></div>
+          <div style="position:absolute;inset:3px;border-radius:50%;background:#0EA5A0;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.25);"></div>
+        </div>`,
+                    className: '', iconSize: [20, 20], iconAnchor: [10, 10]
+                });
+                userMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 }).addTo(map);
+                userMarker.bindPopup('<b style="font-family:\'Plus Jakarta Sans\',sans-serif;">You are here</b>').openPopup();
+                if (fly) map.flyTo([lat, lng], 16, { duration: 1.2 });
+                else map.setView([lat, lng], 15);
+            }, () => { btn.classList.remove('locating'); showMapToast('Location access denied'); },
+                { enableHighAccuracy: true, timeout: 8000 });
+        }
+
+        // ── TILES & TRAFFIC ──────────────────────
+        function setTile(name, el) {
+            document.querySelectorAll('.layer-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            map.removeLayer(tileLayer);
+            tileLayer = L.tileLayer(TILES[name] || TILES.standard, { maxZoom: 19 }).addTo(map);
+            document.getElementById('layer-panel').classList.remove('open');
+            document.getElementById('layers-btn').classList.toggle('active', name !== 'standard');
+        }
+
+        function toggleLayerPanel() {
+            document.getElementById('layer-panel').classList.toggle('open');
+        }
+
+        function toggleTraffic() {
+            trafficOn = !trafficOn;
+            const btn = document.getElementById('traffic-btn');
+            const legend = document.getElementById('traffic-legend');
+            if (trafficOn) {
+                trafficLayer = L.tileLayer(TILES.standard, { maxZoom: 19, opacity: .4 }).addTo(map);
+                btn.classList.add('active'); legend.classList.add('visible');
+                showMapToast('Traffic layer enabled');
+            } else {
+                if (trafficLayer) { map.removeLayer(trafficLayer); trafficLayer = null; }
+                btn.classList.remove('active'); legend.classList.remove('visible');
+            }
+        }
+
+        // Close layer panel on outside click
+        document.addEventListener('click', e => {
+            const panel = document.getElementById('layer-panel');
+            const btn = document.getElementById('layers-btn');
+            if (panel.classList.contains('open') && !panel.contains(e.target) && !btn.contains(e.target)) {
+                panel.classList.remove('open');
+            }
+        });
+
+        // ── BUS PIN ──────────────────────────────
+        function createBusPin(busId) {
+            return L.divIcon({
+                html: `<div style="position:relative;display:inline-block;transform:translate(-50%,-100%);pointer-events:none;">
+        <div style="background:linear-gradient(135deg,#F5A623,#E07B00);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;
+          font-size:11px;font-weight:800;padding:6px 11px;border-radius:8px;white-space:nowrap;
+          box-shadow:0 4px 12px rgba(224,123,0,.4);border:1px solid rgba(255,255,255,.2);pointer-events:auto;">
+          ${busId}
+          <div style="position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);
+            width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;
+            border-top:5px solid #E07B00;"></div>
+        </div>
+      </div>`,
+                className: 'bus-pin',
+                iconSize: [0, 0], iconAnchor: [0, 0], popupAnchor: [0, -35]
+            });
+        }
+
+        // ── LIVE FETCH ───────────────────────────
+        async function fetchLiveLocations() {
+            try {
+                const res = await fetch('/api/bus/active', { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                if (data.success) updateMarkers(data.activeBuses);
+            } catch { }
+        }
+
+        function updateMarkers(buses) {
+            const current = new Set();
+            const latLngs = [];
+
+            // Feed list
+            const listEl = document.getElementById('dynamic-bus-list');
+            if (listEl) {
+                if (!buses.length) {
+                    listEl.innerHTML = `
+          <div class="bus-row" onclick="showMapPanel()">
+            <div class="bus-row-left"><i class="bus-row-icon fa-solid fa-bus-simple"></i>
+              <div><div class="bus-num">M-22</div><div class="bus-dir">To Rajwada Circle</div></div>
+            </div>
+            <div class="bus-time">10:00 PM</div>
+          </div>
+          <div class="bus-row" onclick="showMapPanel()">
+            <div class="bus-row-left"><i class="bus-row-icon fa-solid fa-bus-simple"></i>
+              <div><div class="bus-num">C-4(M-34)</div><div class="bus-dir">To Aurobindo</div></div>
+            </div>
+            <div class="bus-time na">Timing not available</div>
+          </div>`;
+                } else {
+                    listEl.innerHTML = buses.map(b => `
+          <div class="bus-row" onclick="showMapPanel()">
+            <div class="bus-row-left">
+              <i class="bus-row-icon fa-solid fa-bus-simple" style="color:var(--brand-amber);"></i>
+              <div><div class="bus-num">${b.busId}</div><div class="bus-dir">Live Tracking Active</div></div>
+            </div>
+            <div class="live-pill"><div class="live-dot"></div> LIVE</div>
+          </div>`).join('');
+                }
+            }
+
+            buses.forEach(bus => {
+                if (!bus.coordinates) return;
+                const { latitude: lat, longitude: lng } = bus.coordinates;
+                const id = bus.busId;
+                current.add(id);
+                latLngs.push([lat, lng]);
+
+                const elapsed = Math.round((Date.now() - new Date(bus.lastUpdated)) / 1000);
+                const updated = elapsed < 60 ? `${elapsed}s ago` : `${Math.round(elapsed / 60)}m ago`;
+                const popup = `<div style="font-family:'Plus Jakarta Sans',sans-serif;padding:4px;min-width:170px;">
+        <div style="font-weight:800;font-size:.9rem;color:var(--brand-deep);margin-bottom:6px;">🚌 Bus: ${id}</div>
+        <div style="font-size:.78rem;color:var(--text-200);margin-bottom:2px;"><b>Driver:</b> +91 ${bus.phone ? bus.phone.slice(-10) : 'N/A'}</div>
+        <div style="font-size:.78rem;color:var(--text-200);margin-bottom:2px;"><b>Started:</b> ${new Date(bus.startTime).toLocaleTimeString()}</div>
+        <div style="font-size:.72rem;color:var(--text-400);margin-top:4px;"><b>Updated:</b> ${updated}</div>
+      </div>`;
+
+                if (busMarkers.has(id)) {
+                    busMarkers.get(id).setLatLng([lat, lng]).setPopupContent(popup);
+                } else {
+                    const m = L.marker([lat, lng], { icon: createBusPin(id) }).bindPopup(popup).addTo(map);
+                    busMarkers.set(id, m);
+                    showMapToast(`Active bus detected: ${id}`);
+                }
+            });
+
+            for (const [id, m] of busMarkers.entries()) {
+                if (!current.has(id)) {
+                    map.removeLayer(m); busMarkers.delete(id);
+                    showMapToast(`Trip ended: ${id}`);
+                }
+            }
+
+            if (isFirstLoad && latLngs.length) {
+                map.fitBounds(L.latLngBounds(latLngs), { padding: [50, 50] });
+                isFirstLoad = false;
+            }
+        }
+
+        // ── LOGOUT ───────────────────────────────
+        function handleLogout() {
+            localStorage.clear();
+            window.location.href = 'commuter-login.html';
+        }
+
+        // ── INIT ─────────────────────────────────
+        initMap();
+        fetchLiveLocations();
+        setInterval(fetchLiveLocations, 10000);
+    </script>
+</body>
+
+</html>

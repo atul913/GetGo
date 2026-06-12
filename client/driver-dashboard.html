@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GetGo — Driver Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        /* ─ MAP PANEL ──────────────────────────── */
+        #live-map-panel {
+            position: fixed;
+            inset: 0;
+            z-index: 500;
+            background: #fff;
+        }
+
+        .map-topbar {
+            height: 56px;
+            background: #fff;
+            border-bottom: 1.5px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 14px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 900;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .map-back-btn {
+            width: 34px;
+            height: 34px;
+            background: var(--surface-1);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: var(--text-100);
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .map-back-btn:hover {
+            background: var(--surface-2);
+        }
+
+        .map-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-100);
+        }
+
+        .map-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 6px;
+        }
+
+        .map-icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--r-full);
+            border: 1.5px solid var(--border);
+            background: var(--surface-0);
+            color: var(--text-200);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background .15s, color .15s, border-color .15s;
+        }
+
+        .map-icon-btn.active {
+            background: #D1FAE5;
+            color: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .map-icon-btn:hover {
+            background: var(--surface-1);
+        }
+
+        #map {
+            position: absolute;
+            inset: 56px 0 0 0;
+            z-index: 1;
+        }
+
+        /* Layer panel */
+        .layer-panel {
+            position: absolute;
+            top: 68px;
+            right: 12px;
+            z-index: 850;
+            background: var(--surface-0);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r-md);
+            box-shadow: var(--shadow-lg);
+            padding: 8px;
+            display: none;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 150px;
+        }
+
+        .layer-panel.open {
+            display: flex;
+        }
+
+        .layer-eyebrow {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--text-500);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 4px 8px 6px;
+        }
+
+        .layer-item {
+            padding: 9px 10px;
+            border-radius: var(--r-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 0.83rem;
+            font-weight: 600;
+            color: var(--text-400);
+            transition: background .1s, color .1s;
+        }
+
+        .layer-item:hover {
+            background: var(--surface-1);
+            color: var(--text-100);
+        }
+
+        .layer-item.active {
+            background: #D1FAE5;
+            color: var(--accent-green);
+        }
+
+        .layer-swatch {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* Map float controls */
+        .map-float-group {
+            position: absolute;
+            right: 12px;
+            bottom: 84px;
+            z-index: 800;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .float-btns {
+            background: var(--surface-0);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r-md);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .float-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-100);
+            font-size: 1.1rem;
+            font-weight: 700;
+            transition: background .1s;
+        }
+
+        .float-btn:hover {
+            background: var(--surface-1);
+        }
+
+        .float-btn+.float-btn {
+            border-top: 1.5px solid var(--border);
+        }
+
+        .locate-btn {
+            position: absolute;
+            right: 12px;
+            bottom: 24px;
+            z-index: 800;
+            width: 46px;
+            height: 46px;
+            border-radius: var(--r-full);
+            background: var(--surface-0);
+            border: 1.5px solid var(--border);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--accent-teal);
+            font-size: 1rem;
+            transition: background .15s, transform .15s;
+        }
+
+        .locate-btn:hover {
+            background: #CCFBF1;
+            transform: scale(1.05);
+        }
+
+        .locate-btn.locating {
+            animation: locate-pulse 1.2s infinite;
+        }
+
+        @keyframes locate-pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(14, 165, 160, .4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(14, 165, 160, 0);
+            }
+        }
+
+        /* Traffic legend */
+        .traffic-legend {
+            position: absolute;
+            bottom: 84px;
+            right: 60px;
+            z-index: 800;
+            background: var(--surface-0);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r-md);
+            box-shadow: var(--shadow-md);
+            padding: 10px 14px;
+            display: none;
+            flex-direction: column;
+            gap: 7px;
+            min-width: 120px;
+        }
+
+        .traffic-legend.visible {
+            display: flex;
+        }
+
+        .traffic-legend-title {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--text-500);
+            text-transform: uppercase;
+            letter-spacing: .6px;
+        }
+
+        .t-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78rem;
+            color: var(--text-400);
+            font-weight: 600;
+        }
+
+        .t-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* Map scale */
+        .map-scale {
+            position: absolute;
+            left: 12px;
+            bottom: 14px;
+            z-index: 800;
+            background: var(--surface-0);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r-sm);
+            padding: 4px 10px;
+            font-size: 10px;
+            color: var(--text-400);
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Map toast */
+        .map-toast {
+            position: absolute;
+            bottom: 84px;
+            left: 50%;
+            transform: translateX(-50%) translateY(14px);
+            background: var(--text-100);
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: var(--r-full);
+            font-size: 0.82rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: all .25s;
+            pointer-events: none;
+            z-index: 9999;
+            white-space: nowrap;
+        }
+
+        .map-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Popup */
+        .leaflet-popup-content-wrapper {
+            background: var(--surface-0) !important;
+            border: 1.5px solid var(--border) !important;
+            border-radius: var(--r-md) !important;
+            box-shadow: var(--shadow-lg) !important;
+            color: var(--text-100) !important;
+        }
+
+        .leaflet-popup-tip {
+            background: var(--surface-0) !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dash-wrap" id="home-feed-panel">
+
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-logo">
+                <i class="fa-solid fa-bus-simple"></i> GetGo <span class="badge">DRIVER</span>
+            </div>
+            <button class="topbar-action" onclick="handleLogout()" title="Logout">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </header>
+
+        <div class="dash-body">
+
+            <!-- Main card -->
+            <div class="dash-card">
+                <div class="dash-card-head">
+                    <div class="dash-title">Driver Panel</div>
+                    <div class="dash-phone" id="driver-phone-display">+91 ——— ———</div>
+                </div>
+                <div class="dash-sub">Manage your active bus trip and transmit GPS tracking coordinates to live
+                    commuters.</div>
+
+                <!-- Status row -->
+                <div class="status-row">
+                    <div class="status-indicator off" id="status-dot"></div>
+                    <div>
+                        <div class="status-label" id="status-text">System Offline</div>
+                        <div class="status-sub" id="status-subtext">Trip has not been started yet.</div>
+                    </div>
+                </div>
+
+                <!-- Pre-trip form -->
+                <div id="trip-config-form">
+                    <div class="field-group">
+                        <label class="form-label">Bus / Vehicle Code</label>
+                        <input type="text" id="bus-id" class="field" placeholder="e.g. MH12-AB-9876 or BUS-101">
+                    </div>
+                    <button class="btn btn-primary" id="trip-btn" onclick="handleStartTrip()">
+                        <span>Start Live Trip</span> <i class="fa-solid fa-play"></i>
+                    </button>
+                </div>
+
+                <!-- Live stats (hidden until trip active) -->
+                <div id="live-trip-stats" class="hidden">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+                        <div class="live-dot"></div>
+                        <span style="font-weight:800; font-size:0.9rem; color:var(--accent-green);">Broadcasting
+                            Coordinates</span>
+                    </div>
+
+                    <div class="coord-grid">
+                        <div class="coord-card">
+                            <span class="coord-label">Latitude</span>
+                            <span class="coord-value" id="stat-lat">0.000000</span>
+                        </div>
+                        <div class="coord-card">
+                            <span class="coord-label">Longitude</span>
+                            <span class="coord-value" id="stat-lon">0.000000</span>
+                        </div>
+                    </div>
+
+                    <div class="log-wrap">
+                        <div class="log-eyebrow">Broadcast Log</div>
+                        <div class="log-box" id="log-box">
+                            <div>[system] ready to transmit…</div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-danger" onclick="handleEndTrip()">
+                        <span>End Trip &amp; Stop</span> <i class="fa-solid fa-stop"></i>
+                    </button>
+                </div>
+
+                <div id="msg" class="msg-box"></div>
+            </div>
+
+
+            <button class="bottom-cta" onclick="showMapPanel()">
+                <i class="fa-solid fa-map-location-dot"></i>
+                SEE LIVE ROUTES ON MAP
+            </button>
+
+        </div>
+    </div>
+
+
+    <!-- ════ LIVE MAP PANEL ═════════════════════ -->
+    <div id="live-map-panel" style="display:none;">
+
+        <header class="map-topbar">
+            <button class="map-back-btn" onclick="showFeedPanel()">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <span class="map-title" id="driver-map-title">Live Tracking</span>
+
+            <div class="map-actions">
+                <button class="map-icon-btn" id="layers-btn" title="Map style" onclick="toggleLayerPanel()">
+                    <i class="fa-solid fa-layer-group"></i>
+                </button>
+                <button class="map-icon-btn" id="traffic-btn" title="Traffic" onclick="toggleTraffic()">
+                    <i class="fa-solid fa-traffic-light"></i>
+                </button>
+            </div>
+        </header>
+
+        <div id="map"></div>
+
+        <!-- Layer panel -->
+        <div class="layer-panel" id="layer-panel">
+            <div class="layer-eyebrow">Map Style</div>
+            <div class="layer-item active" onclick="setTile('standard',this)">
+                <div class="layer-swatch" style="background:var(--brand-amber);"></div> Standard
+            </div>
+            <div class="layer-item" onclick="setTile('satellite',this)">
+                <div class="layer-swatch" style="background:#0f9d58;"></div> Satellite
+            </div>
+            <div class="layer-item" onclick="setTile('topo',this)">
+                <div class="layer-swatch" style="background:#f9ab00;"></div> Terrain
+            </div>
+            <div class="layer-item" onclick="setTile('dark',this)">
+                <div class="layer-swatch" style="background:var(--text-100);"></div> Dark
+            </div>
+        </div>
+
+        <!-- Float controls -->
+        <div class="map-float-group">
+            <div class="float-btns">
+                <button class="float-btn" onclick="map.zoomIn()" title="Zoom in">+</button>
+                <button class="float-btn" onclick="map.zoomOut()" title="Zoom out">−</button>
+            </div>
+            <div class="float-btns">
+                <button class="float-btn" onclick="map.setZoom(13)" title="Reset" style="font-size:.85rem;">↺</button>
+            </div>
+        </div>
+
+        <!-- Locate -->
+        <button class="locate-btn" id="locate-btn" onclick="locateMe()">
+            <i class="fa-solid fa-location-crosshairs"></i>
+        </button>
+
+        <!-- Traffic legend -->
+        <div class="traffic-legend" id="traffic-legend">
+            <div class="traffic-legend-title">Traffic</div>
+            <div class="t-item">
+                <div class="t-dot" style="background:#0f9d58;"></div> Flowing
+            </div>
+            <div class="t-item">
+                <div class="t-dot" style="background:#f9ab00;"></div> Moderate
+            </div>
+            <div class="t-item">
+                <div class="t-dot" style="background:#ea4335;"></div> Heavy
+            </div>
+        </div>
+
+        <!-- Scale -->
+        <div class="map-scale" id="map-scale">— m</div>
+
+        <!-- Map toast -->
+        <div class="map-toast" id="map-toast"></div>
+
+    </div><!-- /live-map-panel -->
+
+    <!-- Toast -->
+    <div class="toast-wrap">
+        <div class="toast" id="toast"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Route protection check
+        const token = localStorage.getItem("getgo_token");
+        const role = localStorage.getItem("getgo_role");
+        const phone = localStorage.getItem("getgo_phone");
+
+        if (!token || role !== "driver") {
+            handleLogout();
+        }
+
+        // Display logged-in user phone
+        if (phone) {
+            document.getElementById("driver-phone-display").innerText = `+91 ${phone}`;
+        }
+
+        let watchId = null;
+        let activeBusId = "";
+        // ── PANEL SWITCH ─────────────────────────
+        function showMapPanel() {
+            document.getElementById('home-feed-panel').style.display = 'none';
+            document.getElementById('live-map-panel').style.display = 'block';
+            if (map) setTimeout(() => map.invalidateSize(), 150);
+        }
+
+        function showFeedPanel() {
+            document.getElementById('home-feed-panel').style.display = 'block';
+            document.getElementById('live-map-panel').style.display = 'none';
+        }
+
+        // ── MAP STATE ────────────────────────────
+        let map, tileLayer, userMarker;
+        const busMarkers = new Map();
+        let isFirstLoad = true;
+        let trafficOn = false;
+        let trafficLayer = null;
+
+        const TILES = {
+            standard: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            satellite: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+            topo: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+            dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        };
+
+        // ── MAP INIT ─────────────────────────────
+        function initMap() {
+            map = L.map('map', {
+                center: [22.7196, 75.8577],
+                zoom: 13,
+                zoomControl: false,
+                attributionControl: false
+            });
+            tileLayer = L.tileLayer(TILES.standard, { maxZoom: 19 }).addTo(map);
+            map.on('click', () => document.getElementById('layer-panel').classList.remove('open'));
+            map.on('zoomend moveend', updateScale);
+            map.whenReady(updateScale);
+            locateMe();
+        }
+
+        // Scale
+        function updateScale() {
+            const zoom = map.getZoom();
+            const m = Math.round(156543.03392 * Math.cos(map.getCenter().lat * Math.PI / 180) / Math.pow(2, zoom) * 100);
+            document.getElementById('map-scale').textContent = m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${m} m`;
+        }
+
+        // ── MAP TOAST ────────────────────────────
+        let _mToastT;
+        function showMapToast(msg) {
+            const el = document.getElementById('map-toast');
+            el.textContent = msg; el.classList.add('show');
+            clearTimeout(_mToastT);
+            _mToastT = setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        // ── LOCATE ───────────────────────────────
+        function updateDriverLocationOnMap(lat, lng, fly = false) {
+            if (!map) return;
+            if (userMarker) {
+                userMarker.setLatLng([lat, lng]);
+            } else {
+                const icon = L.divIcon({
+                    html: `<div style="display: flex; flex-direction: column; align-items: center; width: 38px; height: 49px;">
+          <div style="width: 38px; height: 38px; border-radius: 50%; background: #000000; border: 2.5px solid #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 2;">
+              <i class="fa-solid fa-bus" style="color: #ffffff; font-size: 16px;"></i>
+          </div>
+          <div style="width: 2.5px; height: 12px; background: #000000; margin-top: -1px; z-index: 1;"></div>
+        </div>`,
+                    className: '',
+                    iconSize: [38, 49],
+                    iconAnchor: [19, 49],
+                    popupAnchor: [0, -42]
+                });
+                userMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 }).addTo(map);
+                userMarker.bindPopup('<b style="font-family:\'Plus Jakarta Sans\',sans-serif;">You are here</b>');
+            }
+
+            if (fly) {
+                map.flyTo([lat, lng], 16, { duration: 1.2 });
+                userMarker.openPopup();
+            } else if (isFirstLoad) {
+                map.setView([lat, lng], 16);
+                isFirstLoad = false;
+            }
+        }
+
+        function locateMe(fly = true) {
+            const btn = document.getElementById('locate-btn');
+            btn.classList.add('locating');
+            if (!navigator.geolocation) { showMapToast('Geolocation not supported'); btn.classList.remove('locating'); return; }
+
+            navigator.geolocation.getCurrentPosition(pos => {
+                const { latitude: lat, longitude: lng } = pos.coords;
+                btn.classList.remove('locating');
+                updateDriverLocationOnMap(lat, lng, fly);
+            }, () => { btn.classList.remove('locating'); showMapToast('Location access denied'); },
+                { enableHighAccuracy: true, timeout: 8000 });
+        }
+
+        // ── TILES & TRAFFIC ──────────────────────
+        function setTile(name, el) {
+            document.querySelectorAll('.layer-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            map.removeLayer(tileLayer);
+            tileLayer = L.tileLayer(TILES[name] || TILES.standard, { maxZoom: 19 }).addTo(map);
+            document.getElementById('layer-panel').classList.remove('open');
+            document.getElementById('layers-btn').classList.toggle('active', name !== 'standard');
+        }
+
+        function toggleLayerPanel() {
+            document.getElementById('layer-panel').classList.toggle('open');
+        }
+
+        function toggleTraffic() {
+            trafficOn = !trafficOn;
+            const btn = document.getElementById('traffic-btn');
+            const legend = document.getElementById('traffic-legend');
+            if (trafficOn) {
+                trafficLayer = L.tileLayer(TILES.standard, { maxZoom: 19, opacity: .4 }).addTo(map);
+                btn.classList.add('active'); legend.classList.add('visible');
+                showMapToast('Traffic layer enabled');
+            } else {
+                if (trafficLayer) { map.removeLayer(trafficLayer); trafficLayer = null; }
+                btn.classList.remove('active'); legend.classList.remove('visible');
+            }
+        }
+
+        // Close layer panel on outside click
+        document.addEventListener('click', e => {
+            const panel = document.getElementById('layer-panel');
+            const btn = document.getElementById('layers-btn');
+            if (panel.classList.contains('open') && !panel.contains(e.target) && !btn.contains(e.target)) {
+                panel.classList.remove('open');
+            }
+        });
+
+        // ── INIT ─────────────────────────────────
+        initMap();
+
+        function showToast(message, type = "success") {
+            const toastEl = document.getElementById("toast");
+            if (!toastEl) return;
+            toastEl.textContent = message;
+            toastEl.className = `toast show ${type}`;
+            setTimeout(() => {
+                toastEl.className = "toast";
+            }, 3000);
+        }
+
+        function handleLogout() {
+            localStorage.clear();
+            window.location.href = "driver-login.html";
+        }
+
+        function appendLog(message) {
+            const logBox = document.getElementById("log-box");
+            if (!logBox) return;
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement("div");
+            logEntry.innerHTML = `<span style="color: #64748b;">[${timestamp}]</span> ${message}`;
+            logBox.appendChild(logEntry);
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        // Start Trip Request
+        async function handleStartTrip(event) {
+            if (event && event.preventDefault) event.preventDefault();
+            const busInput = document.getElementById("bus-id").value.trim().toUpperCase();
+            const startBtn = document.getElementById("trip-btn");
+
+            if (!busInput) {
+                showToast("Please enter a Bus ID", "error");
+                return;
+            }
+
+            startBtn.disabled = true;
+            startBtn.innerHTML = '<span>Starting...</span> <i class="fa-solid fa-spinner fa-spin"></i>';
+
+            try {
+                const response = await fetch("/api/bus/start", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ busId: busInput })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    activeBusId = busInput;
+                    showToast(`Trip started for ${busInput}`, "success");
+
+                    // Transition Forms UI
+                    document.getElementById("trip-config-form").style.display = "none";
+                    document.getElementById("live-trip-stats").style.display = "block";
+
+                    // Update Status Indicator
+                    const statusDot = document.getElementById("status-dot");
+                    statusDot.className = "status-dot on";
+                    document.getElementById("status-text").innerText = `Active: ${busInput}`;
+                    document.getElementById("status-subtext").innerText = "Transmitting live coordinates...";
+
+                    // Initialize location tracking & polling loop
+                    startPolling();
+                } else {
+                    showToast(data.message || "Failed to start trip", "error");
+                }
+            } catch (err) {
+                console.error("Error starting trip:", err);
+                showToast("Failed to communicate with server", "error");
+            } finally {
+                startBtn.disabled = false;
+                startBtn.innerHTML = '<span>Start Live Trip</span> <i class="fa-solid fa-play"></i>';
+            }
+        }
+
+        // End Trip Request
+        async function handleEndTrip() {
+            if (!confirm(`Are you sure you want to end the trip for ${activeBusId}?`)) {
+                return;
+            }
+
+            // Stop local polling loop immediately
+            stopPolling();
+
+            try {
+                const response = await fetch("/api/bus/end", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ busId: activeBusId })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast(`Trip successfully closed.`, "success");
+                } else {
+                    showToast(data.message || "Server trip closure error.", "warning");
+                }
+            } catch (err) {
+                console.error("Error closing trip:", err);
+            } finally {
+                // Return interface state
+                document.getElementById("trip-config-form").style.display = "block";
+                document.getElementById("live-trip-stats").style.display = "none";
+
+                const statusDot = document.getElementById("status-dot");
+                statusDot.className = "status-dot off";
+                document.getElementById("status-text").innerText = "System Offline";
+                document.getElementById("status-subtext").innerText = "Trip has not been started yet.";
+
+                activeBusId = "";
+            }
+        }
+
+
+        function startPolling() {
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+            }
+
+            if (!navigator.geolocation) {
+                showToast("Geolocation not supported", "error");
+                return;
+            }
+
+            watchId = navigator.geolocation.watchPosition(
+                (position) => {
+                    sendCoordinates(
+                        position.coords.latitude,
+                        position.coords.longitude
+                    );
+                },
+                (error) => {
+                    appendLog(`GPS Error: ${error.message}`);
+                },
+                {
+                    enableHighAccuracy: true,
+                    maximumAge: 0,
+                    timeout: 10000
+                }
+            );
+        }
+
+        function stopPolling() {
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
+
+            appendLog("<span style='color: var(--danger);'>Tracking stopped.</span>");
+        }
+
+
+        // Post updates to backend API
+        async function sendCoordinates(lat, lon) {
+            // Update stats layout
+            document.getElementById("stat-lat").innerText = lat.toFixed(6);
+            document.getElementById("stat-lon").innerText = lon.toFixed(6);
+
+            // Update on map
+            updateDriverLocationOnMap(lat, lon, false);
+
+            try {
+                const response = await fetch("/api/bus/update", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        busId: activeBusId,
+                        latitude: lat,
+                        longitude: lon
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    appendLog(`Location pushed. Lat: ${lat.toFixed(5)}, Lon: ${lon.toFixed(5)}`);
+                } else {
+                    appendLog(`<span style='color: #ef4444;'>Push failed: ${data.message}</span>`);
+                }
+            } catch (err) {
+                console.error("HTTP Coordinate push error:", err);
+                appendLog("<span style='color: #ef4444;'>Connection offline. Retrying...</span>");
+            }
+        }
+    </script>
+</body>
+
+</html>

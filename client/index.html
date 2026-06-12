@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GetGo — Select Role</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="selector-wrap">
+        <div class="selector-inner">
+
+            <div class="selector-brand">
+                <div class="brand-icon"><i class="fa-solid fa-route"></i></div>
+                <div class="brand-name">GetGo</div>
+                <div class="brand-tagline">Real-time bus tracking for everyone</div>
+            </div>
+
+            <div class="selector-card">
+                <div class="selector-option" id="driverBtn">
+                    <div class="selector-opt-icon icon-amber">
+                        <i class="fa-solid fa-steering-wheel"></i>
+                    </div>
+                    <div>
+                        <div class="selector-opt-title">Driver Login</div>
+                        <div class="selector-opt-sub">Share your live location with commuters</div>
+                    </div>
+                    <div class="selector-chevron"><i class="fa-solid fa-chevron-right"></i></div>
+                </div>
+
+                <div class="selector-option" id="commuterBtn">
+                    <div class="selector-opt-icon icon-teal">
+                        <i class="fa-solid fa-person-walking"></i>
+                    </div>
+                    <div>
+                        <div class="selector-opt-title">Commuter Login</div>
+                        <div class="selector-opt-sub">Track buses and plan your journey</div>
+                    </div>
+                    <div class="selector-chevron"><i class="fa-solid fa-chevron-right"></i></div>
+                </div>
+            </div>
+
+            <p
+                style="text-align:center; margin-top:24px; font-size:0.78rem; color:rgba(255,255,255,.55); font-weight:500;">
+                Powered by live GPS tracking · Indore & beyond
+            </p>
+
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem("getgo_token");
+        const role = localStorage.getItem("getgo_role");
+
+        if (token && role === "driver") window.location.href = "driver-dashboard.html";
+        if (token && role === "commuter") window.location.href = "commuter-dashboard.html";
+
+        document.getElementById("driverBtn").addEventListener("click", () => {
+            window.location.href = "driver-login.html";
+        });
+        document.getElementById("commuterBtn").addEventListener("click", () => {
+            window.location.href = "commuter-login.html";
+        });
+    </script>
+</body>
+
+</html>
