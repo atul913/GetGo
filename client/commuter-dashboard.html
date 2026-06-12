@@ -530,10 +530,17 @@
         }
 
         // ── PANEL SWITCH ─────────────────────────
+        let isFirstMapOpen = true;
         function showMapPanel() {
             document.getElementById('home-feed-panel').style.display = 'none';
             document.getElementById('live-map-panel').style.display = 'block';
-            if (map) setTimeout(() => map.invalidateSize(), 150);
+            if (map) {
+                setTimeout(() => map.invalidateSize(), 150);
+                if (isFirstMapOpen) {
+                    locateMe(false);
+                    isFirstMapOpen = false;
+                }
+            }
         }
 
         function showFeedPanel() {
@@ -567,7 +574,6 @@
             map.on('click', () => document.getElementById('layer-panel').classList.remove('open'));
             map.on('zoomend moveend', updateScale);
             map.whenReady(updateScale);
-            locateMe();
         }
 
         // Scale
@@ -605,11 +611,10 @@
                     className: '', iconSize: [20, 20], iconAnchor: [10, 10]
                 });
                 userMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 }).addTo(map);
-                userMarker.bindPopup('<b style="font-family:\'Plus Jakarta Sans\',sans-serif;">You are here</b>').openPopup();
                 if (fly) map.flyTo([lat, lng], 16, { duration: 1.2 });
                 else map.setView([lat, lng], 15);
             }, () => { btn.classList.remove('locating'); showMapToast('Location access denied'); },
-                { enableHighAccuracy: true, timeout: 8000 });
+                { enableHighAccuracy: false, timeout: 5000, maximumAge: 10000 });
         }
 
         // ── TILES & TRAFFIC ──────────────────────

@@ -335,6 +335,15 @@
         .leaflet-popup-tip {
             background: var(--surface-0) !important;
         }
+
+        /* Override fixed positioning for Start Trip button so it stays inside the form card */
+        #trip-btn {
+            position: static !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin-top: 16px !important;
+            box-shadow: 0 4px 16px rgba(255, 111, 0, 0.3) !important;
+        }
     </style>
 </head>
 
@@ -527,11 +536,17 @@
 
         let watchId = null;
         let activeBusId = "";
-        // ── PANEL SWITCH ─────────────────────────
+        let isFirstMapOpen = true;
         function showMapPanel() {
             document.getElementById('home-feed-panel').style.display = 'none';
             document.getElementById('live-map-panel').style.display = 'block';
-            if (map) setTimeout(() => map.invalidateSize(), 150);
+            if (map) {
+                setTimeout(() => map.invalidateSize(), 150);
+                if (isFirstMapOpen) {
+                    locateMe(false);
+                    isFirstMapOpen = false;
+                }
+            }
         }
 
         function showFeedPanel() {
@@ -565,7 +580,6 @@
             map.on('click', () => document.getElementById('layer-panel').classList.remove('open'));
             map.on('zoomend moveend', updateScale);
             map.whenReady(updateScale);
-            locateMe();
         }
 
         // Scale
@@ -603,12 +617,10 @@
                     popupAnchor: [0, -42]
                 });
                 userMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 }).addTo(map);
-                userMarker.bindPopup('<b style="font-family:\'Plus Jakarta Sans\',sans-serif;">You are here</b>');
             }
 
             if (fly) {
                 map.flyTo([lat, lng], 16, { duration: 1.2 });
-                userMarker.openPopup();
             } else if (isFirstLoad) {
                 map.setView([lat, lng], 16);
                 isFirstLoad = false;
@@ -625,7 +637,7 @@
                 btn.classList.remove('locating');
                 updateDriverLocationOnMap(lat, lng, fly);
             }, () => { btn.classList.remove('locating'); showMapToast('Location access denied'); },
-                { enableHighAccuracy: true, timeout: 8000 });
+                { enableHighAccuracy: false, timeout: 5000, maximumAge: 10000 });
         }
 
         // ── TILES & TRAFFIC ──────────────────────
@@ -724,8 +736,8 @@
                     showToast(`Trip started for ${busInput}`, "success");
 
                     // Transition Forms UI
-                    document.getElementById("trip-config-form").style.display = "none";
-                    document.getElementById("live-trip-stats").style.display = "block";
+                    document.getElementById("trip-config-form").classList.add("hidden");
+                    document.getElementById("live-trip-stats").classList.remove("hidden");
 
                     // Update Status Indicator
                     const statusDot = document.getElementById("status-dot");
@@ -777,8 +789,8 @@
                 console.error("Error closing trip:", err);
             } finally {
                 // Return interface state
-                document.getElementById("trip-config-form").style.display = "block";
-                document.getElementById("live-trip-stats").style.display = "none";
+                document.getElementById("trip-config-form").classList.remove("hidden");
+                document.getElementById("live-trip-stats").classList.add("hidden");
 
                 const statusDot = document.getElementById("status-dot");
                 statusDot.className = "status-dot off";
