@@ -21,7 +21,7 @@
 
         .map-topbar {
             height: 56px;
-            background: #fff;
+            background: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
             border-bottom: 1.5px solid var(--border);
             display: flex;
             align-items: center;
@@ -95,6 +95,25 @@
             position: absolute;
             inset: 56px 0 0 0;
             z-index: 1;
+        }
+
+        .stop-pin-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #000000 !important;
+            border: 2px solid #FFFFFF !important;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .stop-pin-icon:hover {
+            transform: scale(1.25) !important;
+            background: #000000 !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4) !important;
         }
 
         /* Layer panel */
@@ -304,11 +323,12 @@
         /* Map toast */
         .map-toast {
             position: absolute;
-            bottom: 84px;
+            top: 84px;
             left: 50%;
             transform: translateX(-50%) translateY(14px);
-            background: var(--text-100);
-            color: #fff;
+            background-color: #ffffff;
+            border: 1px solid var(--border);
+            color: var(--text-100);
             padding: 10px 18px;
             border-radius: var(--r-full);
             font-size: 0.82rem;
@@ -349,7 +369,7 @@
             <!-- Topbar -->
             <header class="topbar">
                 <div class="topbar-profile" id="topbarProfileBtn" onclick="openSidePanel()">
-                    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>"
+                    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2371717A'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>"
                         id="topbarProfileImg" alt="Profile">
                 </div>
                 <div class="topbar-logo">
@@ -393,17 +413,16 @@
                     <span class="section-title"
                         style="font-size: 1.15rem; font-weight: 850; color: #000000; letter-spacing: -0.2px;">Nearest
                         bus stop</span>
-                    <a class="see-all-link" href="#" onclick="showMapPanel(); return false;">See all stops <span
+                    <a class="see-all-link" href="#" onclick="showMapPanel(true); return false;">See all stops <span
                             class="chevron-circle"><i class="fa-solid fa-chevron-right"></i></span></a>
                 </div>
 
                 <div class="stop-card">
-                    <div class="stop-card-head">
+                    <div class="stop-card-head" style="padding: 16px 18px;">
                         <div class="stop-id-pill">
                             <div class="stop-dot"><i class="fa-solid fa-bus" style="font-size:.7rem;"></i></div>
                             <span class="stop-name">Dawa Bazaar</span>
                         </div>
-                        <div class="stop-walk"><i class="fa-solid fa-person-walking"></i> 6 min away</div>
                     </div>
 
                     <div class="bus-rows" id="dynamic-bus-list">
@@ -444,8 +463,8 @@
                     <div class="divider-line"></div>
                 </div>
                 <div class="map-card" onclick="showMapPanel()"
-                    style="background: #ffffff; border: 1.5px solid var(--border); border-radius: var(--r-lg); padding: 8px; box-shadow: var(--shadow-sm);">
-                    <div id="feed-map" style="height: 200px; border-radius: 12px; z-index: 10;"></div>
+                    style="background: #ffffff; border: 1.5px solid var(--border); border-radius: var(--r-sm); padding: 8px; box-shadow: var(--shadow-sm);">
+                    <div id="feed-map" style="height: 200px; border-radius: var(--r-sm); z-index: 10;"></div>
                 </div>
             </div>
 
@@ -549,11 +568,19 @@
 
         // ── PANEL SWITCH ─────────────────────────
         let isFirstMapOpen = true;
-        function showMapPanel() {
+        let showStopsOnMap = false;
+        function showMapPanel(showStops = false) {
+            showStopsOnMap = showStops;
             document.getElementById('home-feed-panel').style.display = 'none';
             document.getElementById('live-map-panel').style.display = 'block';
             if (map) {
-                setTimeout(() => map.invalidateSize(), 150);
+                setTimeout(() => {
+                    map.invalidateSize();
+                    if (map.getZoom() < 16) {
+                        map.setZoom(16);
+                    }
+                    updateStopMarkers();
+                }, 150);
                 if (isFirstMapOpen) {
                     locateMe(false);
                     isFirstMapOpen = false;
@@ -584,6 +611,8 @@
         let isFirstLoad = true;
         let trafficOn = false;
         let trafficLayer = null;
+        let allStopsList = [];
+        const stopMarkersLayer = L.layerGroup();
 
         const TILES = {
             standard: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -597,13 +626,14 @@
             // Main Live Tracking Map
             map = L.map('map', {
                 center: [22.7196, 75.8577],
-                zoom: 13,
+                zoom: 16,
                 zoomControl: false,
                 attributionControl: false
             });
             tileLayer = L.tileLayer(TILES.standard, { maxZoom: 19 }).addTo(map);
             map.on('click', () => document.getElementById('layer-panel').classList.remove('open'));
             map.on('zoomend moveend', updateScale);
+            map.on('zoomend', updateStopMarkers);
             map.whenReady(updateScale);
         }
 
@@ -657,8 +687,8 @@
                 // Update main tracking map marker
                 if (userMarker) map.removeLayer(userMarker);
                 userMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 }).addTo(map);
-                if (fly) map.flyTo([lat, lng], 16, { duration: 1.2 });
-                else map.setView([lat, lng], 15);
+                if (fly) map.flyTo([lat, lng], 17, { duration: 0.8 });
+                else map.setView([lat, lng], 16);
 
                 // Update feed mini map marker & view
                 if (feedMap) {
@@ -666,8 +696,99 @@
                     feedUserMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 }).addTo(feedMap);
                     feedMap.setView([lat, lng], 14);
                 }
+
+                // Fetch nearest stops using commuter's live location
+                fetchNearestStops(lat, lng);
             }, () => { if (btn) btn.classList.remove('locating'); showMapToast('Location access denied'); },
-                { enableHighAccuracy: false, timeout: 5000, maximumAge: 10000 });
+                { enableHighAccuracy: false, timeout: 3000, maximumAge: Infinity });
+        }
+
+        // ── BUS STOPS PROCESSING ─────────────────
+        async function fetchNearestStops(lat, lng) {
+            try {
+                const res = await fetch(`/api/stops/nearest?latitude=${lat}&longitude=${lng}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success && data.stops.length > 0) {
+                    updateNearestStopUI(data.stops, lat, lng);
+                }
+            } catch (error) {
+                console.error("fetchNearestStops error:", error);
+            }
+        }
+
+        function getDistanceMeters(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; // Earth radius in metres
+            const phi1 = lat1 * Math.PI / 180;
+            const phi2 = lat2 * Math.PI / 180;
+            const deltaPhi = (lat2 - lat1) * Math.PI / 180;
+            const deltaLambda = (lon2 - lon1) * Math.PI / 180;
+
+            const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+                Math.cos(phi1) * Math.cos(phi2) *
+                Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            return R * c; // In meters
+        }
+
+        function updateNearestStopUI(stops, userLat, userLng) {
+            const nearestStop = stops[0];
+            const distMeters = getDistanceMeters(userLat, userLng, nearestStop.latitude, nearestStop.longitude);
+            const walkingTimeMin = Math.max(1, Math.round(distMeters / 80)); // 80m per min walking speed
+
+            const stopNameEl = document.querySelector(".stop-name");
+            const stopWalkEl = document.querySelector(".stop-walk");
+
+            if (stopNameEl) stopNameEl.textContent = nearestStop.stationName;
+            if (stopWalkEl) stopWalkEl.innerHTML = `<i class="fa-solid fa-person-walking"></i> ${walkingTimeMin} min away`;
+        }
+
+        async function fetchAllStops() {
+            try {
+                const res = await fetch('/api/stops', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    allStopsList = data.stops;
+                    updateStopMarkers();
+                }
+            } catch (error) {
+                console.error("fetchAllStops error:", error);
+            }
+        }
+
+        function updateStopMarkers() {
+            if (!map) return;
+            const currentZoom = map.getZoom();
+
+            // Only render markers when zoomed in to level 15 or higher AND showStopsOnMap flag is enabled
+            if (showStopsOnMap && currentZoom >= 15) {
+                if (!map.hasLayer(stopMarkersLayer)) {
+                    stopMarkersLayer.addTo(map);
+                }
+
+                if (stopMarkersLayer.getLayers().length === 0 && allStopsList.length > 0) {
+                    allStopsList.forEach(stop => {
+                        const marker = L.marker([stop.latitude, stop.longitude], {
+                            icon: L.divIcon({
+                                html: `<div class="stop-pin-icon"><i class="fa-solid fa-bus" style="color: #FFFFFF; font-size: 9px;"></i></div>`,
+                                className: '',
+                                iconSize: [20, 20],
+                                iconAnchor: [10, 10],
+                                popupAnchor: [0, -10]
+                            })
+                        }).bindPopup(`<div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:0.85rem;color:var(--text-100);">🚏 Stop: ${stop.stationName}</div>`);
+                        stopMarkersLayer.addLayer(marker);
+                    });
+                }
+            } else {
+                if (map.hasLayer(stopMarkersLayer)) {
+                    map.removeLayer(stopMarkersLayer);
+                }
+            }
         }
 
         // ── TILES & TRAFFIC ──────────────────────
@@ -847,6 +968,7 @@
             setInterval(fetchLiveLocations, 10000);
             fetchUserProfile();
             locateMe(false); // Initial center of both maps
+            fetchAllStops();
         });
     </script>
 
@@ -900,26 +1022,36 @@
                         <span class="side-panel-item-text">Bus stops near me</span>
                         <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
                     </div>
+
+                    <span class="stop-card-divider"></span>
                     <div class="side-panel-item">
                         <i class="fa-solid fa-language side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Change language</span>
                         <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
                     </div>
+
+                    <span class="stop-card-divider"></span>
                     <div class="side-panel-item">
                         <i class="fa-solid fa-circle-exclamation side-panel-item-icon sos-icon"></i>
                         <span class="side-panel-item-text">SOS</span>
                         <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
                     </div>
+
+                    <span class="stop-card-divider"></span>
                     <div class="side-panel-item">
                         <i class="fa-solid fa-headset side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Customer support</span>
                         <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
                     </div>
+
+                    <span class="stop-card-divider"></span>
                     <div class="side-panel-item">
                         <i class="fa-solid fa-file-shield side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Manage Consent</span>
                         <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
                     </div>
+
+                    <span class="stop-card-divider"></span>
                     <div class="side-panel-item">
                         <i class="fa-solid fa-gear side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Account settings</span>
