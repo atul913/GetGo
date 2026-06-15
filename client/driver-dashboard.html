@@ -344,7 +344,7 @@
             width: 100% !important;
             max-width: 100% !important;
             margin-top: 16px !important;
-            box-shadow: 0 4px 16px rgba(255, 111, 0, 0.3) !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
         }
     </style>
 </head>
@@ -379,7 +379,7 @@
                     commuters.</div>
 
                 <!-- Status row -->
-                <div class="status-row">
+                <div class="status-row" onclick="showMapPanel()" style="cursor: pointer;">
                     <div class="status-indicator off" id="status-dot"></div>
                     <div>
                         <div class="status-label" id="status-text">System Offline</div>
@@ -435,7 +435,7 @@
 
             <button class="bottom-cta" onclick="showMapPanel()">
                 <i class="fa-solid fa-map-location-dot"></i>
-                SEE LIVE ROUTES ON MAP
+                Navigate on map
             </button>
 
         </div>
@@ -553,11 +553,19 @@
                     isFirstMapOpen = false;
                 }
             }
+            document.querySelectorAll('.bottom-nav-item').forEach(item => item.classList.remove('active'));
         }
 
         function showFeedPanel() {
             document.getElementById('home-feed-panel').style.display = 'block';
             document.getElementById('live-map-panel').style.display = 'none';
+            const homeTab = document.querySelector('.bottom-nav-item i.fa-house').parentElement;
+            updateBottomNav(homeTab);
+        }
+
+        function updateBottomNav(el) {
+            document.querySelectorAll('.bottom-nav-item').forEach(item => item.classList.remove('active'));
+            el.classList.add('active');
         }
 
         // ── MAP STATE ────────────────────────────
@@ -1106,12 +1114,20 @@
             document.getElementById("sidePanel").classList.add("open");
             document.getElementById("sidePanelOverlay").classList.add("active");
             fetchUserProfile();
+
+            // Highlight the Profile tab
+            const profileTab = document.querySelector('.bottom-nav-item i.fa-user').parentElement;
+            updateBottomNav(profileTab);
         }
 
         function closeSidePanel() {
             document.getElementById("sidePanel").classList.remove("open");
             document.getElementById("sidePanelOverlay").classList.remove("active");
             showAccountView();
+
+            // Reset to Home tab when side panel is closed
+            const homeTab = document.querySelector('.bottom-nav-item i.fa-house').parentElement;
+            updateBottomNav(homeTab);
         }
 
         function showAccountView() {

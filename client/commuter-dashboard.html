@@ -387,9 +387,14 @@
             </div>
 
             <!-- Nearest Stop -->
-            <div class="section" style="padding-bottom:80px;">
-                <div class="section-head">
-                    <span class="section-title">Nearest bus stop</span>
+            <div class="section" style="padding-bottom:12px;">
+                <div class="section-head"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                    <span class="section-title"
+                        style="font-size: 1.15rem; font-weight: 850; color: #000000; letter-spacing: -0.2px;">Nearest
+                        bus stop</span>
+                    <a class="see-all-link" href="#" onclick="showMapPanel(); return false;">See all stops <span
+                            class="chevron-circle"><i class="fa-solid fa-chevron-right"></i></span></a>
                 </div>
 
                 <div class="stop-card">
@@ -398,48 +403,55 @@
                             <div class="stop-dot"><i class="fa-solid fa-bus" style="font-size:.7rem;"></i></div>
                             <span class="stop-name">Dawa Bazaar</span>
                         </div>
-                        <div class="stop-walk"><i class="fa-solid fa-person-walking"></i> 6 min</div>
-                    </div>
-
-                    <div
-                        style="padding: 8px 18px 2px; font-size:0.7rem; font-weight:800; color:var(--text-500); text-transform:uppercase; letter-spacing:.7px;">
-                        Next Buses
+                        <div class="stop-walk"><i class="fa-solid fa-person-walking"></i> 6 min away</div>
                     </div>
 
                     <div class="bus-rows" id="dynamic-bus-list">
                         <div class="bus-row" onclick="showMapPanel()">
                             <div class="bus-row-left">
-                                <i class="bus-row-icon fa-solid fa-bus-simple"></i>
+                                <i class="bus-row-icon fa-solid fa-bus"></i>
+                                <div>
+                                    <div class="bus-num">M-22</div>
+                                    <div class="bus-dir">To Indore Railway Station</div>
+                                </div>
+                            </div>
+                            <div class="bus-time">12:15 PM</div>
+                        </div>
+                        <span class="stop-card-divider"></span>
+                        <div class="bus-row" onclick="showMapPanel()">
+                            <div class="bus-row-left">
+                                <i class="bus-row-icon fa-solid fa-bus"></i>
                                 <div>
                                     <div class="bus-num">M-22</div>
                                     <div class="bus-dir">To Rajwada Circle</div>
                                 </div>
                             </div>
-                            <div class="bus-time">10:00 PM</div>
-                        </div>
-                        <div class="bus-row" onclick="showMapPanel()">
-                            <div class="bus-row-left">
-                                <i class="bus-row-icon fa-solid fa-bus-simple"></i>
-                                <div>
-                                    <div class="bus-num">C-4(M-34)</div>
-                                    <div class="bus-dir">To Aurobindo</div>
-                                </div>
-                            </div>
-                            <div class="bus-time na">Timing not available</div>
+                            <div class="bus-time">01:00 PM</div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="see-all-row">
-                        <a onclick="showMapPanel(); return false;" href="#">See all buses</a>
-                    </div>
+                <div style="margin-top: 14px; text-align: left;">
+                    <a class="see-all-link" href="#" onclick="showMapPanel(); return false;">See all buses <span
+                            class="chevron-circle"><i class="fa-solid fa-chevron-right"></i></span></a>
                 </div>
             </div>
 
-            <!-- Bottom CTA -->
-            <button class="bottom-cta" onclick="showMapPanel()">
-                <i class="fa-solid fa-map-location-dot"></i>
-                SEE ALL BUSES AROUND YOU
-            </button>
+            <!-- Buses Around You (Mini Map) -->
+            <div class="section" style="padding-bottom: 90px; margin-top: 10px;">
+                <div class="buses-around-title-container">
+                    <h3>Buses around you</h3>
+                    <div class="divider-line"></div>
+                </div>
+                <div class="map-card" onclick="showMapPanel()"
+                    style="background: #ffffff; border: 1.5px solid var(--border); border-radius: var(--r-lg); padding: 8px; box-shadow: var(--shadow-sm);">
+                    <div id="feed-map" style="height: 200px; border-radius: 12px; z-index: 10;"></div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation Bar -->
+
+
 
         </div><!-- /page-wrap -->
     </div><!-- /home-feed-panel -->
@@ -547,16 +559,28 @@
                     isFirstMapOpen = false;
                 }
             }
+            // De-select bottom nav items when showing the full map overlay
+            document.querySelectorAll('.bottom-nav-item').forEach(item => item.classList.remove('active'));
         }
 
         function showFeedPanel() {
             document.getElementById('home-feed-panel').style.display = 'block';
             document.getElementById('live-map-panel').style.display = 'none';
+            // Sync bottom nav to Home tab
+            const homeTab = document.querySelector('.bottom-nav-item i.fa-house').parentElement;
+            updateBottomNav(homeTab);
+        }
+
+        function updateBottomNav(el) {
+            document.querySelectorAll('.bottom-nav-item').forEach(item => item.classList.remove('active'));
+            el.classList.add('active');
         }
 
         // ── MAP STATE ────────────────────────────
         let map, tileLayer, userMarker;
+        let feedMap, feedUserMarker;
         const busMarkers = new Map();
+        const feedBusMarkers = new Map();
         let isFirstLoad = true;
         let trafficOn = false;
         let trafficLayer = null;
@@ -570,6 +594,7 @@
 
         // ── MAP INIT ─────────────────────────────
         function initMap() {
+            // Main Live Tracking Map
             map = L.map('map', {
                 center: [22.7196, 75.8577],
                 zoom: 13,
@@ -580,6 +605,17 @@
             map.on('click', () => document.getElementById('layer-panel').classList.remove('open'));
             map.on('zoomend moveend', updateScale);
             map.whenReady(updateScale);
+        }
+
+        function initFeedMap() {
+            // Dashboard Mini Map
+            feedMap = L.map('feed-map', {
+                center: [22.7196, 75.8577],
+                zoom: 14,
+                zoomControl: false,
+                attributionControl: false
+            });
+            L.tileLayer(TILES.standard, { maxZoom: 19 }).addTo(feedMap);
         }
 
         // Scale
@@ -593,21 +629,22 @@
         let _mToastT;
         function showMapToast(msg) {
             const el = document.getElementById('map-toast');
-            el.textContent = msg; el.classList.add('show');
-            clearTimeout(_mToastT);
-            _mToastT = setTimeout(() => el.classList.remove('show'), 3000);
+            if (el) {
+                el.textContent = msg; el.classList.add('show');
+                clearTimeout(_mToastT);
+                _mToastT = setTimeout(() => el.classList.remove('show'), 3000);
+            }
         }
 
         // ── LOCATE ───────────────────────────────
         function locateMe(fly = true) {
             const btn = document.getElementById('locate-btn');
-            btn.classList.add('locating');
-            if (!navigator.geolocation) { showMapToast('Geolocation not supported'); btn.classList.remove('locating'); return; }
+            if (btn) btn.classList.add('locating');
+            if (!navigator.geolocation) { showMapToast('Geolocation not supported'); if (btn) btn.classList.remove('locating'); return; }
 
             navigator.geolocation.getCurrentPosition(pos => {
                 const { latitude: lat, longitude: lng } = pos.coords;
-                btn.classList.remove('locating');
-                if (userMarker) map.removeLayer(userMarker);
+                if (btn) btn.classList.remove('locating');
 
                 const icon = L.divIcon({
                     html: `<div style="position:relative;width:20px;height:20px;">
@@ -616,10 +653,20 @@
         </div>`,
                     className: '', iconSize: [20, 20], iconAnchor: [10, 10]
                 });
+
+                // Update main tracking map marker
+                if (userMarker) map.removeLayer(userMarker);
                 userMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 }).addTo(map);
                 if (fly) map.flyTo([lat, lng], 16, { duration: 1.2 });
                 else map.setView([lat, lng], 15);
-            }, () => { btn.classList.remove('locating'); showMapToast('Location access denied'); },
+
+                // Update feed mini map marker & view
+                if (feedMap) {
+                    if (feedUserMarker) feedMap.removeLayer(feedUserMarker);
+                    feedUserMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 }).addTo(feedMap);
+                    feedMap.setView([lat, lng], 14);
+                }
+            }, () => { if (btn) btn.classList.remove('locating'); showMapToast('Location access denied'); },
                 { enableHighAccuracy: false, timeout: 5000, maximumAge: 10000 });
         }
 
@@ -655,7 +702,7 @@
         document.addEventListener('click', e => {
             const panel = document.getElementById('layer-panel');
             const btn = document.getElementById('layers-btn');
-            if (panel.classList.contains('open') && !panel.contains(e.target) && !btn.contains(e.target)) {
+            if (panel && panel.classList.contains('open') && !panel.contains(e.target) && !btn.contains(e.target)) {
                 panel.classList.remove('open');
             }
         });
@@ -663,18 +710,20 @@
         // ── BUS PIN ──────────────────────────────
         function createBusPin(busId) {
             return L.divIcon({
-                html: `<div style="position:relative;display:inline-block;transform:translate(-50%,-100%);pointer-events:none;">
-        <div style="background:linear-gradient(135deg,#F5A623,#E07B00);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;
-          font-size:11px;font-weight:800;padding:6px 11px;border-radius:8px;white-space:nowrap;
-          box-shadow:0 4px 12px rgba(224,123,0,.4);border:1px solid rgba(255,255,255,.2);pointer-events:auto;">
+                html: `<div style="display: flex; flex-direction: column; align-items: center; width: 60px; height: 65px; position: relative; transform: translate(-50%, -100%); pointer-events: none;">
+        <!-- Bus ID Badge -->
+        <div style="background: #000000; color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; white-space: nowrap; margin-bottom: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.15); pointer-events: auto;">
           ${busId}
-          <div style="position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);
-            width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;
-            border-top:5px solid #E07B00;"></div>
         </div>
+        <!-- Black Circle Pin -->
+        <div style="width: 32px; height: 32px; border-radius: 50%; background: #000000; border: 2px solid #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.25); pointer-events: auto;">
+          <i class="fa-solid fa-bus" style="color: #ffffff; font-size: 13px;"></i>
+        </div>
+        <!-- Pole -->
+        <div style="width: 2px; height: 8px; background: #000000; margin-top: -1px; z-index: -1;"></div>
       </div>`,
                 className: 'bus-pin',
-                iconSize: [0, 0], iconAnchor: [0, 0], popupAnchor: [0, -35]
+                iconSize: [0, 0], iconAnchor: [0, 0], popupAnchor: [0, -45]
             });
         }
 
@@ -690,6 +739,7 @@
         function updateMarkers(buses) {
             const current = new Set();
             const latLngs = [];
+            const feedLatLngs = [];
 
             // Feed list
             const listEl = document.getElementById('dynamic-bus-list');
@@ -697,26 +747,27 @@
                 if (!buses.length) {
                     listEl.innerHTML = `
           <div class="bus-row" onclick="showMapPanel()">
-            <div class="bus-row-left"><i class="bus-row-icon fa-solid fa-bus-simple"></i>
+            <div class="bus-row-left"><i class="bus-row-icon fa-solid fa-bus"></i>
+              <div><div class="bus-num">M-22</div><div class="bus-dir">To Indore Railway Station</div></div>
+            </div>
+            <div class="bus-time">12:15 PM</div>
+          </div>
+          <span class="stop-card-divider"></span>
+          <div class="bus-row" onclick="showMapPanel()">
+            <div class="bus-row-left"><i class="bus-row-icon fa-solid fa-bus"></i>
               <div><div class="bus-num">M-22</div><div class="bus-dir">To Rajwada Circle</div></div>
             </div>
-            <div class="bus-time">10:00 PM</div>
-          </div>
-          <div class="bus-row" onclick="showMapPanel()">
-            <div class="bus-row-left"><i class="bus-row-icon fa-solid fa-bus-simple"></i>
-              <div><div class="bus-num">C-4(M-34)</div><div class="bus-dir">To Aurobindo</div></div>
-            </div>
-            <div class="bus-time na">Timing not available</div>
+            <div class="bus-time">01:00 PM</div>
           </div>`;
                 } else {
                     listEl.innerHTML = buses.map(b => `
           <div class="bus-row" onclick="showMapPanel()">
             <div class="bus-row-left">
-              <i class="bus-row-icon fa-solid fa-bus-simple" style="color:var(--brand-amber);"></i>
+              <i class="bus-row-icon fa-solid fa-bus" style="color:var(--brand-amber);"></i>
               <div><div class="bus-num">${b.busId}</div><div class="bus-dir">Live Tracking Active</div></div>
             </div>
             <div class="live-pill"><div class="live-dot"></div> LIVE</div>
-          </div>`).join('');
+          </div>`).join('<span class="stop-card-divider"></span>');
                 }
             }
 
@@ -726,6 +777,7 @@
                 const id = bus.busId;
                 current.add(id);
                 latLngs.push([lat, lng]);
+                feedLatLngs.push([lat, lng]);
 
                 const elapsed = Math.round((Date.now() - new Date(bus.lastUpdated)) / 1000);
                 const updated = elapsed < 60 ? `${elapsed}s ago` : `${Math.round(elapsed / 60)}m ago`;
@@ -736,6 +788,7 @@
         <div style="font-size:.72rem;color:var(--text-400);margin-top:4px;"><b>Updated:</b> ${updated}</div>
       </div>`;
 
+                // Main map update
                 if (busMarkers.has(id)) {
                     busMarkers.get(id).setLatLng([lat, lng]).setPopupContent(popup);
                 } else {
@@ -743,17 +796,38 @@
                     busMarkers.set(id, m);
                     showMapToast(`Active bus detected: ${id}`);
                 }
+
+                // Feed mini-map update
+                if (feedMap) {
+                    if (feedBusMarkers.has(id)) {
+                        feedBusMarkers.get(id).setLatLng([lat, lng]);
+                    } else {
+                        const m = L.marker([lat, lng], { icon: createBusPin(id) }).addTo(feedMap);
+                        feedBusMarkers.set(id, m);
+                    }
+                }
             });
 
+            // Cleanup removed bus markers
             for (const [id, m] of busMarkers.entries()) {
                 if (!current.has(id)) {
                     map.removeLayer(m); busMarkers.delete(id);
                     showMapToast(`Trip ended: ${id}`);
                 }
             }
+            if (feedMap) {
+                for (const [id, m] of feedBusMarkers.entries()) {
+                    if (!current.has(id)) {
+                        feedMap.removeLayer(m); feedBusMarkers.delete(id);
+                    }
+                }
+            }
 
             if (isFirstLoad && latLngs.length) {
                 map.fitBounds(L.latLngBounds(latLngs), { padding: [50, 50] });
+                if (feedMap && feedLatLngs.length) {
+                    feedMap.fitBounds(L.latLngBounds(feedLatLngs), { padding: [30, 30] });
+                }
                 isFirstLoad = false;
             }
         }
@@ -767,9 +841,11 @@
         // ── INIT ─────────────────────────────────
         window.addEventListener("DOMContentLoaded", () => {
             initMap();
+            initFeedMap();
             fetchLiveLocations();
             setInterval(fetchLiveLocations, 10000);
             fetchUserProfile();
+            locateMe(false); // Initial center of both maps
         });
     </script>
 
@@ -977,12 +1053,20 @@
             document.getElementById("sidePanel").classList.add("open");
             document.getElementById("sidePanelOverlay").classList.add("active");
             fetchUserProfile();
+
+            // Highlight the My Tickets tab
+            const ticketsTab = document.querySelector('.bottom-nav-item i.fa-ticket').parentElement;
+            updateBottomNav(ticketsTab);
         }
 
         function closeSidePanel() {
             document.getElementById("sidePanel").classList.remove("open");
             document.getElementById("sidePanelOverlay").classList.remove("active");
             showAccountView();
+
+            // Reset to Home tab when side panel is closed
+            const homeTab = document.querySelector('.bottom-nav-item i.fa-house').parentElement;
+            updateBottomNav(homeTab);
         }
 
         function showAccountView() {

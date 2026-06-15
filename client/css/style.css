@@ -273,6 +273,7 @@ input {
 
 /* ─── STOP CARD ───────────────────────────── */
 .stop-card {
+    color: var(--text-100);
     border: 1.5px solid var(--border);
     border-radius: var(--r-lg);
     overflow: hidden;
@@ -645,7 +646,7 @@ input {
     width: 100%;
     height: 52px;
     border: none;
-    border-radius: var(--r-md);
+    border-radius: var(--r-sm);
     font-size: 0.95rem;
     font-weight: 800;
     letter-spacing: 0.3px;
@@ -1334,103 +1335,197 @@ body {
     height: 36px !important;
 }
 
-/* Commuter Stop Card styled as a dark panel (like the train info block in Behance redesign) */
+
 .stop-card {
-    background: #000000 !important;
-    /* Pitch black block */
-    color: #ffffff !important;
-    border: 1px solid #27272A !important;
-    border-radius: 28px !important;
-    /* High rounded corners */
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15) !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1.5px solid var(--border) !important;
+    border-radius: var(--r-sm) !important;
+    box-shadow: var(--shadow-sm) !important;
 }
 
 .stop-card-head {
-    background: #000000 !important;
-    border-bottom: 1px solid #27272A !important;
+    background: #ffffff !important;
+    border-bottom: 1.5px solid var(--border) !important;
     padding: 16px 18px !important;
 }
 
 .stop-dot {
     background: #ffffff !important;
-    /* Inverted stop dot indicator */
+    border: 2px solid #000000 !important;
     color: #000000 !important;
     border-radius: 50% !important;
-    width: 28px !important;
-    height: 28px !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+}
+
+.stop-dot::after {
+    content: '' !important;
+    position: absolute !important;
+    bottom: -6px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 2px !important;
+    height: 6px !important;
+    background: #000000 !important;
 }
 
 .stop-walk {
-    color: #A1A1AA !important;
-    /* Soft gray for walk text */
-    font-weight: 500 !important;
-    font-size: 0.85rem !important;
-}
-
-/* Style Next Buses label to be a nice light badge container */
-.stop-card>div[style*="text-transform:uppercase"] {
-    background: #27272A !important;
-    /* Darker gray badge background */
-    color: #ffffff !important;
+    background: #F4F4F5 !important;
+    color: #71717A !important;
     padding: 6px 12px !important;
-    font-size: 0.75rem !important;
-    font-weight: 700 !important;
-    display: inline-block !important;
-    border-radius: 9999px !important;
-    /* Pill style */
-    margin: 12px 18px 4px !important;
-    letter-spacing: normal !important;
+    border-radius: 20px !important;
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 5px !important;
 }
 
 .bus-row {
-    border-bottom: 1px solid #27272A !important;
     padding: 16px 18px !important;
-}
-
-.bus-row:last-child {
+    background: #ffffff !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
     border-bottom: none !important;
 }
 
+.stop-card-divider {
+    display: block !important;
+    border-bottom: 1px solid #E4E4E7 !important;
+    width: 90% !important;
+    margin: 0 auto !important;
+}
+
 .bus-row:hover {
-    background: rgba(255, 255, 255, 0.06) !important;
-    /* Dark hover highlight */
+    background: #F4F4F5 !important;
 }
 
 .bus-row-icon {
-    color: #A1A1AA !important;
+    color: #71717A !important;
 }
 
 .bus-num {
     font-size: 0.95rem !important;
-    font-weight: 800 !important;
-    color: #ffffff !important;
+    font-weight: 850 !important;
+    color: #000000 !important;
 }
 
 .bus-dir {
     font-size: 0.8rem !important;
-    color: #A1A1AA !important;
+    color: #71717A !important;
 }
 
 .bus-time {
     font-size: 0.9rem !important;
-    font-weight: 700 !important;
-    color: #ffffff !important;
-}
-
-.see-all-row {
-    background: #000000 !important;
-    border-top: 1px solid #27272A !important;
-    padding: 12px !important;
-    display: flex !important;
-    justify-content: center !important;
-}
-
-.see-all-row a {
-    color: #ffffff !important;
     font-weight: 800 !important;
-    font-size: 0.85rem !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
+    color: #000000 !important;
+}
+
+/* See All links and badges styling */
+.see-all-link {
+    color: var(--text-100) !important;
+    font-weight: 800 !important;
+    font-size: 0.88rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+}
+
+.see-all-link .chevron-circle {
+    background: var(--text-100) !important;
+    color: #ffffff !important;
+    border-radius: 50% !important;
+    width: 20px !important;
+    height: 20px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.6rem !important;
+}
+
+/* Buses around you title divider style */
+.buses-around-title-container {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+}
+
+.buses-around-title-container h3 {
+    font-weight: 850 !important;
+    font-size: 1.25rem !important;
+    color: #000000 !important;
+    margin: 0 !important;
+}
+
+.buses-around-title-container .divider-line {
+    flex-grow: 1 !important;
+    height: 1px !important;
+    background: #E4E4E7 !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+}
+
+.buses-around-title-container .divider-line::before {
+    content: '◆' !important;
+    font-size: 0.8rem !important;
+    color: #A1A1AA !important;
+    position: absolute !important;
+    left: 0 !important;
+    background: #ffffff !important;
+    padding-right: 8px !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Bottom Navigation Bar Styles */
+.bottom-nav {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 100% !important;
+    max-width: 560px !important;
+    height: 64px !important;
+    background: #ffffff !important;
+    border-top: 1.5px solid #E4E4E7 !important;
+    display: flex !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    z-index: 1000 !important;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05) !important;
+    border-radius: 16px 16px 0 0 !important;
+}
+
+.bottom-nav-item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 4px !important;
+    color: #A1A1AA !important;
+    cursor: pointer !important;
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    transition: color 0.15s ease !important;
+    flex: 1 !important;
+    text-align: center !important;
+}
+
+.bottom-nav-item i {
+    font-size: 1.25rem !important;
+}
+
+.bottom-nav-item.active {
+    color: #000000 !important;
 }
 
 /* 5. Portal Selection Page */
