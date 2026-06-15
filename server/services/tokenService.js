@@ -1,22 +1,40 @@
 // services/tokenService.js
-const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
 
-// In-memory session store: token -> { phone, role }
-// Tokens persist until the server restarts. Swap for a DB/Redis for production.
-const sessions = new Map();
+const JWT_SECRET = process.env.JWT_SECRET || "getgo_development_jwt_secret_key_987654321";
 
+/**
+ * Creates a stateless JWT for the user.
+ * Expiration times:
+ * - commuter: 7 days (7d)
+ * - driver: 30 days (30d)
+ */
 const createToken = (phone, role) => {
-    const token = crypto.randomBytes(24).toString("hex");
-    sessions.set(token, { phone, role, createdAt: Date.now() });
-    return token;
+    const cleanRole = role.toLowerCase().trim();
+    const expiresIn = cleanRole === "driver" ? "30d" : "7d";
+    
+    return jwt.sign({ phone, role: cleanRole }, JWT_SECRET, { expiresIn });
 };
 
+/**
+ * Verifies a token and returns the decoded payload { phone, role }.
+ * Returns null if token is expired, invalid, or missing.
+ */
 const getSession = (token) => {
-    return sessions.get(token) || null;
+    try {
+        if (!token) return null;
+        return jwt.verify(token, JWT_SECRET);
+    } catch (err) {
+        return null;
+    }
 };
 
+/**
+ * Stateless JWT logout is handled client-side by clearing localStorage,
+ * so destroyToken is a no-op.
+ */
 const destroyToken = (token) => {
-    sessions.delete(token);
+    // No-op for stateless JWTs
 };
 
 module.exports = { createToken, getSession, destroyToken };

@@ -3,36 +3,37 @@
    ═══════════════════════════════════════════ */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,800&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cuprum:ital,wght@0,400..700;1,400..700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
 :root {
     /* Brand */
-    --brand-amber: #F5A623;
-    --brand-deep: #E07B00;
-    --brand-dark: #1C1917;
-    --brand-ink: #292524;
+    --brand-amber: #000000;
+    --brand-deep: #27272A;
+    --brand-dark: #18181B;
+    --brand-ink: #09090B;
 
     /* Accent */
-    --accent-teal: #0EA5A0;
-    --accent-green: #10B981;
-    --accent-rose: #F43F5E;
+    --accent-teal: #27272A;
+    --accent-green: #000000;
+    --accent-rose: #71717A;
 
     /* Surface */
     --surface-0: #FFFFFF;
-    --surface-1: #FAFAF9;
-    --surface-2: #F5F4F2;
-    --border: #E7E5E4;
-    --border-strong: #D6D3D1;
+    --surface-1: #F4F4F5;
+    --surface-2: #FAFAFA;
+    --border: #E4E4E7;
+    --border-strong: #71717A;
 
     /* Text */
-    --text-100: #1C1917;
-    --text-200: #44403C;
-    --text-400: #78716C;
-    --text-500: #A8A29E;
+    --text-100: #000000;
+    --text-200: #18181B;
+    --text-400: #71717A;
+    --text-500: #A1A1AA;
 
     /* Gradients */
-    --grad-amber: linear-gradient(135deg, #F5A623 0%, #E07B00 100%);
-    --grad-teal: linear-gradient(135deg, #0EA5A0 0%, #0D8A86 100%);
-    --grad-hero: linear-gradient(160deg, #F5A623 0%, #E07B00 55%, #C56A00 100%);
+    --grad-amber: linear-gradient(135deg, #000000 0%, #27272A 100%);
+    --grad-teal: linear-gradient(135deg, #27272A 0%, #18181B 100%);
+    --grad-hero: linear-gradient(160deg, #000000 0%, #18181B 55%, #000000 100%);
 
     /* Elevation */
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, .07), 0 1px 2px rgba(0, 0, 0, .04);
@@ -48,7 +49,7 @@
     --r-full: 9999px;
 
     /* Font */
-    --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font: 'DM Sans', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 *,
@@ -99,7 +100,6 @@ input {
 .topbar-logo {
     font-size: 1.25rem;
     font-weight: 900;
-    font-style: italic;
     color: #fff;
     letter-spacing: 0.5px;
     display: flex;
@@ -1196,7 +1196,7 @@ input {
 }
 
 /* ==========================================================================
-   DESKTOP & MOBILE COHESIVE STRETCHED LAYOUT (CHALO STYLE RESPONSIVENESS)
+   DESKTOP & MOBILE COHESIVE STRETCHED LAYOUT (BEHANCE REDESIGN RESPONSIVENESS)
    ========================================================================== */
 
 /* 1. Global Reset & Width Scaling */
@@ -1220,8 +1220,8 @@ body {
 /* 2. Topbar & Brand Customizations */
 .topbar {
     position: relative !important;
-    background: #FFC107 !important;
-    /* Chalo Gold/Yellow */
+    background: #000000 !important;
+    /* Behance Black */
     box-shadow: var(--shadow-sm) !important;
     height: 56px !important;
     display: flex !important;
@@ -1230,7 +1230,7 @@ body {
     padding: 0 16px !important;
 }
 
-/* Center the logo and rename to CHALO */
+/* Center the logo */
 .topbar-logo {
     position: absolute !important;
     left: 50% !important;
@@ -1245,7 +1245,8 @@ body {
     content: "GetGo" !important;
     font-size: 1.25rem !important;
     font-weight: 900 !important;
-    color: #1c1917 !important;
+    color: #ffffff !important;
+    /* White logo */
     letter-spacing: 0.5px !important;
 }
 
@@ -1265,7 +1266,8 @@ body {
     width: 32px !important;
     height: 32px !important;
     border-radius: 50% !important;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231C1917"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>') !important;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23FFFFFF"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>') !important;
+    /* White SVG icon */
     background-size: cover !important;
     background-repeat: no-repeat !important;
     cursor: pointer !important;
@@ -1275,7 +1277,8 @@ body {
 .topbar-action {
     background: transparent !important;
     border: none !important;
-    color: #1c1917 !important;
+    color: #ffffff !important;
+    /* White profile actions/logout button */
     margin-left: auto !important;
     /* Push it to the right */
     position: relative !important;
@@ -1284,8 +1287,9 @@ body {
 
 /* 3. Hero Search Banner */
 .hero-search {
-    background: #FFC107 !important;
-    border-radius: 0 !important;
+    background: #000000 !important;
+    /* Curved black background */
+    border-radius: 0 0 32px 32px !important;
     padding: 16px 24px 28px !important;
 }
 
@@ -1293,11 +1297,13 @@ body {
     background: #ffffff !important;
     border: 1px solid var(--border) !important;
     box-shadow: var(--shadow-md) !important;
-    border-radius: 99px !important;
+    border-radius: 9999px !important;
+    /* Fully rounded pill */
 }
 
 .search-icon {
-    color: #FF6F00 !important;
+    color: #71717A !important;
+    /* Cool gray search icon */
 }
 
 /* 4. Section & Card Margins */
@@ -1309,7 +1315,8 @@ body {
 .tile {
     background: #ffffff !important;
     border: 1px solid var(--border) !important;
-    border-radius: 12px !important;
+    border-radius: 24px !important;
+    /* High-radius rounded corner */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
     padding: 16px 14px !important;
     display: flex !important;
@@ -1318,57 +1325,65 @@ body {
 }
 
 .tile-icon {
-    background: #FFF9C4 !important;
-    /* Light yellow */
-    color: #FF9800 !important;
-    /* Orange icon */
+    background: #F4F4F5 !important;
+    /* Clean light gray */
+    color: #000000 !important;
+    /* Black icon */
     border-radius: 50% !important;
     width: 36px !important;
     height: 36px !important;
 }
 
+/* Commuter Stop Card styled as a dark panel (like the train info block in Behance redesign) */
 .stop-card {
-    background: #ffffff !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 16px !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+    background: #000000 !important;
+    /* Pitch black block */
+    color: #ffffff !important;
+    border: 1px solid #27272A !important;
+    border-radius: 28px !important;
+    /* High rounded corners */
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15) !important;
 }
 
 .stop-card-head {
-    background: #ffffff !important;
-    border-bottom: 1px solid var(--border) !important;
+    background: #000000 !important;
+    border-bottom: 1px solid #27272A !important;
     padding: 16px 18px !important;
 }
 
 .stop-dot {
-    background: #333333 !important;
-    color: #ffffff !important;
+    background: #ffffff !important;
+    /* Inverted stop dot indicator */
+    color: #000000 !important;
     border-radius: 50% !important;
     width: 28px !important;
     height: 28px !important;
 }
 
 .stop-walk {
-    color: #666666 !important;
+    color: #A1A1AA !important;
+    /* Soft gray for walk text */
     font-weight: 500 !important;
     font-size: 0.85rem !important;
 }
 
 /* Style Next Buses label to be a nice light badge container */
 .stop-card>div[style*="text-transform:uppercase"] {
-    background: #F5F5F5 !important;
-    color: #555555 !important;
+    background: #27272A !important;
+    /* Darker gray badge background */
+    color: #ffffff !important;
     padding: 6px 12px !important;
     font-size: 0.75rem !important;
     font-weight: 700 !important;
     display: inline-block !important;
-    border-radius: 4px !important;
+    border-radius: 9999px !important;
+    /* Pill style */
     margin: 12px 18px 4px !important;
     letter-spacing: normal !important;
 }
 
 .bus-row {
-    border-bottom: 1px solid var(--border) !important;
+    border-bottom: 1px solid #27272A !important;
     padding: 16px 18px !important;
 }
 
@@ -1376,37 +1391,42 @@ body {
     border-bottom: none !important;
 }
 
+.bus-row:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+    /* Dark hover highlight */
+}
+
 .bus-row-icon {
-    color: #555555 !important;
+    color: #A1A1AA !important;
 }
 
 .bus-num {
     font-size: 0.95rem !important;
     font-weight: 800 !important;
-    color: #000000 !important;
+    color: #ffffff !important;
 }
 
 .bus-dir {
     font-size: 0.8rem !important;
-    color: #777777 !important;
+    color: #A1A1AA !important;
 }
 
 .bus-time {
     font-size: 0.9rem !important;
     font-weight: 700 !important;
-    color: #000000 !important;
+    color: #ffffff !important;
 }
 
 .see-all-row {
-    background: #ffffff !important;
-    border-top: 1px solid var(--border) !important;
+    background: #000000 !important;
+    border-top: 1px solid #27272A !important;
     padding: 12px !important;
     display: flex !important;
     justify-content: center !important;
 }
 
 .see-all-row a {
-    color: #FF6F00 !important;
+    color: #ffffff !important;
     font-weight: 800 !important;
     font-size: 0.85rem !important;
     text-transform: uppercase !important;
@@ -1429,13 +1449,15 @@ body {
 }
 
 .brand-icon {
-    background: #FFC107 !important;
-    color: #1c1917 !important;
-    border: 2px solid #FFA000 !important;
+    background: #000000 !important;
+    /* Pitch black icon container */
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 20px !important;
 }
 
 .brand-name {
-    color: #1c1917 !important;
+    color: #000000 !important;
 }
 
 .brand-tagline {
@@ -1444,7 +1466,14 @@ body {
 
 .selector-card {
     border: 1px solid var(--border) !important;
+    border-radius: 24px !important;
+    /* High rounded corners */
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Adjust index footer tagline visibility on white background */
+.selector-wrap p {
+    color: #71717A !important;
 }
 
 /* 6. Auth Portals & Cards */
@@ -1553,7 +1582,8 @@ body {
 .phone-row .country-chip {
     border: 1px solid #CCCCCC !important;
     background: #ffffff !important;
-    border-radius: 8px !important;
+    border-radius: 9999px !important;
+    /* Fully rounded country selector pill */
     height: 52px !important;
     padding: 0 14px !important;
     display: flex !important;
@@ -1567,15 +1597,17 @@ body {
 }
 
 .phone-row .country-chip i {
-    color: #FF6F00 !important;
-    /* Orange chevron */
+    color: #000000 !important;
+    /* Neutral chevron */
 }
 
 .phone-row .field {
-    border: 1.5px solid #FF6F00 !important;
-    /* Vibrant orange border */
-    background: #ffffff !important;
-    border-radius: 8px !important;
+    border: 1.5px solid #E4E4E7 !important;
+    /* Gray border */
+    background: #F4F4F5 !important;
+    /* Soft gray base */
+    border-radius: 9999px !important;
+    /* Fully rounded input field pill */
     height: 52px !important;
     flex-grow: 1 !important;
     font-size: 1.1rem !important;
@@ -1583,40 +1615,46 @@ body {
 }
 
 .phone-row .field:focus {
-    border-color: #E65100 !important;
-    box-shadow: 0 0 0 2px rgba(255, 111, 0, 0.15) !important;
+    border-color: #000000 !important;
+    /* Black focus border */
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08) !important;
 }
 
 .otp-box {
     width: 48px !important;
     height: 54px !important;
-    border: 1px solid #CCCCCC !important;
-    border-radius: 8px !important;
-    background: #ffffff !important;
+    border: 1px solid #E4E4E7 !important;
+    border-radius: 12px !important;
+    /* Clean rounded OTP boxes */
+    background: #F4F4F5 !important;
     font-size: 1.5rem !important;
     font-weight: 700 !important;
     color: #000000 !important;
 }
 
 .otp-box:focus {
-    border-color: #FF6F00 !important;
-    box-shadow: 0 0 0 2px rgba(255, 111, 0, 0.15) !important;
+    border-color: #000000 !important;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08) !important;
 }
 
 .btn-ghost {
     background: transparent !important;
-    border: none !important;
-    color: #FF6F00 !important;
+    border: 1px solid #000000 !important;
+    /* Black border outline */
+    color: #000000 !important;
     font-weight: 700 !important;
+    border-radius: 9999px !important;
+    /* Pill style */
     margin-top: 16px !important;
 }
 
 /* 7. Promo Banner Customizations */
 .promo-banner {
-    background: #FFF5E6 !important;
-    /* Soft peach background */
-    border: 1px solid #FFE0B2 !important;
-    border-radius: 12px !important;
+    background: #F4F4F5 !important;
+    /* Neutral light gray background */
+    border: 1px solid #E4E4E7 !important;
+    border-radius: 24px !important;
+    /* Highly rounded corners */
     padding: 24px !important;
     padding-right: 140px !important;
     /* Offset for absolute mock image */
@@ -1640,7 +1678,7 @@ body {
     content: "GET THE APP" !important;
     font-size: 0.75rem !important;
     font-weight: 800 !important;
-    color: #777777 !important;
+    color: #71717A !important;
     letter-spacing: 0.5px !important;
 }
 
@@ -1666,10 +1704,9 @@ body {
     display: inline-flex !important;
     align-items: center !important;
     gap: 6px !important;
-    background: #E8F5E9 !important;
-    /* Green badge chip background */
-    color: #2E7D32 !important;
-    /* Dark green text */
+    background: #000000 !important;
+    /* Monochromatic badge chip */
+    color: #ffffff !important;
     padding: 6px 12px !important;
     border-radius: 99px !important;
     width: fit-content !important;
@@ -1681,7 +1718,7 @@ body {
     content: "✔ Live track buses" !important;
     font-size: 0.75rem !important;
     font-weight: 700 !important;
-    color: #2E7D32 !important;
+    color: #ffffff !important;
     display: inline-block !important;
 }
 
@@ -1698,9 +1735,11 @@ body {
 }
 
 .store-btn {
-    background: #1C1917 !important;
+    background: #000000 !important;
+    /* Pitch black store button */
     color: #ffffff !important;
-    border-radius: 8px !important;
+    border-radius: 9999px !important;
+    /* Pill style */
     font-size: 0.8rem !important;
     padding: 10px 18px !important;
 }
@@ -1716,10 +1755,11 @@ body {
     background: #ffffff !important;
     border: 1px solid var(--border) !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
-    border-radius: 16px !important;
+    border-radius: 28px !important;
+    /* Highly rounded cards */
 }
 
-/* 9. Sticky Viewport Bottom Orange Buttons */
+/* 9. Sticky Viewport Bottom Action Buttons Overhaul (Solid Black Pills) */
 .btn-primary,
 .btn-teal,
 .bottom-cta,
@@ -1733,13 +1773,14 @@ body {
     right: 16px !important;
     width: calc(100% - 32px) !important;
     max-width: calc(100% - 32px) !important;
-    border-radius: 12px !important;
+    border-radius: 9999px !important;
+    /* Pill shape */
     margin: 0 !important;
     height: 52px !important;
     z-index: 1000 !important;
-    background: #FF6F00 !important;
-    /* Solid Orange */
-    box-shadow: 0 4px 16px rgba(255, 111, 0, 0.3) !important;
+    background: #000000 !important;
+    /* Solid Black */
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
     border: none !important;
     color: #ffffff !important;
     font-size: 0.95rem !important;
@@ -1754,7 +1795,8 @@ body {
 .btn-primary:hover,
 .btn-teal:hover,
 .bottom-cta:hover {
-    background: #E65100 !important;
+    background: #27272A !important;
+    /* Soft black hover */
 }
 
 /* Override Text of Action Buttons */
@@ -1787,9 +1829,616 @@ body {
     display: none !important;
 }
 
+/* 10. Live Status Coral Highlight (Behance style) */
+.live-pill {
+    color: #EF4444 !important;
+    /* Coral red live indicator text */
+}
+
+.live-dot {
+    background: #EF4444 !important;
+    /* Coral red live dot */
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, .7) !important;
+    animation: live-pulse-coral 1.2s infinite !important;
+}
+
+@keyframes live-pulse-coral {
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, .7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 7px rgba(239, 68, 68, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}
+
 /* Padding offset to keep content viewable above bottom sticky actions */
 .auth-body,
 .dash-body,
 .page-wrap {
     padding-bottom: 88px !important;
+}
+
+/* ==========================================================================
+   SIDE PANEL & PROFILE EDIT VIEW & CROP MODAL STYLES (BEHANCE REDESIGN)
+   ========================================================================== */
+
+/* Topbar Profile Avatar Trigger */
+.topbar-profile {
+    position: absolute !important;
+    left: 16px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    z-index: 100 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #27272A !important;
+    border: 1.5px solid #ffffff !important;
+}
+
+.topbar-profile img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+/* Hide old topbar::before pseudo profile icon */
+.topbar::before {
+    display: none !important;
+    content: none !important;
+}
+
+/* Side Panel Overlay Backdrop */
+.side-panel-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(4px) !important;
+    z-index: 9990 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: opacity 0.3s ease, visibility 0.3s ease !important;
+}
+
+.side-panel-overlay.active {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Slide Out Side Panel */
+.side-panel {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    width: 100% !important;
+    max-width: 420px !important;
+    background: #F4F4F5 !important;
+    /* Cool Light Gray */
+    z-index: 9995 !important;
+    box-shadow: var(--shadow-xl) !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+.side-panel.open {
+    transform: translateX(0) !important;
+}
+
+/* Views inside Side Panel */
+.side-panel-view {
+    display: none !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+}
+
+.side-panel-view.active {
+    display: flex !important;
+}
+
+/* Side Panel Header */
+.side-panel-header {
+    background: #ffffff !important;
+    border-bottom: 1.5px solid var(--border) !important;
+    height: 56px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    padding: 0 20px !important;
+    flex-shrink: 0 !important;
+}
+
+.side-panel-back-btn {
+    background: transparent !important;
+    border: none !important;
+    font-size: 1.2rem !important;
+    color: #000000 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.side-panel-title {
+    font-weight: 800 !important;
+    font-size: 1.2rem !important;
+    color: #000000 !important;
+}
+
+/* Side Panel Body content */
+.side-panel-body {
+    padding: 20px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+}
+
+/* Profile Summary Card */
+.profile-card {
+    background: #ffffff !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 20px !important;
+    padding: 18px 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+}
+
+.profile-card-avatar {
+    width: 54px !important;
+    height: 54px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    background: #27272A !important;
+    border: 1px solid var(--border) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+}
+
+.profile-card-avatar img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+.profile-card-info {
+    flex: 1 !important;
+}
+
+.profile-card-name {
+    font-weight: 800 !important;
+    font-size: 1.15rem !important;
+    color: #000000 !important;
+}
+
+.profile-card-phone {
+    font-size: 0.85rem !important;
+    color: var(--text-400) !important;
+    margin-top: 2px !important;
+    font-weight: 600 !important;
+}
+
+.profile-card-edit {
+    font-size: 0.88rem !important;
+    color: #71717A !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+}
+
+.profile-card-edit:hover {
+    color: #000000 !important;
+}
+
+/* Tickets & Cards Info Panel blocks */
+.menu-card {
+    background: #ffffff !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 16px !important;
+    padding: 16px 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease !important;
+}
+
+.menu-card:hover {
+    background: #FAFAFA !important;
+}
+
+.menu-card-icon {
+    font-size: 1.25rem !important;
+    color: #000000 !important;
+}
+
+.menu-card-text {
+    font-weight: 800 !important;
+    color: #000000 !important;
+    font-size: 0.95rem !important;
+}
+
+/* Options Lists */
+.side-panel-list {
+    background: #ffffff !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 20px !important;
+    padding: 6px 0 !important;
+}
+
+.side-panel-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    padding: 14px 20px !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease !important;
+    border-bottom: 1px solid #F4F4F5 !important;
+}
+
+.side-panel-item:last-child {
+    border-bottom: none !important;
+}
+
+.side-panel-item:hover {
+    background: #FAFAFA !important;
+}
+
+.side-panel-item-icon {
+    width: 24px !important;
+    display: flex !important;
+    justify-content: center !important;
+    font-size: 1.15rem !important;
+    color: #000000 !important;
+}
+
+.side-panel-item-icon.sos-icon {
+    color: #EF4444 !important;
+}
+
+.side-panel-item-text {
+    font-weight: 700 !important;
+    color: #000000 !important;
+    font-size: 0.92rem !important;
+}
+
+.side-panel-item-chevron {
+    margin-left: auto !important;
+    color: #A1A1AA !important;
+    font-size: 0.78rem !important;
+}
+
+/* Side Panel Footer */
+.side-panel-footer {
+    margin-top: auto !important;
+    padding: 24px 20px 16px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    font-size: 0.8rem !important;
+    color: #71717A !important;
+    font-weight: 600 !important;
+}
+
+/* My Travel Profile Edit view */
+.profile-edit-body {
+    padding: 20px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+    background: #ffffff !important;
+    min-height: 100% !important;
+}
+
+.profile-edit-subtitle {
+    font-size: 0.85rem !important;
+    color: var(--text-400) !important;
+    line-height: 1.4 !important;
+    font-weight: 500 !important;
+}
+
+/* Profile Upload Circular Avatar Container */
+.profile-upload-container {
+    position: relative !important;
+    width: 104px !important;
+    height: 104px !important;
+    margin: 10px auto 20px !important;
+}
+
+.profile-upload-avatar {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    background: #F4F4F5 !important;
+    border: 3px solid #ffffff !important;
+    box-shadow: var(--shadow-md) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.profile-upload-avatar img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+.camera-overlay-btn {
+    position: absolute !important;
+    bottom: -2px !important;
+    right: -2px !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    background: #000000 !important;
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.88rem !important;
+    cursor: pointer !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+/* Form inputs styling */
+.form-group-custom {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+}
+
+.form-group-custom label {
+    font-size: 0.85rem !important;
+    font-weight: 800 !important;
+    color: #000000 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.form-group-custom input {
+    height: 48px !important;
+    background: #F4F4F5 !important;
+    border: 1px solid #E4E4E7 !important;
+    border-radius: 12px !important;
+    padding: 0 16px !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: #000000 !important;
+    outline: none !important;
+}
+
+.form-group-custom input:focus {
+    border-color: #000000 !important;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Gender Card Grid options */
+.gender-cards-row {
+    display: flex !important;
+    gap: 10px !important;
+}
+
+.gender-card {
+    flex: 1 !important;
+    border: 1.5px solid #E4E4E7 !important;
+    border-radius: 16px !important;
+    padding: 12px 8px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    background: #ffffff !important;
+}
+
+.gender-card-icon {
+    font-size: 1.6rem !important;
+    color: #71717A !important;
+}
+
+.gender-card-label {
+    font-size: 0.78rem !important;
+    font-weight: 800 !important;
+    color: #71717A !important;
+}
+
+.gender-card.selected {
+    border-color: #000000 !important;
+    background: #F4F4F5 !important;
+}
+
+.gender-card.selected .gender-card-icon {
+    color: #000000 !important;
+}
+
+.gender-card.selected .gender-card-label {
+    color: #000000 !important;
+}
+
+/* Image Cropping modal styles */
+.crop-modal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.85) !important;
+    z-index: 10010 !important;
+    display: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px !important;
+}
+
+.crop-modal.show,
+.crop-modal.active {
+    display: flex !important;
+}
+
+.crop-modal-content {
+    background: #ffffff !important;
+    border-radius: 24px !important;
+    padding: 24px !important;
+    width: 100% !important;
+    max-width: 440px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+    box-shadow: var(--shadow-xl) !important;
+}
+
+.crop-modal-title {
+    font-weight: 800 !important;
+    font-size: 1.2rem !important;
+    color: #000000 !important;
+    margin: 0 !important;
+}
+
+.crop-image-container {
+    width: 100% !important;
+    height: 280px !important;
+    background: #18181B !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+}
+
+#image-to-crop:not(.cropper-hidden) {
+    max-width: 100% !important;
+    display: block !important;
+}
+
+.crop-actions {
+    display: flex !important;
+    gap: 12px !important;
+}
+
+.btn-crop-cancel {
+    flex: 1 !important;
+    height: 48px !important;
+    background: #F4F4F5 !important;
+    border: 1px solid #E4E4E7 !important;
+    border-radius: 9999px !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
+    font-size: 0.9rem !important;
+    cursor: pointer !important;
+}
+
+.btn-crop-save {
+    flex: 1 !important;
+    height: 48px !important;
+    background: #000000 !important;
+    border: none !important;
+    border-radius: 9999px !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 0.9rem !important;
+    cursor: pointer !important;
+}
+
+.profile-save-btn {
+    width: 100% !important;
+    height: 48px !important;
+    background: #000000 !important;
+    border: none !important;
+    border-radius: 9999px !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 0.95rem !important;
+    cursor: pointer !important;
+    margin-top: 20px !important;
+    flex: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: background 0.2s ease !important;
+}
+
+.profile-save-btn:hover {
+    background: #27272A !important;
+}
+
+/* Lightbox Modal (Behance Premium style) */
+.lightbox-modal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.85) !important;
+    backdrop-filter: blur(8px) !important;
+    z-index: 10020 !important;
+    display: none;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px !important;
+    opacity: 0;
+    transition: opacity 0.3s ease !important;
+}
+
+.lightbox-modal.show {
+    display: flex !important;
+    opacity: 1;
+}
+
+.lightbox-content {
+    position: relative !important;
+    max-width: 90% !important;
+    max-height: 90% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    transform: scale(0.9) !important;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.lightbox-modal.show .lightbox-content {
+    transform: scale(1) !important;
+}
+
+.lightbox-content img {
+    max-width: 100% !important;
+    max-height: 80vh !important;
+    border-radius: 20px !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
+    border: 3px solid #ffffff !important;
+    object-fit: contain !important;
+}
+
+.lightbox-close {
+    position: absolute !important;
+    top: -45px !important;
+    right: 0 !important;
+    color: #ffffff !important;
+    font-size: 2.5rem !important;
+    font-weight: 300 !important;
+    cursor: pointer !important;
+    transition: color 0.2s ease !important;
+    line-height: 1 !important;
+}
+
+.lightbox-close:hover {
+    color: #ef4444 !important;
 }

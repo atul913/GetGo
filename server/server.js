@@ -4,8 +4,23 @@ require("dotenv").config({ path: path.join(__dirname, ".env") });
 const express = require("express");
 const cors = require("cors");
 
+const mongoose = require("mongoose");
+
 const authRoutes = require("./routes/authRoutes");
 const busRoutes = require("./routes/busRoutes");
+
+// Connect to MongoDB
+const mongoUri = process.env.MONGODB_URI;
+if (mongoUri) {
+    mongoose.connect(mongoUri)
+        .then(() => console.log("Connected to MongoDB successfully"))
+        .catch(err => {
+            console.error("Failed to connect to MongoDB:", err.message);
+            console.warn("Continuing server execution without database connection.");
+        });
+} else {
+    console.warn("MONGODB_URI environment variable is missing. Continuing without MongoDB connection.");
+}
 
 const app = express();
 const port = process.env.PORT || 3000;

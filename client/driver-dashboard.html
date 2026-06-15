@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
     <style>
         /* ─ MAP PANEL ──────────────────────────── */
         #live-map-panel {
@@ -353,6 +355,10 @@
 
         <!-- Topbar -->
         <header class="topbar">
+            <div class="topbar-profile" id="topbarProfileBtn" onclick="openSidePanel()">
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>"
+                    id="topbarProfileImg" alt="Profile">
+            </div>
             <div class="topbar-logo">
                 <i class="fa-solid fa-bus-simple"></i> GetGo <span class="badge">DRIVER</span>
             </div>
@@ -678,7 +684,10 @@
         });
 
         // ── INIT ─────────────────────────────────
-        initMap();
+        window.addEventListener("DOMContentLoaded", () => {
+            initMap();
+            fetchUserProfile();
+        });
 
         function showToast(message, type = "success") {
             const toastEl = document.getElementById("toast");
@@ -874,6 +883,565 @@
                 console.error("HTTP Coordinate push error:", err);
                 appendLog("<span style='color: #ef4444;'>Connection offline. Retrying...</span>");
             }
+        }
+
+        // Handle browser tab/window close or navigation
+        window.addEventListener("pagehide", () => {
+            if (activeBusId && token) {
+                // Use keepalive: true to ensure the request is transmitted even as the page is destroyed
+                fetch("/api/bus/end", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ busId: activeBusId }),
+                    keepalive: true
+                });
+            }
+        });
+    </script>
+
+    <!-- Side Panel Overlay -->
+    <div class="side-panel-overlay" id="sidePanelOverlay" onclick="closeSidePanel()"></div>
+
+    <!-- Side Panel -->
+    <div class="side-panel" id="sidePanel">
+        <!-- VIEW 1: ACCOUNT DETAIL SUMMARY -->
+        <div class="side-panel-view active" id="accountView">
+            <header class="side-panel-header">
+                <button class="side-panel-back-btn" onclick="closeSidePanel()">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="side-panel-title">Account</div>
+            </header>
+            <div class="side-panel-body">
+                <!-- Profile card -->
+                <div class="profile-card">
+                    <div class="profile-card-avatar" onclick="openLightbox()">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2371717A'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>"
+                            id="panelAvatarImg" alt="Profile">
+                    </div>
+                    <div class="profile-card-info">
+                        <div class="profile-card-name" id="panelNameDisplay">Loading...</div>
+                        <div class="profile-card-phone" id="panelPhoneDisplay">+91 ——— ———</div>
+                    </div>
+                    <div class="profile-card-edit" onclick="showEditProfileView()">
+                        Edit <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                </div>
+
+                <!-- My tickets / passes -->
+                <div class="menu-card">
+                    <i class="fa-solid fa-ticket menu-card-icon"></i>
+                    <span class="menu-card-text">My tickets / passes</span>
+                    <i class="fa-solid fa-chevron-right" style="margin-left:auto;color:#A1A1AA;font-size:0.8rem;"></i>
+                </div>
+
+                <!-- Manage travel card -->
+                <div class="menu-card">
+                    <i class="fa-solid fa-credit-card menu-card-icon"></i>
+                    <span class="menu-card-text">Manage travel card</span>
+                    <i class="fa-solid fa-chevron-right" style="margin-left:auto;color:#A1A1AA;font-size:0.8rem;"></i>
+                </div>
+
+                <!-- Settings & Info List -->
+                <div class="side-panel-list">
+                    <div class="side-panel-item">
+                        <i class="fa-solid fa-location-dot side-panel-item-icon"></i>
+                        <span class="side-panel-item-text">Bus stops near me</span>
+                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
+                    </div>
+                    <div class="side-panel-item">
+                        <i class="fa-solid fa-language side-panel-item-icon"></i>
+                        <span class="side-panel-item-text">Change language</span>
+                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
+                    </div>
+                    <div class="side-panel-item">
+                        <i class="fa-solid fa-circle-exclamation side-panel-item-icon sos-icon"></i>
+                        <span class="side-panel-item-text">SOS</span>
+                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
+                    </div>
+                    <div class="side-panel-item">
+                        <i class="fa-solid fa-headset side-panel-item-icon"></i>
+                        <span class="side-panel-item-text">Customer support</span>
+                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
+                    </div>
+                    <div class="side-panel-item">
+                        <i class="fa-solid fa-file-shield side-panel-item-icon"></i>
+                        <span class="side-panel-item-text">Manage Consent</span>
+                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
+                    </div>
+                    <div class="side-panel-item">
+                        <i class="fa-solid fa-gear side-panel-item-icon"></i>
+                        <span class="side-panel-item-text">Account settings</span>
+                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="side-panel-footer">
+                <span>Terms and conditions</span>
+                <span>V 2.0.79</span>
+            </footer>
+        </div>
+
+        <!-- VIEW 2: EDIT PROFILE FORM -->
+        <div class="side-panel-view" id="editProfileView">
+            <header class="side-panel-header">
+                <button class="side-panel-back-btn" onclick="showAccountView()">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="side-panel-title">My travel profile</div>
+            </header>
+            <div class="profile-edit-body">
+                <div class="profile-edit-subtitle">
+                    Your response would help us tailor the app experience more effectively.
+                </div>
+
+                <!-- Avatar with camera overlay -->
+                <div class="profile-upload-container">
+                    <div class="profile-upload-avatar">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2371717A'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>"
+                            id="editAvatarPreview" alt="Profile Upload" onclick="openLightbox()">
+                    </div>
+                    <div class="camera-overlay-btn" onclick="triggerProfileUpload()">
+                        <i class="fa-solid fa-camera"></i>
+                    </div>
+                </div>
+
+                <!-- Hidden Input file selector -->
+                <input type="file" id="avatar-upload" style="display:none;" accept="image/*">
+
+                <!-- Fields -->
+                <div class="form-group-custom">
+                    <label for="editName">Name</label>
+                    <input type="text" id="editName" placeholder="Enter name">
+                </div>
+
+                <div class="form-group-custom">
+                    <label for="editEmail">Email ID</label>
+                    <input type="email" id="editEmail" placeholder="Enter email">
+                </div>
+
+                <div class="form-group-custom">
+                    <label for="editAge">What's your age?</label>
+                    <input type="number" id="editAge" placeholder="Enter age" min="1" max="120">
+                </div>
+
+                <!-- Gender Grid -->
+                <div class="form-group-custom">
+                    <label>Gender</label>
+                    <div class="gender-cards-row">
+                        <div class="gender-card" id="genderMaleCard" onclick="selectGender('Male')">
+                            <i class="fa-solid fa-user-tie gender-card-icon"></i>
+                            <span class="gender-card-label">Male</span>
+                        </div>
+                        <div class="gender-card" id="genderFemaleCard" onclick="selectGender('Female')">
+                            <i class="fa-solid fa-user-nurse gender-card-icon"></i>
+                            <span class="gender-card-label">Female</span>
+                        </div>
+                        <div class="gender-card" id="genderThirdCard" onclick="selectGender('Third gender')">
+                            <i class="fa-solid fa-transgender gender-card-icon"></i>
+                            <span class="gender-card-label">Third gender</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <button class="profile-save-btn" onclick="saveProfileData()">
+                    Save
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Cropping Modal -->
+    <div class="crop-modal" id="crop-modal">
+        <div class="crop-modal-content">
+            <h3 class="crop-modal-title">Crop Profile Picture</h3>
+            <div class="crop-image-container">
+                <img id="image-to-crop" src="" alt="To Crop">
+            </div>
+            <div class="crop-actions">
+                <button class="btn-crop-cancel" onclick="closeCropModal()">Cancel</button>
+                <button class="btn-crop-save" id="crop-and-upload">Crop &amp; Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox Modal -->
+    <div class="lightbox-modal" id="lightbox-modal" onclick="closeLightbox(event)">
+        <div class="lightbox-content">
+            <span class="lightbox-close" onclick="closeLightboxDirect()">&times;</span>
+            <img id="lightbox-img" src="" alt="Profile Image Large">
+        </div>
+    </div>
+
+    <!-- Toast Wrap -->
+    <div class="toast-wrap">
+        <div class="toast" id="toast"></div>
+    </div>
+
+    <!-- Javascript handlers -->
+    <script>
+        /* --- VARIABLES --- */
+        let cropper;
+        const imageToCrop = document.getElementById('image-to-crop');
+        const fileInput = document.getElementById('avatar-upload');
+        const cropModal = document.getElementById('crop-modal');
+        const lightboxModal = document.getElementById('lightbox-modal');
+        let selectedImageFile = null;
+
+        let selectedGender = "";
+        let profileDetails = {
+            name: "",
+            email: "",
+            age: "",
+            gender: "",
+            profileImageUrl: ""
+        };
+
+        function openSidePanel() {
+            document.getElementById("sidePanel").classList.add("open");
+            document.getElementById("sidePanelOverlay").classList.add("active");
+            fetchUserProfile();
+        }
+
+        function closeSidePanel() {
+            document.getElementById("sidePanel").classList.remove("open");
+            document.getElementById("sidePanelOverlay").classList.remove("active");
+            showAccountView();
+        }
+
+        function showAccountView() {
+            document.getElementById("accountView").classList.add("active");
+            document.getElementById("editProfileView").classList.remove("active");
+        }
+
+        function showEditProfileView() {
+            document.getElementById("accountView").classList.remove("active");
+            document.getElementById("editProfileView").classList.add("active");
+
+            document.getElementById("editName").value = profileDetails.name || "";
+            document.getElementById("editEmail").value = profileDetails.email || "";
+            document.getElementById("editAge").value = profileDetails.age || "";
+            selectGender(profileDetails.gender || "");
+        }
+
+        function selectGender(gender) {
+            selectedGender = gender;
+            document.getElementById("genderMaleCard").classList.remove("selected");
+            document.getElementById("genderFemaleCard").classList.remove("selected");
+            document.getElementById("genderThirdCard").classList.remove("selected");
+
+            if (gender === "Male") {
+                document.getElementById("genderMaleCard").classList.add("selected");
+            } else if (gender === "Female") {
+                document.getElementById("genderFemaleCard").classList.add("selected");
+            } else if (gender === "Third gender") {
+                document.getElementById("genderThirdCard").classList.add("selected");
+            }
+        }
+
+        function triggerProfileUpload() {
+            const input = document.getElementById("avatar-upload");
+            if (input) input.click();
+        }
+
+        /* --- 1. OPEN CROP MODAL --- */
+        if (fileInput) {
+            fileInput.addEventListener('change', function (e) {
+                const file = e.target.files[0];
+                if (file) {
+                    selectedImageFile = file;
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        if (imageToCrop) {
+                            imageToCrop.onload = function () {
+                                if (typeof Cropper === "undefined") {
+                                    console.warn("Cropper library not loaded. Uploading image directly...");
+                                    showToast("Cropper not loaded. Uploading directly...", "warning");
+                                    closeCropModal();
+                                    uploadImageDirectly(file);
+                                    return;
+                                }
+
+                                try {
+                                    cropper = new Cropper(imageToCrop, {
+                                        aspectRatio: 1,
+                                        viewMode: 1,
+                                        guides: true,
+                                        autoCropArea: 1,
+                                    });
+                                } catch (cropperInitErr) {
+                                    console.error("Failed to initialize Cropper:", cropperInitErr);
+                                    showToast("Cropper init failed. Uploading directly...", "warning");
+                                    closeCropModal();
+                                    uploadImageDirectly(file);
+                                }
+                            };
+                            imageToCrop.src = e.target.result;
+                        }
+
+                        if (cropModal) {
+                            cropModal.classList.add('show');
+                            cropModal.classList.add('active');
+                        }
+
+                        if (cropper) { cropper.destroy(); }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        /* --- 2. CLOSE CROP MODAL --- */
+        function closeCropModal() {
+            if (cropModal) {
+                cropModal.classList.remove('show');
+                cropModal.classList.remove('active');
+            }
+            if (fileInput) fileInput.value = ''; // Reset input
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+        }
+
+        /* --- 3. UPLOAD LOGIC --- */
+        const cropUploadBtn = document.getElementById('crop-and-upload');
+        if (cropUploadBtn) {
+            cropUploadBtn.addEventListener('click', function () {
+                const btn = this;
+                const oldBtnHtml = btn.innerHTML;
+                btn.innerHTML = '<span>Uploading...</span> <i class="fa-solid fa-spinner fa-spin"></i>';
+                btn.disabled = true;
+
+                if (!cropper) {
+                    if (selectedImageFile) {
+                        uploadImageDirectly(selectedImageFile);
+                    } else {
+                        showToast("No image selected", "error");
+                        btn.innerHTML = oldBtnHtml;
+                        btn.disabled = false;
+                    }
+                    return;
+                }
+
+                const canvas = cropper.getCroppedCanvas({ width: 256, height: 256 });
+
+                if (!canvas) {
+                    console.warn("Could not get cropped canvas. Uploading directly...");
+                    if (selectedImageFile) {
+                        uploadImageDirectly(selectedImageFile);
+                    }
+                    closeCropModal();
+                    btn.innerHTML = oldBtnHtml;
+                    btn.disabled = false;
+                    return;
+                }
+
+                canvas.toBlob(function (blob) {
+                    if (!blob) {
+                        if (selectedImageFile) uploadImageDirectly(selectedImageFile);
+                        closeCropModal();
+                        btn.innerHTML = oldBtnHtml;
+                        btn.disabled = false;
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append('image', blob, 'profile.jpg'); // Backend expects field name 'image'
+
+                    const token = localStorage.getItem("getgo_token");
+
+                    fetch('/api/auth/profile/image', { // Real route is /api/auth/profile/image
+                        method: 'POST',
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success && data.profileImageUrl) {
+                                profileDetails.profileImageUrl = data.profileImageUrl;
+                                updateProfileImages(data.profileImageUrl);
+                                showToast("Profile picture uploaded successfully!", "success");
+                                closeCropModal();
+                            } else {
+                                console.error("Upload failed:", data);
+                                showToast("Upload failed: " + (data.message || "Unknown error"), "error");
+                            }
+                            // Reset button
+                            btn.innerHTML = oldBtnHtml;
+                            btn.disabled = false;
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            showToast("Upload network error: " + error.message, "error");
+                            btn.innerHTML = oldBtnHtml;
+                            btn.disabled = false;
+                        });
+                }, 'image/jpeg', 0.85);
+            });
+        }
+
+        /* --- DIRECT UPLOAD FALLBACK --- */
+        function uploadImageDirectly(file) {
+            const formData = new FormData();
+            formData.append("image", file, file.name || "profile.jpg");
+
+            const token = localStorage.getItem("getgo_token");
+            const uploadBtn = document.querySelector(".camera-overlay-btn");
+            const oldBtnHtml = uploadBtn ? uploadBtn.innerHTML : "";
+            if (uploadBtn) uploadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+            fetch("/api/auth/profile/image", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
+                body: formData
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.profileImageUrl) {
+                        profileDetails.profileImageUrl = data.profileImageUrl;
+                        updateProfileImages(data.profileImageUrl);
+                        showToast("Profile picture uploaded successfully!", "success");
+                    } else {
+                        console.error("Upload failed response:", data);
+                        showToast("Upload failed: " + (data.message || "Unknown error"), "error");
+                    }
+                })
+                .catch(err => {
+                    console.error("Upload error:", err);
+                    showToast("Upload network error: " + err.message, "error");
+                })
+                .finally(() => {
+                    if (uploadBtn) uploadBtn.innerHTML = oldBtnHtml;
+                });
+        }
+
+        /* --- 4. LIGHTBOX LOGIC --- */
+        function openLightbox() {
+            const imgUrl = profileDetails.profileImageUrl;
+            if (imgUrl && lightboxModal) {
+                const lightboxImg = document.getElementById('lightbox-img');
+                if (lightboxImg) lightboxImg.src = imgUrl;
+                lightboxModal.classList.add('show');
+            }
+        }
+
+        // Close when clicking strictly outside the image
+        function closeLightbox(event) {
+            const lightboxContent = document.querySelector(".lightbox-content");
+            if (lightboxModal && (!lightboxContent || !lightboxContent.contains(event.target) || event.target === lightboxModal)) {
+                closeLightboxDirect();
+            }
+        }
+
+        function closeLightboxDirect() {
+            if (lightboxModal) {
+                lightboxModal.classList.remove('show');
+            }
+        }
+
+        function updateProfileImages(url) {
+            const defaultAvatar = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2371717A'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>`;
+            let finalUrl = url || defaultAvatar;
+            if (url && url.startsWith("/uploads/")) {
+                finalUrl = `${url}?t=${Date.now()}`;
+            }
+
+            const topbarImg = document.getElementById("topbarProfileImg");
+            if (topbarImg) topbarImg.src = finalUrl;
+
+            const panelImg = document.getElementById("panelAvatarImg");
+            if (panelImg) panelImg.src = finalUrl;
+
+            const editImg = document.getElementById("editAvatarPreview");
+            if (editImg) editImg.src = finalUrl;
+        }
+
+        function fetchUserProfile() {
+            const token = localStorage.getItem("getgo_token");
+            if (!token) return;
+
+            fetch("/api/auth/profile", {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.user) {
+                        const user = data.user;
+                        profileDetails = user;
+
+                        document.getElementById("panelNameDisplay").innerText = user.name || "GetGo User";
+                        document.getElementById("panelPhoneDisplay").innerText = `+91 ${user.phone}`;
+
+                        updateProfileImages(user.profileImageUrl);
+                    }
+                })
+                .catch(err => {
+                    console.error("Fetch profile error:", err);
+                });
+        }
+
+        function saveProfileData() {
+            const name = document.getElementById("editName").value.trim();
+            const email = document.getElementById("editEmail").value.trim();
+            const age = document.getElementById("editAge").value.trim();
+
+            if (!name) {
+                showToast("Name is required", "error");
+                return;
+            }
+
+            const token = localStorage.getItem("getgo_token");
+
+            fetch("/api/auth/profile", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    name,
+                    email,
+                    age,
+                    gender: selectedGender
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.user) {
+                        profileDetails = data.user;
+                        document.getElementById("panelNameDisplay").innerText = data.user.name;
+                        showToast("Profile updated successfully!", "success");
+                        showAccountView();
+                    } else {
+                        showToast(data.message || "Failed to update profile", "error");
+                    }
+                })
+                .catch(err => {
+                    console.error("Save profile error:", err);
+                    showToast("Error saving profile details", "error");
+                });
+        }
+
+        function showToast(message, type = "success") {
+            const toastEl = document.getElementById("toast");
+            if (!toastEl) return;
+            toastEl.textContent = message;
+            toastEl.className = `toast show ${type}`;
+            setTimeout(() => {
+                toastEl.className = "toast";
+            }, 3000);
         }
     </script>
 </body>
