@@ -824,10 +824,11 @@
             }
 
             if (isFirstLoad && latLngs.length) {
-                map.fitBounds(L.latLngBounds(latLngs), { padding: [50, 50] });
-                if (feedMap && feedLatLngs.length) {
-                    feedMap.fitBounds(L.latLngBounds(feedLatLngs), { padding: [30, 30] });
-                }
+                // Prevent map camera from automatically adjusting/focusing on active buses
+                // map.fitBounds(L.latLngBounds(latLngs), { padding: [50, 50] });
+                // if (feedMap && feedLatLngs.length) {
+                //     feedMap.fitBounds(L.latLngBounds(feedLatLngs), { padding: [30, 30] });
+                // }
                 isFirstLoad = false;
             }
         }
