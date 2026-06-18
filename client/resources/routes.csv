@@ -1,0 +1,99 @@
+RouteId,RouteName
+5492,C-01:- Advanced Academy to Rajwada
+5500,C-01:- Rajwada to Advanced Academy
+5497,C-02:- Netralay to Sawariya Temple
+5496,C-02:- Sawariya Temple to Netralay
+5488,C-03:- Hatod to Tejaji Nagar
+5501,C-03:- Tejaji Nagar to Hatod
+5565,C-04:- Arvindo Hospital to Silver Spring
+5564,C-04:- Silver Spring to Arvindo Hospital
+5591,E-1:- CAT to Pitra Parvat (Electric Bus)
+5583,E-1:- Pitra Parvat to CAT (Electric Bus)
+5592,E-2:- Gangwal Bus Stand to MR-10 (Electric Bus)
+5585,E-3:- Hawa Bangla to Khajrana Mandir (Electric Bus)
+5588,E-3:- Khajrana Mandir to Hawa Bangla (Electric Bus)
+5581,E-4:- Silicon City Gate to Teen Imli (Electric Bus)
+5580,E-4:- Teen Imli to Silicon City Gate (Electric Bus)
+5586,E-5:- Hawa Bangla to Vaishnav College (Electric Bus)
+5589,E-5:- Vaishnav College to Hawa Bangla (Electric Bus)
+5568,E-9:- Palasiya to Rajwada (Electric Bus)
+5569,E-9:- Rajwada to Palasiya (Electric Bus)
+5490,M-07:- Bijalpur to Jawahar Tekri
+5491,M-07:- Jawahar Tekri to Bijalpur
+5464,M-10:- Teen Imli to Tigariya badshah
+5465,M-10:- Tigariya badshah to Teen Imli
+5471,M-11:- Bhagirathpura to Choitharam Mandi
+5469,M-11:- Choitharam Mandi to Bhagirathpura
+5467,M-12:- Advanced Academy to Chhoti gwaltoli
+5468,M-12:- Chhoti gwaltoli to Advanced Academy
+5462,M-15:- Khajrana Mandir to Sangam Nagar
+5474,M-15:- Sangam Nagar to Khajrana Mandir
+5537,M-17: Railway Station to Toll Naka
+5536,M-17: Toll Naka to Railway Station
+5587,M-18:- Dewas Naka to Reti Mandi
+5538,M-18:- Reti Mandi to Dewas Naka
+5539,M-19: Bhawarkuan to IIT Simrol
+5599,M-19: IIT Simrol to Bhawarkuan
+5764,M-20:- Rajwada to Shiv Chowk Rangwasa
+5765,M-20:- Shiv Chowk Rangwasa to Rajwada
+5800,M-22A: Gangwal Bus Stand to Lakhani By Pass
+5799,M-22A: Lakhani By Pass to Gangwal Bus Stand
+5600,M-22: Index Medical College to Indore Railway stn
+5545,M-22: Indore Railway stn to Index Medical College
+5546,M-23:- Bhawarkua to Kampel
+5593,M-23:- Kampel to Bhawarkua
+5547,M-24:- Bhawarkua to Hatod
+5548,M-25:- Nipania to Rajwada
+5782,M-25:- Rajwada to Nipania
+5543,M-26A:- Indore Railway Station to Sanwer
+5544,M-27:- Dewas Naka to Sirpur Lake
+5549,M-28: Mhow Naka to Bhicholi Hapsi
+5551,M-29:- Tigariya Badshah to Shivalik Parisar
+5550,M-31:- Arvindo to Mhow Naka
+5598,M-31:- Mhow Naka to Arvindo
+5552,M-32: Chhota Bangarda to M.Y Hospital
+5553,M-33:- Bangali Ringroad to Gandhi Nagar
+5596,M-33:- Gandhi Nagar to Bangali Ringroad
+5499,M-34:- Arvindo hospital to Silver City
+5554,M-34: Nayta Mundla to Rajwada
+5498,M-34:- Silver City to Arvindo hospital
+5555,M-35: Arvindo to Medicaps
+5608,M-35: Medicaps to Arvindo
+5609,M-36: Mahak Vatika to Rajwada
+5556,M-36: Rajwada to Mahak Vatika
+5597,M-37: Gandhi Nagar to Seva Kunj
+5557,M-37: Seva Kunj to Gandhi Nagar
+5595,M-38: Jawahar Tekri to Teen Imli
+5558,M-38: Teen Imli to Jawahar Tekri
+5446,M-4:- Chhota Bangarda To Tejaji Nagar
+5447,M-4:- Tejaji nagar to Chota bangada
+5463,M-6:- Rajwada to Tejaji Nagar
+5460,M-6:- Tejaji Nagar to Rajwada
+5805,N-13:- Apollo DB City to Hatod
+5808,N-13:- Hatod  to Apollo DB City
+5809,N-16:- Mhow Naka to Navlakha
+5806,N-16:- Navlakha to Mhow Naka
+5807,N-8:- New Bada Bangarda to Rajwada
+5803,N-8:- Rajwada to New Bada Bangarda
+5438,Niranjanpur to Rajiv Gandhi
+5615,Niranjanpur to Rau Bypass
+5478,R-11:- Pitra Parvat to Tejajinagar
+5477,R-11:- Tejajinagar to Pitra Parvat
+5472,R-17:- Lakhani Bypass to Trimala Pride
+5473,R-17:- Trimala Pride to Lakhani Bypass
+5810,R-25 :- Indorama to Indore Rly Station
+5798,R-25 :- Indore Rly Station to Indorama
+5456,R-4:- A P J Abdul Kalam University to Reti Mandi Square
+5455,R-4:- Reti Mandi Chouraha to A P J Abdul Kalam University
+5457,R-5:- Arvindo to Mhow Naka
+5481,R-5:- Mhow Naka to Arvindo
+5493,R-7:- Mushakhedi to Pitra Parvat
+5494,R-7:- Pitra Parvat to Mushakhedi
+5479,R-9:- California City to Cat
+5480,R-9:- Cat  to California City
+5439,Rajiv Gandhi to Niranjanpur
+5534,Rajiv Gandhi to Regional Park Gate
+5440,Rajiv Gandhi to Silicon City
+5616,Rau Bypass to Niranjanpur
+5535,Regional Park Gate to Rajiv Gandhi
+5441,Silicon City to Rajiv Gandhi

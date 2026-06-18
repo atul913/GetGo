@@ -13,13 +13,6 @@
 
     <div class="auth-wrap">
 
-        <!-- Hero -->
-        <div class="auth-hero">
-            <div class="auth-hero-icon"><i class="fa-solid fa-person-walking"></i></div>
-            <div class="auth-hero-title">Commuter Portal</div>
-            <div class="auth-hero-sub">Sign in to track buses live and plan your daily commute</div>
-        </div>
-
         <!-- Body -->
         <div class="auth-body">
 
@@ -143,7 +136,7 @@
             if (event && event.preventDefault) event.preventDefault();
             const phoneInput = document.getElementById("phone-number");
             if (!phoneInput) return;
-            
+
             const phone = phoneInput.value.trim();
             const reqBtn = document.getElementById("req-btn");
 

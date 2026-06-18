@@ -45,4 +45,24 @@ const getAllStops = async (req, res) => {
     }
 };
 
-module.exports = { getNearestStops, getAllStops };
+const searchStops = async (req, res) => {
+    const { q } = req.query;
+
+    if (!q) {
+        return res.status(200).json({ success: true, stops: [] });
+    }
+
+    try {
+        const query = q.trim();
+        const stops = await Stop.find({
+            stationName: { $regex: query, $options: "i" }
+        }).limit(10);
+
+        res.status(200).json({ success: true, stops });
+    } catch (error) {
+        console.error("searchStops error:", error.message);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+module.exports = { getNearestStops, getAllStops, searchStops };

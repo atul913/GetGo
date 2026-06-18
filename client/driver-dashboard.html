@@ -650,8 +650,17 @@
                 const { latitude: lat, longitude: lng } = pos.coords;
                 btn.classList.remove('locating');
                 updateDriverLocationOnMap(lat, lng, fly);
-            }, () => { btn.classList.remove('locating'); showMapToast('Location access denied'); },
-                { enableHighAccuracy: false, timeout: 5000, maximumAge: 10000 });
+            }, (error) => {
+                btn.classList.remove('locating');
+                let errorMsg = 'Location access denied';
+                if (error.code === error.POSITION_UNAVAILABLE) {
+                    errorMsg = 'Location information is unavailable';
+                } else if (error.code === error.TIMEOUT) {
+                    errorMsg = 'Location request timed out';
+                }
+                showMapToast(errorMsg);
+            },
+                { enableHighAccuracy: false, timeout: 10000, maximumAge: 10000 });
         }
 
         // ── TILES & TRAFFIC ──────────────────────

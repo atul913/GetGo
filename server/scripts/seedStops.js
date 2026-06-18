@@ -2,15 +2,17 @@
 const fs = require("fs");
 const path = require("path");
 const mongoose = require("mongoose");
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
 const Stop = require("../models/stopModel");
 
 const csvPath = path.join(__dirname, "..", "..", "client", "aictsl_stops.csv");
-const mongoUri = process.env.MONGODB_URI;
+const mongoUri = process.env.MONGODB_ATLAS_URI || process.env.MONGODB_URI;
 
 if (!mongoUri) {
-    console.error("Error: MONGODB_URI environment variable is missing in .env file.");
+    console.error("Error: MONGODB_ATLAS_URI or MONGODB_URI environment variable is missing in .env file.");
     process.exit(1);
 }
 

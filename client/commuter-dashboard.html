@@ -382,9 +382,9 @@
 
             <!-- Hero Search -->
             <div class="hero-search">
-                <div class="search-pill" onclick="showMapPanel()">
+                <div class="search-pill" onclick="openLocationSearch('end')">
                     <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                    <span class="search-hint">Enter destination or bus number</span>
+                    <span class="search-hint">Enter destination</span>
                 </div>
             </div>
 
@@ -407,22 +407,20 @@
             </div>
 
             <!-- Nearest Stop -->
-            <div class="section" style="padding-bottom:12px;">
-                <div class="section-head"
-                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                    <span class="section-title"
-                        style="font-size: 1.15rem; font-weight: 850; color: #000000; letter-spacing: -0.2px;">Nearest
-                        bus stop</span>
+            <div class="section nearest-stop">
+                <div class="section-head">
+                    <span class="section-title section-title-lg">Nearest bus stop</span>
                     <a class="see-all-link" href="#" onclick="showMapPanel(true); return false;">See all stops <span
                             class="chevron-circle"><i class="fa-solid fa-chevron-right"></i></span></a>
                 </div>
 
                 <div class="stop-card">
-                    <div class="stop-card-head" style="padding: 16px 18px;">
+                    <div class="stop-card-head">
                         <div class="stop-id-pill">
-                            <div class="stop-dot"><i class="fa-solid fa-bus" style="font-size:.7rem;"></i></div>
+                            <div class="stop-dot"><i class="fa-solid fa-bus stop-dot-bus-icon"></i></div>
                             <span class="stop-name">Dawa Bazaar</span>
                         </div>
+                        <span class="stop-walk"></span>
                     </div>
 
                     <div class="bus-rows" id="dynamic-bus-list">
@@ -450,21 +448,20 @@
                     </div>
                 </div>
 
-                <div style="margin-top: 14px; text-align: left;">
+                <div class="see-all-buses-container">
                     <a class="see-all-link" href="#" onclick="showMapPanel(); return false;">See all buses <span
                             class="chevron-circle"><i class="fa-solid fa-chevron-right"></i></span></a>
                 </div>
             </div>
 
             <!-- Buses Around You (Mini Map) -->
-            <div class="section" style="padding-bottom: 90px; margin-top: 10px;">
+            <div class="section buses-around">
                 <div class="buses-around-title-container">
-                    <h3>Buses around you</h3>
+                    <span class="section-title section-title-lg">Buses around you</span>
                     <div class="divider-line"></div>
                 </div>
-                <div class="map-card" onclick="showMapPanel()"
-                    style="background: #ffffff; border: 1.5px solid var(--border); border-radius: var(--r-sm); padding: 8px; box-shadow: var(--shadow-sm);">
-                    <div id="feed-map" style="height: 200px; border-radius: var(--r-sm); z-index: 10;"></div>
+                <div class="map-card feed-map-card" onclick="showMapPanel()">
+                    <div id="feed-map"></div>
                 </div>
             </div>
 
@@ -480,7 +477,7 @@
     <div id="live-map-panel" style="display:none;">
 
         <header class="map-topbar">
-            <button class="map-back-btn" onclick="showFeedPanel()">
+            <button class="map-back-btn" onclick="closeMapPanel()">
                 <i class="fa-solid fa-arrow-left"></i>
             </button>
             <span class="map-title" id="commuter-phone-display">Live Tracking</span>
@@ -550,6 +547,28 @@
         <!-- Map toast -->
         <div class="map-toast" id="map-toast"></div>
 
+        <!-- Journey Details Bottom Sheet Panel -->
+        <div class="journey-details-panel" id="journey-details-panel">
+            <div class="jd-header">
+                <div class="jd-header-title">
+                    <span class="jd-route-badge" id="jd-route-badge">—</span>
+                    <span class="jd-direction" id="jd-direction">Select a journey</span>
+                    <span class="jd-time-val" id="jd-total-time">—</span>
+                    <span class="jd-header-separator">•</span>
+                    <span class="jd-price" id="jd-total-price">₹—</span>
+                </div>
+                <button class="jd-close-btn" onclick="event.stopPropagation(); hideJourneyDetails()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="jd-content">
+                <div class="jd-timeline-vertical" id="jd-timeline-vertical">
+                    <!-- Dynamic stop timeline items go here -->
+                </div>
+            </div>
+        </div>
+
     </div><!-- /live-map-panel -->
 
 
@@ -569,7 +588,10 @@
         // ── PANEL SWITCH ─────────────────────────
         let isFirstMapOpen = true;
         let showStopsOnMap = false;
-        function showMapPanel(showStops = false) {
+        let mapSourcePanel = 'feed'; // tracks if map was opened from 'feed' or 'search'
+
+        function showMapPanel(showStops = false, source = 'feed') {
+            mapSourcePanel = source;
             showStopsOnMap = showStops;
             document.getElementById('home-feed-panel').style.display = 'none';
             document.getElementById('live-map-panel').style.display = 'block';
@@ -593,9 +615,36 @@
         function showFeedPanel() {
             document.getElementById('home-feed-panel').style.display = 'block';
             document.getElementById('live-map-panel').style.display = 'none';
+            if (typeof hideJourneyDetails === 'function') hideJourneyDetails();
             // Sync bottom nav to Home tab
-            const homeTab = document.querySelector('.bottom-nav-item i.fa-house').parentElement;
-            updateBottomNav(homeTab);
+            const homeTabIcon = document.querySelector('.bottom-nav-item i.fa-house');
+            if (homeTabIcon && homeTabIcon.parentElement) {
+                updateBottomNav(homeTabIcon.parentElement);
+            }
+        }
+
+        function closeMapPanel() {
+            // Clear planned route polyline & markers if they exist
+            if (activeRoutePolyline) {
+                map.removeLayer(activeRoutePolyline);
+                activeRoutePolyline = null;
+            }
+            if (routeMarkersList && routeMarkersList.length) {
+                routeMarkersList.forEach(marker => map.removeLayer(marker));
+                routeMarkersList = [];
+            }
+
+            // Hide the live map panel
+            document.getElementById('live-map-panel').style.display = 'none';
+            hideJourneyDetails();
+
+            // Navigate back to the source panel
+            if (mapSourcePanel === 'search') {
+                showFeedPanel(); // ensures feed is shown underneath
+                showPlannerPanel();
+            } else {
+                showFeedPanel();
+            }
         }
 
         function updateBottomNav(el) {
@@ -631,7 +680,10 @@
                 attributionControl: false
             });
             tileLayer = L.tileLayer(TILES.standard, { maxZoom: 19 }).addTo(map);
-            map.on('click', () => document.getElementById('layer-panel').classList.remove('open'));
+            map.on('click', () => {
+                document.getElementById('layer-panel').classList.remove('open');
+                collapseJourneyDetails();
+            });
             map.on('zoomend moveend', updateScale);
             map.on('zoomend', updateStopMarkers);
             map.whenReady(updateScale);
@@ -699,8 +751,17 @@
 
                 // Fetch nearest stops using commuter's live location
                 fetchNearestStops(lat, lng);
-            }, () => { if (btn) btn.classList.remove('locating'); showMapToast('Location access denied'); },
-                { enableHighAccuracy: false, timeout: 3000, maximumAge: Infinity });
+            }, (error) => {
+                if (btn) btn.classList.remove('locating');
+                let errorMsg = 'Location access denied';
+                if (error.code === error.POSITION_UNAVAILABLE) {
+                    errorMsg = 'Location information is unavailable';
+                } else if (error.code === error.TIMEOUT) {
+                    errorMsg = 'Location request timed out';
+                }
+                showMapToast(errorMsg);
+            },
+                { enableHighAccuracy: false, timeout: 10000, maximumAge: 10000 });
         }
 
         // ── BUS STOPS PROCESSING ─────────────────
@@ -858,6 +919,7 @@
         }
 
         function updateMarkers(buses) {
+            latestActiveBusesList = buses;
             const current = new Set();
             const latLngs = [];
             const feedLatLngs = [];
@@ -952,8 +1014,10 @@
                 // }
                 isFirstLoad = false;
             }
+            if (typeof updateTimelineLiveBuses === 'function') {
+                updateTimelineLiveBuses(buses);
+            }
         }
-
         // ── LOGOUT ───────────────────────────────
         function handleLogout() {
             localStorage.clear();
@@ -1005,57 +1069,51 @@
                 <div class="menu-card">
                     <i class="fa-solid fa-ticket menu-card-icon"></i>
                     <span class="menu-card-text">My tickets / passes</span>
-                    <i class="fa-solid fa-chevron-right" style="margin-left:auto;color:#A1A1AA;font-size:0.8rem;"></i>
+                    <i class="fa-solid fa-chevron-right menu-card-chevron"></i>
                 </div>
 
                 <!-- Manage travel card -->
                 <div class="menu-card">
                     <i class="fa-solid fa-credit-card menu-card-icon"></i>
                     <span class="menu-card-text">Manage travel card</span>
-                    <i class="fa-solid fa-chevron-right" style="margin-left:auto;color:#A1A1AA;font-size:0.8rem;"></i>
+                    <i class="fa-solid fa-chevron-right menu-card-chevron"></i>
                 </div>
 
                 <!-- Settings & Info List -->
                 <div class="side-panel-list">
-                    <div class="side-panel-item">
+                    <div class="side-panel-item" onclick="showMapPanel(true);closeSidePanel();">
                         <i class="fa-solid fa-location-dot side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Bus stops near me</span>
-                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
                     </div>
 
                     <span class="stop-card-divider"></span>
                     <div class="side-panel-item">
                         <i class="fa-solid fa-language side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Change language</span>
-                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
                     </div>
 
                     <span class="stop-card-divider"></span>
                     <div class="side-panel-item">
                         <i class="fa-solid fa-circle-exclamation side-panel-item-icon sos-icon"></i>
                         <span class="side-panel-item-text">SOS</span>
-                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
                     </div>
 
                     <span class="stop-card-divider"></span>
                     <div class="side-panel-item">
                         <i class="fa-solid fa-headset side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Customer support</span>
-                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
                     </div>
 
                     <span class="stop-card-divider"></span>
                     <div class="side-panel-item">
                         <i class="fa-solid fa-file-shield side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Manage Consent</span>
-                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
                     </div>
 
                     <span class="stop-card-divider"></span>
                     <div class="side-panel-item">
                         <i class="fa-solid fa-gear side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Account settings</span>
-                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
                     </div>
                 </div>
             </div>
@@ -1158,6 +1216,80 @@
         </div>
     </div>
 
+    <!-- ════ TRIP PLANNER PANEL ═════════════════ -->
+    <div id="trip-planner-panel" style="display:none;">
+        <header class="planner-header">
+            <button class="planner-back-btn" onclick="hidePlannerPanel()">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <div class="planner-title">Trip Details</div>
+        </header>
+
+        <div class="planner-body">
+            <!-- Location Inputs Card -->
+            <div class="location-inputs-card">
+                <div class="inputs-row">
+                    <div class="inputs-col-left">
+                        <div class="location-dot-start"></div>
+                        <div class="location-line"></div>
+                        <div class="location-dot-end"></div>
+                    </div>
+                    <div class="inputs-col-right">
+                        <div class="input-wrapper">
+                            <input type="text" id="planner-start" placeholder="Starting point..." readonly
+                                onclick="openLocationSearch('start')">
+                            <button class="clear-input-btn" onclick="clearStartLocation()">&times;</button>
+                        </div>
+                        <div class="input-divider"></div>
+                        <div class="input-wrapper">
+                            <input type="text" id="planner-end" placeholder="Enter destination..." readonly
+                                onclick="openLocationSearch('end')">
+                            <button class="clear-input-btn" onclick="clearEndLocation()">&times;</button>
+                        </div>
+                    </div>
+                    <div class="inputs-col-swap">
+                        <button class="swap-btn" onclick="swapLocations()">
+                            <i class="fa-solid fa-arrowsleg-up-down"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="planner-results-section" class="planner-results-section">
+                <div class="results-tabs">
+                    <button class="tab-btn active" id="tab-all-btn" onclick="switchResultTab('all')">All</button>
+                    <button class="tab-btn" id="tab-direct-btn" onclick="switchResultTab('direct')">Direct</button>
+                </div>
+
+                <div id="trip-results-list" class="results-list">
+                    <!-- Dynamic journey cards will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════ LOCATION SEARCH PANEL ══════════════ -->
+    <div id="location-search-panel" style="display:none;">
+        <header class="search-panel-header">
+            <button class="search-panel-back-btn" onclick="hideLocationSearchPanel()">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <div class="search-input-wrapper">
+
+                <i class="fa-solid fa-magnifying-glass search-icon location-search-icon"></i>
+                <input type="text" id="location-search-input" placeholder="Search location or bus stop..."
+                    autocomplete="off">
+                <button class="clear-search-btn" onclick="clearSearchInput()">&times;</button>
+            </div>
+        </header>
+        <div class="search-panel-body">
+            <div id="location-suggestions-list" class="suggestions-list-container">
+                <!-- Suggestions will be dynamically rendered here -->
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Wrap -->
     <div class="toast-wrap">
         <div class="toast" id="toast"></div>
@@ -1188,8 +1320,10 @@
             fetchUserProfile();
 
             // Highlight the My Tickets tab
-            const ticketsTab = document.querySelector('.bottom-nav-item i.fa-ticket').parentElement;
-            updateBottomNav(ticketsTab);
+            const ticketsTabIcon = document.querySelector('.bottom-nav-item i.fa-ticket');
+            if (ticketsTabIcon && ticketsTabIcon.parentElement) {
+                updateBottomNav(ticketsTabIcon.parentElement);
+            }
         }
 
         function closeSidePanel() {
@@ -1198,8 +1332,10 @@
             showAccountView();
 
             // Reset to Home tab when side panel is closed
-            const homeTab = document.querySelector('.bottom-nav-item i.fa-house').parentElement;
-            updateBottomNav(homeTab);
+            const homeTabIcon = document.querySelector('.bottom-nav-item i.fa-house');
+            if (homeTabIcon && homeTabIcon.parentElement) {
+                updateBottomNav(homeTabIcon.parentElement);
+            }
         }
 
         function showAccountView() {
@@ -1531,6 +1667,857 @@
                 toastEl.className = "toast";
             }, 3000);
         }
+
+        /* --- TRIP PLANNER & AUTOCOMPLETE LOGIC --- */
+        let plannerStartLocation = { name: "Current location", coords: null, isStop: false, stopId: null };
+        let plannerEndLocation = null;
+        let activeAutocompleteTarget = null; // 'start' or 'end'
+        let currentTabFilter = 'all'; // 'all' or 'direct'
+        let tripRoutesResult = [];
+        let activeRoutePolyline = null;
+        let routeMarkersList = [];
+        let currentlySelectedRoute = null;
+        let latestActiveBusesList = [];
+
+        function showPlannerPanel() {
+            document.getElementById('trip-planner-panel').style.display = 'flex';
+
+            // Set default start location as current location
+            const startInput = document.getElementById('planner-start');
+            if (!startInput.value) {
+                startInput.value = "Current location";
+                if (userMarker) {
+                    const latlng = userMarker.getLatLng();
+                    plannerStartLocation = {
+                        name: "Current location",
+                        coords: [latlng.lat, latlng.lng],
+                        isStop: false,
+                        stopId: null
+                    };
+                }
+            }
+
+            // Trigger calculation if both locations are already defined
+            calculateTrip();
+        }
+
+        function hidePlannerPanel() {
+            document.getElementById('trip-planner-panel').style.display = 'none';
+        }
+
+        function clearStartLocation() {
+            const startInput = document.getElementById('planner-start');
+            startInput.value = '';
+            plannerStartLocation = null;
+            document.getElementById('trip-results-list').innerHTML = '';
+            startInput.focus();
+        }
+
+        function clearEndLocation() {
+            const endInput = document.getElementById('planner-end');
+            endInput.value = '';
+            plannerEndLocation = null;
+            document.getElementById('trip-results-list').innerHTML = '';
+            endInput.focus();
+        }
+
+        function swapLocations() {
+            const startInput = document.getElementById('planner-start');
+            const endInput = document.getElementById('planner-end');
+
+            const tempVal = startInput.value;
+            startInput.value = endInput.value;
+            endInput.value = tempVal;
+
+            const tempLoc = plannerStartLocation;
+            plannerStartLocation = plannerEndLocation;
+            plannerEndLocation = tempLoc;
+
+            calculateTrip();
+        }
+
+        /* --- LOCATION OVERLAY SEARCH LOGIC --- */
+        let locationSearchMode = 'start'; // 'start' or 'end'
+
+        function openLocationSearch(mode) {
+            locationSearchMode = mode;
+            const searchPanel = document.getElementById('location-search-panel');
+            const searchInput = document.getElementById('location-search-input');
+            const suggestionsList = document.getElementById('location-suggestions-list');
+
+            // Clear old values and set correct placeholder
+            suggestionsList.innerHTML = '';
+            if (mode === 'start') {
+                searchInput.placeholder = "Search starting point...";
+                searchInput.value = plannerStartLocation ? (plannerStartLocation.name === "Current location" ? "" : plannerStartLocation.name) : "";
+            } else {
+                searchInput.placeholder = "Search destination...";
+                searchInput.value = plannerEndLocation ? plannerEndLocation.name : "";
+            }
+
+            // Show Location Search Overlay Panel
+            searchPanel.style.display = 'flex';
+
+            // Auto-focus search input
+            setTimeout(() => {
+                searchInput.focus();
+                if (searchInput.value.trim().length >= 2) {
+                    fetchLocationSearchSuggestions(searchInput.value.trim());
+                }
+            }, 150);
+        }
+
+        function hideLocationSearchPanel() {
+            document.getElementById('location-search-panel').style.display = 'none';
+        }
+
+        function clearSearchInput() {
+            const searchInput = document.getElementById('location-search-input');
+            searchInput.value = '';
+            document.getElementById('location-suggestions-list').innerHTML = '';
+            searchInput.focus();
+        }
+
+        async function fetchLocationSearchSuggestions(query) {
+            const suggestionsList = document.getElementById('location-suggestions-list');
+            try {
+                // 1. Query stops in DB
+                const stopsRes = await fetch(`/api/stops/search?q=${encodeURIComponent(query)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const stopsData = await stopsRes.json();
+                let stopsResults = [];
+                if (stopsData.success) {
+                    stopsResults = stopsData.stops.map(stop => ({
+                        name: stop.stationName,
+                        coords: [stop.latitude, stop.longitude],
+                        isStop: true,
+                        stopId: stop._id,
+                        sub: "Bus Stop"
+                    }));
+                }
+
+                // 2. Query places in Indore via OSM Nominatim
+                let placesResults = [];
+                try {
+                    const osmRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', Indore')}&limit=5`);
+                    const osmData = await osmRes.json();
+                    placesResults = osmData.map(item => ({
+                        name: item.display_name.split(',')[0],
+                        coords: [parseFloat(item.lat), parseFloat(item.lon)],
+                        isStop: false,
+                        stopId: null,
+                        sub: item.display_name.split(',').slice(1, 3).join(',').trim()
+                    }));
+                } catch (osmErr) {
+                    console.warn("OSM Search error:", osmErr);
+                }
+
+                const allResults = [...stopsResults, ...placesResults];
+                if (allResults.length === 0) {
+                    suggestionsList.innerHTML = `<div class="autocomplete-item"><div class="autocomplete-details"><span class="autocomplete-name">No locations found</span></div></div>`;
+                } else {
+                    suggestionsList.innerHTML = allResults.map(item => {
+                        const escapedItem = JSON.stringify(item).replace(/"/g, '&quot;');
+                        return `
+                            <div class="autocomplete-item" onclick="selectSearchLocationItem(${escapedItem})">
+                                <div class="autocomplete-icon">
+                                    <i class="${item.isStop ? 'fa-solid fa-bus-simple' : 'fa-solid fa-location-dot'}"></i>
+                                </div>
+                                <div class="autocomplete-details">
+                                    <span class="autocomplete-name">${item.name}</span>
+                                    <span class="autocomplete-sub">${item.sub}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (err) {
+                console.error("Suggestions fetch error:", err);
+            }
+        }
+
+        function selectSearchLocationItem(item) {
+            hideLocationSearchPanel();
+
+            if (locationSearchMode === 'start') {
+                const startInput = document.getElementById('planner-start');
+                startInput.value = item.name;
+                plannerStartLocation = item;
+            } else {
+                const endInput = document.getElementById('planner-end');
+                endInput.value = item.name;
+                plannerEndLocation = item;
+            }
+
+            showPlannerPanel();
+        }
+
+        // Set up Event Listeners for autocomplete search inputs
+        document.addEventListener("DOMContentLoaded", () => {
+            const searchInput = document.getElementById('location-search-input');
+            let debounceTimer;
+
+            if (searchInput) {
+                searchInput.addEventListener('input', () => {
+                    clearTimeout(debounceTimer);
+                    const query = searchInput.value.trim();
+
+                    if (query.length < 2) {
+                        document.getElementById('location-suggestions-list').innerHTML = '';
+                        return;
+                    }
+
+                    debounceTimer = setTimeout(() => {
+                        fetchLocationSearchSuggestions(query);
+                    }, 300);
+                });
+            }
+        });
+
+        async function calculateTrip() {
+            if (!plannerStartLocation || !plannerEndLocation) return;
+
+            const resultsList = document.getElementById('trip-results-list');
+
+            // Fallback: if starting point is current location and coords are null (waiting for Geolocation), resolve from userMarker
+            if (!plannerStartLocation.isStop && !plannerStartLocation.coords) {
+                if (userMarker) {
+                    const latlng = userMarker.getLatLng();
+                    plannerStartLocation.coords = [latlng.lat, latlng.lng];
+                } else {
+                    resultsList.innerHTML = `
+                        <div class="empty-results">
+                            <i class="fa-solid fa-location-crosshairs fa-spin empty-results-icon" style="color:var(--brand-amber);"></i>
+                            <div class="empty-results-title">Acquiring Current Location...</div>
+                            <div class="empty-results-desc">Please enable location access or select a starting bus stop.</div>
+                        </div>
+                    `;
+                    return;
+                }
+            }
+
+            resultsList.innerHTML = `
+                <div style="text-align:center; padding: 40px 0; color: #71717A;">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 12px;"></i>
+                    <div>Planning your route...</div>
+                </div>
+            `;
+
+            try {
+                let url = `/api/routes/plan?`;
+                if (plannerStartLocation.isStop) {
+                    url += `startStopId=${plannerStartLocation.stopId}`;
+                } else {
+                    url += `startLat=${plannerStartLocation.coords[0]}&startLng=${plannerStartLocation.coords[1]}`;
+                }
+
+                if (plannerEndLocation.isStop) {
+                    url += `&endStopId=${plannerEndLocation.stopId}`;
+                } else {
+                    url += `&endLat=${plannerEndLocation.coords[0]}&endLng=${plannerEndLocation.coords[1]}`;
+                }
+
+                const res = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    renderPlannerResults(data);
+                } else {
+                    resultsList.innerHTML = `
+                        <div class="empty-results">
+                            <i class="fa-solid fa-circle-exclamation empty-results-icon"></i>
+                            <div class="empty-results-title">Route Planning Failed</div>
+                            <div class="empty-results-desc">${data.message || 'Error occurred.'}</div>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.error("Trip planning calculation error:", err);
+                resultsList.innerHTML = `
+                    <div class="empty-results">
+                        <i class="fa-solid fa-triangle-exclamation empty-results-icon"></i>
+                        <div class="empty-results-title">Server Connection Failed</div>
+                        <div class="empty-results-desc">Could not connect to route planning servers. Please try again.</div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderPlannerResults(data) {
+            const resultsList = document.getElementById('trip-results-list');
+            tripRoutesResult = data.routes || [];
+
+            filterAndRenderCards();
+        }
+
+        function switchResultTab(tab) {
+            currentTabFilter = tab;
+            document.getElementById('tab-all-btn').classList.toggle('active', tab === 'all');
+            document.getElementById('tab-direct-btn').classList.toggle('active', tab === 'direct');
+
+            filterAndRenderCards();
+        }
+
+        function filterAndRenderCards() {
+            const resultsList = document.getElementById('trip-results-list');
+
+            const filteredRoutes = tripRoutesResult;
+
+            if (filteredRoutes.length === 0) {
+                resultsList.innerHTML = `
+                    <div class="empty-results">
+                        <i class="fa-solid fa-bus-simple empty-results-icon"></i>
+                        <div class="empty-results-title">No Direct Routes Found</div>
+                        <div class="empty-results-desc">We couldn't find a direct bus route connecting these points. Try searching close to major stops.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const startCoords = plannerStartLocation.coords;
+            const endCoords = plannerEndLocation.coords;
+
+            resultsList.innerHTML = filteredRoutes.map(route => {
+                const firstStop = route.stops[0];
+                const lastStop = route.stops[route.stops.length - 1];
+
+                const walkToStartDist = getDistanceMeters(startCoords[0], startCoords[1], firstStop.latitude, firstStop.longitude);
+                const walkToEndDist = getDistanceMeters(lastStop.latitude, lastStop.longitude, endCoords[0], endCoords[1]);
+
+                const startLegType = walkToStartDist > 500 ? 'Auto' : 'Walk';
+                const startLegTime = Math.max(1, Math.round(startLegType === 'Walk' ? walkToStartDist / 80 : walkToStartDist / 300));
+
+                const endLegType = walkToEndDist > 500 ? 'Auto' : 'Walk';
+                const endLegTime = Math.max(1, Math.round(endLegType === 'Walk' ? walkToEndDist / 80 : walkToEndDist / 300));
+
+                const busRideTime = Math.max(2, route.numStops * 2);
+                const totalDuration = startLegTime + busRideTime + endLegTime;
+
+                const busCost = 10 + (route.numStops * 2);
+                const startAutoCost = startLegType === 'Auto' ? Math.round(30 + (walkToStartDist / 1000) * 10) : 0;
+                const endAutoCost = endLegType === 'Auto' ? Math.round(30 + (walkToEndDist / 1000) * 10) : 0;
+                const totalCost = busCost + startAutoCost + endAutoCost;
+
+                const legs = [];
+                if (walkToStartDist > 30) {
+                    legs.push(`
+                        <div class="timeline-leg">
+                            <i class="${startLegType === 'Walk' ? 'fa-solid fa-person-walking' : 'fa-solid fa-rickshaw'}"></i>
+                            <span>${startLegType}</span>
+                        </div>
+                    `);
+                }
+
+                legs.push(`
+                    <div class="timeline-leg" style="background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.2); color: #B45309;">
+                        <i class="fa-solid fa-bus" style="color: #D97706;"></i>
+                        <span>Take ${route.routeName.split(' ')[0].replace(/[:-]+$/, '')}</span>
+                    </div>
+                `);
+
+                if (walkToEndDist > 30) {
+                    legs.push(`
+                        <div class="timeline-leg">
+                            <i class="${endLegType === 'Walk' ? 'fa-solid fa-person-walking' : 'fa-solid fa-rickshaw'}"></i>
+                            <span>${endLegType}</span>
+                        </div>
+                    `);
+                }
+
+                const legFlowHtml = legs.join('<i class="fa-solid fa-arrow-right timeline-arrow"></i>');
+                const escapedRoute = JSON.stringify(route).replace(/"/g, '&quot;');
+
+                return `
+                    <div class="journey-card" onclick="mapPlannedRoute(${escapedRoute}, ${walkToStartDist}, ${walkToEndDist})">
+                        <div class="journey-card-head">
+                            <div style="display:flex; align-items:center;">
+                                <span class="journey-duration">${totalDuration} min</span>
+                                <span class="journey-direct-pill">Direct</span>
+                            </div>
+                            <span class="journey-price">₹${totalCost}</span>
+                        </div>
+                        <div class="journey-timeline">
+                            ${legFlowHtml}
+                        </div>
+                        <div class="journey-details-text">
+                            <div>Bus from: <span>${firstStop.stopName}</span></div>
+                            <div>Interval: <span>Every 15 min</span></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function mapPlannedRoute(route, walkStartDist, walkEndDist) {
+            hidePlannerPanel();
+            showMapPanel(false, 'search');
+
+            if (activeRoutePolyline) {
+                map.removeLayer(activeRoutePolyline);
+                activeRoutePolyline = null;
+            }
+            routeMarkersList.forEach(marker => map.removeLayer(marker));
+            routeMarkersList = [];
+
+            const latlngs = route.stops.map(stop => [stop.latitude, stop.longitude]);
+            activeRoutePolyline = L.polyline(latlngs, {
+                color: '#EA580C',
+                weight: 6,
+                opacity: 0.8,
+                dashArray: '2, 8'
+            }).addTo(map);
+
+            map.fitBounds(activeRoutePolyline.getBounds(), { padding: [50, 50] });
+
+            const firstStop = route.stops[0];
+            const lastStop = route.stops[route.stops.length - 1];
+
+            const startStopMarker = L.marker([firstStop.latitude, firstStop.longitude], {
+                icon: L.divIcon({
+                    html: `<div style="width:24px;height:24px;background:#000000;border:2.5px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-bus" style="color:white;font-size:10px;"></i></div>`,
+                    className: '', iconSize: [24, 24], iconAnchor: [12, 12]
+                })
+            }).bindPopup(`<b>Start Bus Stop:</b> ${firstStop.stopName}`).addTo(map);
+
+            const endStopMarker = L.marker([lastStop.latitude, lastStop.longitude], {
+                icon: L.divIcon({
+                    html: `<div style="width:24px;height:24px;background:#71717A;border:2.5px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-bus" style="color:white;font-size:10px;"></i></div>`,
+                    className: '', iconSize: [24, 24], iconAnchor: [12, 12]
+                })
+            }).bindPopup(`<b>End Bus Stop:</b> ${lastStop.stopName}`).addTo(map);
+
+            routeMarkersList.push(startStopMarker, endStopMarker);
+            showMapToast(`Showing route path: ${route.routeName.split(' ')[0].replace(/[:-]+$/, '')}`);
+
+            if (walkStartDist > 30) {
+                const walkLine = L.polyline([plannerStartLocation.coords, [firstStop.latitude, firstStop.longitude]], {
+                    color: '#9CA3AF',
+                    weight: 3,
+                    dashArray: '5, 5'
+                }).addTo(map);
+                routeMarkersList.push(walkLine);
+            }
+
+            if (walkEndDist > 30) {
+                const walkLine = L.polyline([[lastStop.latitude, lastStop.longitude], plannerEndLocation.coords], {
+                    color: '#9CA3AF',
+                    weight: 3,
+                    dashArray: '5, 5'
+                }).addTo(map);
+                routeMarkersList.push(walkLine);
+            }
+
+            // Timeline calculations
+            const startLegType = walkStartDist > 500 ? 'Auto' : 'Walk';
+            const startLegTime = Math.max(1, Math.round(startLegType === 'Walk' ? walkStartDist / 80 : walkStartDist / 300));
+
+            const endLegType = walkEndDist > 500 ? 'Auto' : 'Walk';
+            const endLegTime = Math.max(1, Math.round(endLegType === 'Walk' ? walkEndDist / 80 : walkEndDist / 300));
+
+            const busRideTime = Math.max(2, route.numStops * 2);
+            const totalDuration = startLegTime + busRideTime + endLegTime;
+
+            const busCost = 10 + (route.numStops * 2);
+            const startAutoCost = startLegType === 'Auto' ? Math.round(30 + (walkStartDist / 1000) * 10) : 0;
+            const endAutoCost = endLegType === 'Auto' ? Math.round(30 + (walkEndDist / 1000) * 10) : 0;
+            const totalCost = busCost + startAutoCost + endAutoCost;
+
+            let timelineHtml = '';
+
+            // Leg 1: Walk / Auto to first stop
+            if (walkStartDist > 30) {
+                timelineHtml += `
+                    <div class="timeline-item walk-leg">
+                        <div class="timeline-left">
+                            <div class="timeline-icon-circle walk">
+                                <i class="${startLegType === 'Walk' ? 'fa-solid fa-person-walking' : 'fa-solid fa-rickshaw'}"></i>
+                            </div>
+                            <div class="timeline-line dotted"></div>
+                        </div>
+                        <div class="timeline-right">
+                            <div class="timeline-card">
+                                <div class="timeline-card-title">${startLegType === 'Walk' ? 'Walk' : 'Take Auto'} to ${firstStop.stopName}</div>
+                                <div class="timeline-card-details">${startLegTime} min • ${Math.round(walkStartDist)}m</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Leg 2: Bus ride
+            const intermediateStops = route.stops.slice(1, -1);
+            const stopsCount = intermediateStops.length;
+            const routeNamePrefix = route.routeName.split(' ')[0].replace(/[:-]+$/, '');
+
+            // Check if active bus exists on the route
+            const isLive = latestActiveBusesList.some(bus => {
+                if (!bus.coordinates) return false;
+                const busIdLower = bus.busId.toLowerCase();
+                return route.routeName.toLowerCase().includes(busIdLower) ||
+                    busIdLower.includes(routeNamePrefix.toLowerCase());
+            });
+
+            const liveStatusHtml = isLive
+                ? `<span class="bus-card-status active live-pill" style="display:flex; align-items:center; gap:5px; font-weight:700;"><span class="live-dot" style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#EF4444; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); animation: live-pulse-coral 1.2s infinite;"></span>LIVE</span>`
+                : ``;
+
+            timelineHtml += `
+                <div class="timeline-item bus-leg">
+                    <div class="timeline-left">
+                        <div class="timeline-icon-circle bus">
+                            <i class="fa-solid fa-bus"></i>
+                        </div>
+                        <div class="timeline-line solid"></div>
+                    </div>
+                    <div class="timeline-right">
+                        <div class="timeline-card bus-card">
+                            <div class="bus-card-header">
+                                <span class="bus-card-badge">${routeNamePrefix}</span>
+                                ${liveStatusHtml}
+                            </div>
+                            
+                            <div class="bus-leg-details">
+                                <div class="stop-point start-stop">
+                                    <span class="stop-point-dot"></span>
+                                    <span>Board at ${firstStop.stopName}</span>
+                                    <span id="timeline-start-bus"></span>
+                                </div>
+            `;
+
+            if (stopsCount > 0) {
+                timelineHtml += `
+                                <div class="intermediate-accordion">
+                                    <button class="accordion-toggle" onclick="toggleIntermediateStops(this)">
+                                        <span class="stops-count">${stopsCount} stop${stopsCount > 1 ? 's' : ''}</span>
+                                        <i class="fa-solid fa-chevron-down toggle-icon"></i>
+                                    </button>
+                                    <div class="accordion-content">
+                                        <div class="sub-timeline">
+                                            <div class="sub-timeline-line"></div>
+                                            ${intermediateStops.map(stop => `
+                                                <div class="sub-stop-item" data-stop-id="${stop.stopId}" data-lat="${stop.latitude}" data-lng="${stop.longitude}">
+                                                    <span class="sub-stop-dot"></span>
+                                                    <span class="sub-stop-name">${stop.stopName}</span>
+                                                    <span class="live-bus-container"></span>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                `;
+            }
+
+            timelineHtml += `
+                                <div class="stop-point end-stop">
+                                    <span class="stop-point-dot"></span>
+                                    <span>Alight at ${lastStop.stopName}</span>
+                                    <span id="timeline-end-bus"></span>
+                                </div>
+                            </div>
+                            
+                            <button class="btn-track-bus" onclick="trackBusOnMap('${routeNamePrefix}')">
+                                <i class="fa-solid fa-location-crosshairs"></i> Track Bus
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Leg 3: Walk / Auto from last stop to final destination
+            if (walkEndDist > 30) {
+                timelineHtml += `
+                    <div class="timeline-item walk-leg">
+                        <div class="timeline-left">
+                            <div class="timeline-icon-circle walk">
+                                <i class="${endLegType === 'Walk' ? 'fa-solid fa-person-walking' : 'fa-solid fa-rickshaw'}"></i>
+                            </div>
+                            <div class="timeline-line dotted"></div>
+                        </div>
+                        <div class="timeline-right">
+                            <div class="timeline-card">
+                                <div class="timeline-card-title">${endLegType === 'Walk' ? 'Walk' : 'Take Auto'} to Destination</div>
+                                <div class="timeline-card-details">${endLegTime} min • ${Math.round(walkEndDist)}m</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Final Destination node
+            timelineHtml += `
+                <div class="timeline-item destination-leg">
+                    <div class="timeline-left">
+                        <div class="timeline-icon-circle destination">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+                    </div>
+                    <div class="timeline-right">
+                        <div class="timeline-card">
+                            <div class="timeline-card-title">Your destination</div>
+                            <div class="timeline-card-details">Arrived</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Populate Bottom Sheet details
+            currentlySelectedRoute = route;
+            document.getElementById('jd-route-badge').textContent = routeNamePrefix;
+            document.getElementById('jd-direction').textContent = `To ${lastStop.stopName}`;
+            document.getElementById('jd-total-time').textContent = `${totalDuration} min`;
+            document.getElementById('jd-total-price').textContent = `₹${totalCost}`;
+            document.getElementById('jd-timeline-vertical').innerHTML = timelineHtml;
+
+            // Open bottom sheet
+            document.getElementById('journey-details-panel').classList.add('open');
+
+            // Force immediate update of live bus markers in the sheet
+            updateTimelineLiveBuses(latestActiveBusesList);
+        }
+
+        function hideJourneyDetails() {
+            const panel = document.getElementById('journey-details-panel');
+            if (panel) {
+                panel.classList.remove('open');
+                panel.classList.remove('collapsed');
+                panel.classList.remove('expanded');
+            }
+            currentlySelectedRoute = null;
+        }
+
+        function toggleIntermediateStops(btn) {
+            btn.classList.toggle('expanded');
+            const content = btn.nextElementSibling;
+            if (content) {
+                content.classList.toggle('open');
+            }
+        }
+
+        function trackBusOnMap(routeNamePrefix) {
+            if (!routeNamePrefix || !latestActiveBusesList.length) {
+                showMapToast(`No live bus found active for ${routeNamePrefix}`);
+                return;
+            }
+
+            const matchingBus = latestActiveBusesList.find(bus => {
+                if (!bus.coordinates) return false;
+                const busIdLower = bus.busId.toLowerCase();
+                return currentlySelectedRoute.routeName.toLowerCase().includes(busIdLower) ||
+                    busIdLower.includes(routeNamePrefix.toLowerCase());
+            });
+
+            if (matchingBus) {
+                const { latitude: lat, longitude: lng } = matchingBus.coordinates;
+                map.flyTo([lat, lng], 17, { duration: 1.2 });
+                showMapToast(`Tracking bus: ${matchingBus.busId}`);
+
+                const marker = busMarkers.get(matchingBus.busId);
+                if (marker) {
+                    marker.openPopup();
+                }
+            } else {
+                showMapToast(`No live bus found active for ${routeNamePrefix}`);
+            }
+        }
+
+        function updateTimelineLiveBuses(buses) {
+            if (!currentlySelectedRoute) return;
+
+            // Clear previous indicators
+            document.querySelectorAll('.live-bus-container').forEach(el => el.innerHTML = '');
+            const startBusIcon = document.getElementById('timeline-start-bus');
+            const endBusIcon = document.getElementById('timeline-end-bus');
+            if (startBusIcon) startBusIcon.innerHTML = '';
+            if (endBusIcon) endBusIcon.innerHTML = '';
+
+            const routeNamePrefix = currentlySelectedRoute.routeName.split(' ')[0].replace(/[:-]+$/, '').toLowerCase();
+
+            // Filter active buses matching this route
+            const matchingBuses = buses.filter(bus => {
+                if (!bus.coordinates) return false;
+                const busIdLower = bus.busId.toLowerCase();
+                return currentlySelectedRoute.routeName.toLowerCase().includes(busIdLower) ||
+                    busIdLower.includes(routeNamePrefix);
+            });
+
+            if (!matchingBuses.length) return;
+
+            // Map each matching bus to the closest stop
+            matchingBuses.forEach(bus => {
+                let closestStopIndex = -1;
+                let minDistance = Infinity;
+
+                currentlySelectedRoute.stops.forEach((stop, index) => {
+                    const dist = getDistanceMeters(
+                        bus.coordinates.latitude,
+                        bus.coordinates.longitude,
+                        stop.latitude,
+                        stop.longitude
+                    );
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        closestStopIndex = index;
+                    }
+                });
+
+                // Display bus indicator if closest stop is within 500 meters
+                if (closestStopIndex !== -1 && minDistance < 500) {
+                    const busIndicatorHtml = `
+                        <span class="timeline-live-bus" title="Bus ${bus.busId} is here">
+                            <i class="fa-solid fa-bus"></i>
+                        </span>
+                    `;
+
+                    if (closestStopIndex === 0) {
+                        const el = document.getElementById('timeline-start-bus');
+                        if (el) el.innerHTML = busIndicatorHtml;
+                    } else if (closestStopIndex === currentlySelectedRoute.stops.length - 1) {
+                        const el = document.getElementById('timeline-end-bus');
+                        if (el) el.innerHTML = busIndicatorHtml;
+                    } else {
+                        const stopId = currentlySelectedRoute.stops[closestStopIndex].stopId;
+                        const parentEl = document.querySelector(`.sub-stop-item[data-stop-id="${stopId}"]`);
+                        if (parentEl) {
+                            const container = parentEl.querySelector('.live-bus-container');
+                            if (container) container.innerHTML = busIndicatorHtml;
+                        }
+                    }
+                }
+            });
+        }
+
+        function collapseJourneyDetails() {
+            const panel = document.getElementById('journey-details-panel');
+            if (panel && panel.classList.contains('open')) {
+                panel.classList.add('collapsed');
+            }
+        }
+
+        // Tap on collapsed header to expand it & touch swipe/drag behavior for mobile
+        document.addEventListener("DOMContentLoaded", () => {
+            const panel = document.getElementById('journey-details-panel');
+            const header = document.querySelector('.journey-details-panel .jd-header');
+            const dragHandler = document.querySelector('.journey-details-panel .drag-handler');
+
+            if (header) {
+                header.addEventListener('click', (e) => {
+                    // Do not expand if user clicks close button
+                    if (e.target.closest('.jd-close-btn') || e.target.closest('.jd-close-btn *')) {
+                        return;
+                    }
+                    if (panel && panel.classList.contains('open') && panel.classList.contains('collapsed')) {
+                        panel.classList.remove('collapsed');
+                        panel.classList.remove('expanded');
+                    }
+                });
+            }
+
+            // Swipeable / draggable sheet behavior
+            let startY = 0;
+            let startTranslateY = 0;
+            let isDragging = false;
+            let panelHeight = 0;
+
+            function onTouchStart(e) {
+                if (!panel || !panel.classList.contains('open')) return;
+
+                startY = e.touches[0].clientY;
+                panelHeight = panel.offsetHeight;
+
+                // Parse current translateY from computed styles transform matrix
+                const style = window.getComputedStyle(panel);
+                const transform = style.transform;
+                const MatrixClass = window.DOMMatrix || window.WebKitCSSMatrix;
+
+                if (transform && transform !== 'none' && MatrixClass) {
+                    const matrix = new MatrixClass(transform);
+                    startTranslateY = matrix.m42; // vertical translation (translateY)
+                } else {
+                    startTranslateY = 0;
+                }
+
+                isDragging = true;
+                panel.style.setProperty('transition', 'none', 'important');
+            }
+
+            function onTouchMove(e) {
+                if (!isDragging) return;
+                const currentY = e.touches[0].clientY;
+                const deltaY = currentY - startY;
+                let newTranslateY = startTranslateY + deltaY;
+
+                const maxTranslateY = Math.max(0, panelHeight - 62);
+                const minTranslateY = 0;
+
+                // Add resistance when pulling past limits
+                if (newTranslateY < minTranslateY) {
+                    newTranslateY = newTranslateY * 0.2;
+                }
+                if (newTranslateY > maxTranslateY) {
+                    newTranslateY = maxTranslateY + (newTranslateY - maxTranslateY) * 0.2;
+                }
+
+                panel.style.setProperty('transform', `translateX(-50%) translateY(${newTranslateY}px)`, 'important');
+                panel.style.setProperty('--translate-y', `${newTranslateY}px`);
+            }
+
+            function onTouchEnd(e) {
+                if (!isDragging) return;
+                isDragging = false;
+                panel.style.removeProperty('transition');
+
+                // Read current translation to snap to closest state
+                const style = window.getComputedStyle(panel);
+                const transform = style.transform;
+                const MatrixClass = window.DOMMatrix || window.WebKitCSSMatrix;
+                let finalTranslateY = 0;
+
+                if (transform && transform !== 'none' && MatrixClass) {
+                    const matrix = new MatrixClass(transform);
+                    finalTranslateY = matrix.m42;
+                }
+
+                panel.style.removeProperty('transform');
+                panel.style.removeProperty('--translate-y');
+
+                const targetExpanded = 0;
+                const targetMedium = Math.max(0, Math.min(panelHeight - 62, panelHeight - 360));
+                const targetCollapsed = panelHeight - 62;
+
+                const diffExpanded = Math.abs(finalTranslateY - targetExpanded);
+                const diffMedium = Math.abs(finalTranslateY - targetMedium);
+                const diffCollapsed = Math.abs(finalTranslateY - targetCollapsed);
+
+                if (diffExpanded < diffMedium && diffExpanded < diffCollapsed) {
+                    // Snap to Expanded
+                    panel.classList.remove('collapsed');
+                    panel.classList.add('expanded');
+                } else if (diffMedium < diffExpanded && diffMedium < diffCollapsed) {
+                    // Snap to Medium (Default Open)
+                    panel.classList.remove('collapsed');
+                    panel.classList.remove('expanded');
+                } else {
+                    // Snap to Collapsed
+                    panel.classList.add('collapsed');
+                    panel.classList.remove('expanded');
+                }
+            }
+
+            // Attach touch event listeners
+            if (dragHandler) {
+                dragHandler.addEventListener('touchstart', onTouchStart, { passive: true });
+                dragHandler.addEventListener('touchmove', onTouchMove, { passive: true });
+                dragHandler.addEventListener('touchend', onTouchEnd, { passive: true });
+            }
+            if (header) {
+                header.addEventListener('touchstart', onTouchStart, { passive: true });
+                header.addEventListener('touchmove', onTouchMove, { passive: true });
+                header.addEventListener('touchend', onTouchEnd, { passive: true });
+            }
+        });
     </script>
 </body>
 
