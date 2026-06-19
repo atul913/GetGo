@@ -576,10 +576,10 @@
         let trafficLayer = null;
 
         const TILES = {
-            standard: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            satellite: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-            topo: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-            dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+            standard: 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+            satellite: 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+            topo: 'https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',
+            dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
         };
 
         // ── MAP INIT ─────────────────────────────
@@ -682,7 +682,7 @@
             const btn = document.getElementById('traffic-btn');
             const legend = document.getElementById('traffic-legend');
             if (trafficOn) {
-                trafficLayer = L.tileLayer(TILES.standard, { maxZoom: 19, opacity: .4 }).addTo(map);
+                trafficLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=h,traffic&x={x}&y={y}&z={z}', { maxZoom: 19 }).addTo(map);
                 btn.classList.add('active'); legend.classList.add('visible');
                 showMapToast('Traffic layer enabled');
             } else {
@@ -967,32 +967,36 @@
                     <div class="side-panel-item">
                         <i class="fa-solid fa-location-dot side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Bus stops near me</span>
-                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
                     </div>
+
+                    <span class="stop-card-divider"></span>
                     <div class="side-panel-item">
                         <i class="fa-solid fa-language side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Change language</span>
-                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
                     </div>
+
+                    <span class="stop-card-divider"></span>
                     <div class="side-panel-item">
                         <i class="fa-solid fa-circle-exclamation side-panel-item-icon sos-icon"></i>
                         <span class="side-panel-item-text">SOS</span>
-                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
                     </div>
+
+                    <span class="stop-card-divider"></span>
                     <div class="side-panel-item">
                         <i class="fa-solid fa-headset side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Customer support</span>
-                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
                     </div>
+
+                    <span class="stop-card-divider"></span>
                     <div class="side-panel-item">
                         <i class="fa-solid fa-file-shield side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Manage Consent</span>
-                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
                     </div>
+
+                    <span class="stop-card-divider"></span>
                     <div class="side-panel-item">
                         <i class="fa-solid fa-gear side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Account settings</span>
-                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
                     </div>
                 </div>
             </div>

@@ -684,10 +684,10 @@
         const stopMarkersLayer = L.layerGroup();
 
         const TILES = {
-            standard: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            satellite: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-            topo: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-            dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+            standard: 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+            satellite: 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+            topo: 'https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',
+            dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
         };
 
         // ── MAP INIT ─────────────────────────────
@@ -891,7 +891,7 @@
             const btn = document.getElementById('traffic-btn');
             const legend = document.getElementById('traffic-legend');
             if (trafficOn) {
-                trafficLayer = L.tileLayer(TILES.standard, { maxZoom: 19, opacity: .4 }).addTo(map);
+                trafficLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=h,traffic&x={x}&y={y}&z={z}', { maxZoom: 19 }).addTo(map);
                 btn.classList.add('active'); legend.classList.add('visible');
                 showMapToast('Traffic layer enabled');
             } else {
@@ -2101,12 +2101,24 @@
             routeMarkersList = [];
 
             const latlngs = route.stops.map(stop => [stop.latitude, stop.longitude]);
-            activeRoutePolyline = L.polyline(latlngs, {
-                color: '#EA580C',
+            // Google Maps styled double-line path (border casing + blue core) with round caps and joins
+            const activeBusBorder = L.polyline(latlngs, {
+                color: '#1557b0',
+                weight: 10,
+                opacity: 0.4,
+                lineJoin: 'round',
+                lineCap: 'round'
+            });
+
+            const activeBusLine = L.polyline(latlngs, {
+                color: '#1a73e8',
                 weight: 6,
-                opacity: 0.8,
-                dashArray: '2, 8'
-            }).addTo(map);
+                opacity: 0.95,
+                lineJoin: 'round',
+                lineCap: 'round'
+            });
+
+            activeRoutePolyline = L.featureGroup([activeBusBorder, activeBusLine]).addTo(map);
 
             map.fitBounds(activeRoutePolyline.getBounds(), { padding: [50, 50] });
 
@@ -2115,14 +2127,14 @@
 
             const startStopMarker = L.marker([firstStop.latitude, firstStop.longitude], {
                 icon: L.divIcon({
-                    html: `<div style="width:24px;height:24px;background:#000000;border:2.5px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-bus" style="color:white;font-size:10px;"></i></div>`,
+                    html: `<div style="width:24px;height:24px;background:#1a73e8;border:2.5px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-bus" style="color:white;font-size:10px;"></i></div>`,
                     className: '', iconSize: [24, 24], iconAnchor: [12, 12]
                 })
             }).bindPopup(`<b>Start Bus Stop:</b> ${firstStop.stopName}`).addTo(map);
 
             const endStopMarker = L.marker([lastStop.latitude, lastStop.longitude], {
                 icon: L.divIcon({
-                    html: `<div style="width:24px;height:24px;background:#71717A;border:2.5px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-bus" style="color:white;font-size:10px;"></i></div>`,
+                    html: `<div style="width:24px;height:24px;background:#5f6368;border:2.5px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-bus" style="color:white;font-size:10px;"></i></div>`,
                     className: '', iconSize: [24, 24], iconAnchor: [12, 12]
                 })
             }).bindPopup(`<b>End Bus Stop:</b> ${lastStop.stopName}`).addTo(map);
@@ -2132,18 +2144,24 @@
 
             if (walkStartDist > 30) {
                 const walkLine = L.polyline([plannerStartLocation.coords, [firstStop.latitude, firstStop.longitude]], {
-                    color: '#9CA3AF',
-                    weight: 3,
-                    dashArray: '5, 5'
+                    color: '#70757a',
+                    weight: 6,
+                    dashArray: '1, 9',
+                    lineCap: 'round',
+                    lineJoin: 'round',
+                    opacity: 0.8
                 }).addTo(map);
                 routeMarkersList.push(walkLine);
             }
 
             if (walkEndDist > 30) {
                 const walkLine = L.polyline([[lastStop.latitude, lastStop.longitude], plannerEndLocation.coords], {
-                    color: '#9CA3AF',
-                    weight: 3,
-                    dashArray: '5, 5'
+                    color: '#70757a',
+                    weight: 6,
+                    dashArray: '1, 9',
+                    lineCap: 'round',
+                    lineJoin: 'round',
+                    opacity: 0.8
                 }).addTo(map);
                 routeMarkersList.push(walkLine);
             }
