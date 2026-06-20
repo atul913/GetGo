@@ -77,6 +77,16 @@
     --r-xl: 28px;
     --r-full: 9999px;
 
+    /* Typography Font Sizes */
+    --fs-xs: 0.75rem;
+    --fs-sm: 0.85rem;
+    --fs-base: 0.95rem;
+    --fs-lg: 1.1rem;
+    --fs-xl: 1.25rem;
+    --fs-2xl: 1.5rem;
+    --fs-3xl: 2rem;
+    --fs-4xl: 2.5rem;
+
     /* Font */
     --font: 'DM Sans', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
@@ -127,8 +137,8 @@ input {
 }
 
 .topbar-logo {
-    font-size: 1.25rem;
-    font-weight: 900;
+    font-size: var(--fs-xl);
+    font-weight: 600;
     color: #fff;
     letter-spacing: 0.5px;
     display: flex;
@@ -138,8 +148,8 @@ input {
 
 .topbar-logo .badge {
     font-style: normal;
-    font-size: 0.65rem;
-    font-weight: 700;
+    font-size: var(--fs-xs);
+    font-weight: 600;
     letter-spacing: 1.5px;
     background: rgba(255, 255, 255, 0.22);
     padding: 2px 7px;
@@ -157,7 +167,7 @@ input {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.95rem;
+    font-size: var(--fs-base);
     cursor: pointer;
     transition: background .15s;
 }
@@ -192,14 +202,14 @@ input {
 }
 
 .section-title {
-    font-weight: 800;
-    font-size: 1rem;
+    font-weight: 600;
+    font-size: var(--fs-base);
     color: var(--text-100);
 }
 
 .section-link {
-    font-size: 0.78rem;
-    font-weight: 700;
+    font-size: var(--fs-sm);
+    font-weight: 600;
     color: var(--brand-deep);
     text-transform: uppercase;
     letter-spacing: 0.6px;
@@ -232,12 +242,12 @@ input {
 
 .search-icon {
     color: var(--brand-amber);
-    font-size: 1rem;
+    font-size: var(--fs-base);
 }
 
 .search-hint {
     color: var(--text-400);
-    font-size: 0.92rem;
+    font-size: var(--fs-base);
     font-weight: 500;
 }
 
@@ -274,7 +284,7 @@ input {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
+    font-size: var(--fs-base);
     flex-shrink: 0;
 }
 
@@ -294,8 +304,8 @@ input {
 }
 
 .tile-label {
-    font-weight: 700;
-    font-size: 0.87rem;
+    font-weight: 600;
+    font-size: var(--fs-sm);
     color: var(--text-200);
     line-height: 1.3;
 }
@@ -330,17 +340,17 @@ input {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.78rem;
+    font-size: var(--fs-sm);
 }
 
 .stop-name {
-    font-weight: 800;
-    font-size: 0.95rem;
+    font-weight: 600;
+    font-size: var(--fs-base);
     color: var(--text-100);
 }
 
 .stop-walk {
-    font-size: 0.8rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     color: var(--text-400);
     display: flex;
@@ -378,30 +388,30 @@ input {
 
 .bus-row-icon {
     color: var(--text-400);
-    font-size: 1.05rem;
+    font-size: var(--fs-lg);
 }
 
 .bus-num {
-    font-weight: 800;
-    font-size: 0.9rem;
+    font-weight: 600;
+    font-size: var(--fs-base);
     color: var(--text-100);
 }
 
 .bus-dir {
-    font-size: 0.76rem;
+    font-size: var(--fs-xs);
     font-weight: 500;
     color: var(--text-400);
     margin-top: 1px;
 }
 
 .bus-time {
-    font-size: 0.85rem;
-    font-weight: 700;
+    font-size: var(--fs-sm);
+    font-weight: 600;
     color: var(--text-100);
 }
 
 .bus-time.na {
-    font-size: 0.76rem;
+    font-size: var(--fs-xs);
     font-weight: 500;
     color: var(--text-500);
 }
@@ -410,8 +420,8 @@ input {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 0.75rem;
-    font-weight: 800;
+    font-size: var(--fs-xs);
+    font-weight: 600;
     color: var(--accent-green);
 }
 
@@ -433,8 +443,8 @@ input {
 }
 
 .see-all-row a {
-    font-size: 0.85rem;
-    font-weight: 800;
+    font-size: var(--fs-sm);
+    font-weight: 600;
     color: var(--brand-deep);
     text-transform: uppercase;
     letter-spacing: 0.6px;
@@ -451,8 +461,8 @@ input {
     color: #fff;
     height: 54px;
     border: none;
-    font-weight: 900;
-    font-size: 0.88rem;
+    font-weight: 600;
+    font-size: var(--fs-base);
     letter-spacing: 1.2px;
     cursor: pointer;
     display: flex;
@@ -523,21 +533,21 @@ input {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.6rem;
+    font-size: var(--fs-2xl);
     color: #fff;
     margin-bottom: 16px;
 }
 
 .auth-hero-title {
-    font-size: 1.6rem;
-    font-weight: 900;
+    font-size: var(--fs-2xl);
+    font-weight: 600;
     color: #fff;
     letter-spacing: -0.3px;
     margin-bottom: 8px;
 }
 
 .auth-hero-sub {
-    font-size: 0.9rem;
+    font-size: var(--fs-base);
     color: rgba(255, 255, 255, .8);
     font-weight: 500;
     max-width: 280px;
@@ -560,14 +570,14 @@ input {
 }
 
 .auth-card-title {
-    font-size: 1.15rem;
-    font-weight: 800;
+    font-size: var(--fs-lg);
+    font-weight: 600;
     color: var(--text-100);
     margin-bottom: 4px;
 }
 
 .auth-card-sub {
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     color: var(--text-400);
     font-weight: 500;
     margin-bottom: 24px;
@@ -577,8 +587,8 @@ input {
 /* ─── FORM ELEMENTS ───────────────────────── */
 .form-label {
     display: block;
-    font-size: 0.8rem;
-    font-weight: 700;
+    font-size: var(--fs-sm);
+    font-weight: 600;
     color: var(--text-200);
     text-transform: uppercase;
     letter-spacing: 0.7px;
@@ -600,8 +610,8 @@ input {
     border-radius: var(--r-md);
     padding: 0 14px;
     height: 52px;
-    font-weight: 700;
-    font-size: 0.9rem;
+    font-weight: 600;
+    font-size: var(--fs-base);
     color: var(--text-200);
     white-space: nowrap;
     flex-shrink: 0;
@@ -615,7 +625,7 @@ input {
     border: 1.5px solid var(--border);
     border-radius: var(--r-md);
     padding: 0 16px;
-    font-size: 1rem;
+    font-size: var(--fs-base);
     font-weight: 600;
     color: var(--text-100);
     outline: none;
@@ -650,8 +660,8 @@ input {
     background: var(--surface-1);
     border: 1.5px solid var(--border);
     border-radius: var(--r-md);
-    font-size: 1.4rem;
-    font-weight: 800;
+    font-size: var(--fs-xl);
+    font-weight: 600;
     color: var(--text-100);
     text-align: center;
     outline: none;
@@ -673,8 +683,8 @@ input {
     height: 46px;
     border: none;
     border-radius: var(--r-sm);
-    font-size: 0.90rem;
-    font-weight: 800;
+    font-size: var(--fs-base);
+    font-weight: 600;
     letter-spacing: 0.3px;
     cursor: pointer;
     transition: opacity .15s, transform .1s, box-shadow .15s;
@@ -737,24 +747,24 @@ input {
 }
 
 .promo-eyebrow {
-    font-size: 0.7rem;
-    font-weight: 800;
+    font-size: var(--fs-xs);
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
     color: var(--brand-deep);
 }
 
 .promo-title {
-    font-size: 1rem;
-    font-weight: 800;
+    font-size: var(--fs-base);
+    font-weight: 600;
     color: var(--text-100);
     margin-bottom: 4px;
 }
 
 .promo-feature {
-    font-size: 0.82rem;
+    font-size: var(--fs-sm);
     color: var(--accent-teal);
-    font-weight: 700;
+    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 6px;
@@ -775,8 +785,8 @@ input {
     color: #fff;
     padding: 8px 14px;
     border-radius: var(--r-sm);
-    font-size: 0.78rem;
-    font-weight: 700;
+    font-size: var(--fs-sm);
+    font-weight: 600;
     transition: background .15s;
 }
 
@@ -785,7 +795,7 @@ input {
 }
 
 .store-btn i {
-    font-size: 1.1rem;
+    font-size: var(--fs-lg);
 }
 
 /* Divider */
@@ -805,7 +815,7 @@ input {
 }
 
 .divider-text {
-    font-size: 0.78rem;
+    font-size: var(--fs-sm);
     color: var(--text-500);
     font-weight: 600;
 }
@@ -815,8 +825,8 @@ input {
     align-items: center;
     justify-content: center;
     gap: 7px;
-    font-size: 0.85rem;
-    font-weight: 700;
+    font-size: var(--fs-sm);
+    font-weight: 600;
     color: var(--text-400);
     margin-top: 20px;
     transition: color .15s;
@@ -853,20 +863,20 @@ input {
 }
 
 .dash-title {
-    font-size: 1.2rem;
-    font-weight: 900;
+    font-size: var(--fs-lg);
+    font-weight: 600;
     color: var(--text-100);
 }
 
 .dash-phone {
-    font-size: 0.82rem;
+    font-size: var(--fs-sm);
     color: var(--text-400);
     font-weight: 600;
     margin-bottom: 4px;
 }
 
 .dash-sub {
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     color: var(--text-400);
     font-weight: 500;
     line-height: 1.5;
@@ -903,13 +913,13 @@ input {
 }
 
 .status-label {
-    font-weight: 800;
-    font-size: 0.88rem;
+    font-weight: 600;
+    font-size: var(--fs-base);
     color: var(--text-100);
 }
 
 .status-sub {
-    font-size: 0.78rem;
+    font-size: var(--fs-sm);
     color: var(--text-400);
     font-weight: 500;
     margin-top: 1px;
@@ -934,16 +944,16 @@ input {
 }
 
 .coord-label {
-    font-size: 0.7rem;
-    font-weight: 800;
+    font-size: var(--fs-xs);
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.8px;
     color: var(--text-400);
 }
 
 .coord-value {
-    font-size: 0.95rem;
-    font-weight: 800;
+    font-size: var(--fs-base);
+    font-weight: 600;
     color: var(--accent-teal);
     font-variant-numeric: tabular-nums;
 }
@@ -953,8 +963,8 @@ input {
 }
 
 .log-eyebrow {
-    font-size: 0.7rem;
-    font-weight: 800;
+    font-size: var(--fs-xs);
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.8px;
     color: var(--text-400);
@@ -968,7 +978,7 @@ input {
     height: 130px;
     overflow-y: auto;
     font-family: 'SF Mono', 'Fira Code', monospace;
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     color: #A3E635;
     line-height: 1.7;
 }
@@ -1041,14 +1051,14 @@ input {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
+    font-size: var(--fs-3xl);
     color: #fff;
     margin: 0 auto 16px;
 }
 
 .brand-name {
-    font-size: 2rem;
-    font-weight: 900;
+    font-size: var(--fs-3xl);
+    font-weight: 600;
     font-style: italic;
     color: #fff;
     letter-spacing: -0.5px;
@@ -1056,7 +1066,7 @@ input {
 }
 
 .brand-tagline {
-    font-size: 0.9rem;
+    font-size: var(--fs-base);
     color: rgba(255, 255, 255, .75);
     font-weight: 500;
 }
@@ -1094,19 +1104,19 @@ input {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.3rem;
+    font-size: var(--fs-xl);
     flex-shrink: 0;
 }
 
 .selector-opt-title {
-    font-weight: 800;
-    font-size: 1rem;
+    font-weight: 600;
+    font-size: var(--fs-base);
     color: var(--text-100);
     margin-bottom: 2px;
 }
 
 .selector-opt-sub {
-    font-size: 0.8rem;
+    font-size: var(--fs-sm);
     color: var(--text-400);
     font-weight: 500;
 }
@@ -1114,7 +1124,7 @@ input {
 .selector-chevron {
     margin-left: auto;
     color: var(--text-500);
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
 }
 
 /* ═══ TOAST ════════════════════════════════ */
@@ -1137,7 +1147,7 @@ input {
     color: var(--text-100);
     padding: 11px 20px;
     border-radius: var(--r-full);
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     opacity: 0;
     transform: translateY(12px);
@@ -1156,7 +1166,7 @@ input {
     margin-top: 14px;
     padding: 12px 14px;
     border-radius: var(--r-md);
-    font-size: 0.83rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     display: none;
 }
@@ -1398,7 +1408,7 @@ body {
     color: var(--text-400) !important;
     padding: 6px 12px !important;
     border-radius: var(--r-lg) !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 600 !important;
     display: flex !important;
     align-items: center !important;
@@ -1430,19 +1440,19 @@ body {
 }
 
 .bus-num {
-    font-size: 0.95rem !important;
-    font-weight: 850 !important;
+    font-size: var(--fs-base) !important;
+    font-weight: 600 !important;
     color: var(--text-100) !important;
 }
 
 .bus-dir {
-    font-size: 0.8rem !important;
+    font-size: var(--fs-sm) !important;
     color: var(--text-400) !important;
 }
 
 .bus-time {
-    font-size: 0.9rem !important;
-    font-weight: 800 !important;
+    font-size: var(--fs-base) !important;
+    font-weight: 600 !important;
     color: var(--text-100) !important;
 }
 
@@ -1450,7 +1460,7 @@ body {
 .see-all-link {
     color: var(--text-400) !important;
     font-weight: 600 !important;
-    font-size: 0.88rem !important;
+    font-size: var(--fs-base) !important;
     display: inline-flex !important;
     align-items: center !important;
     gap: 6px !important;
@@ -1466,7 +1476,7 @@ body {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    font-size: 0.6rem !important;
+    font-size: var(--fs-xs) !important;
 }
 
 /* Buses around you title divider style */
@@ -1478,8 +1488,8 @@ body {
 }
 
 .buses-around-title-container h3 {
-    font-weight: 850 !important;
-    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    font-size: var(--fs-xl) !important;
     color: var(--text-100) !important;
     margin: 0 !important;
 }
@@ -1496,7 +1506,7 @@ body {
 
 .buses-around-title-container .divider-line::before {
     content: '◆' !important;
-    font-size: 0.8rem !important;
+    font-size: var(--fs-sm) !important;
     color: var(--text-500) !important;
     position: absolute !important;
     left: 0 !important;
@@ -1531,15 +1541,15 @@ body {
     gap: 4px !important;
     color: var(--text-500) !important;
     cursor: pointer !important;
-    font-size: 0.78rem !important;
-    font-weight: 700 !important;
+    font-size: var(--fs-sm) !important;
+    font-weight: 600 !important;
     transition: color 0.15s ease !important;
     flex: 1 !important;
     text-align: center !important;
 }
 
 .bottom-nav-item i {
-    font-size: 1.25rem !important;
+    font-size: var(--fs-xl) !important;
 }
 
 .bottom-nav-item.active {
@@ -1615,7 +1625,7 @@ body {
 }
 
 .back-link[style*="justify-content:flex-start"] i {
-    font-size: 1.25rem !important;
+    font-size: var(--fs-xl) !important;
     color: var(--text-100) !important;
 }
 
@@ -1656,8 +1666,8 @@ body {
 #phone-panel .auth-card-title::before,
 #phoneStep .auth-card-title::before {
     content: "Enter your mobile number to get OTP" !important;
-    font-size: 1.4rem !important;
-    font-weight: 700 !important;
+    font-size: var(--fs-xl) !important;
+    font-weight: 600 !important;
     color: var(--text-100) !important;
     display: block !important;
     line-height: 1.3 !important;
@@ -1672,15 +1682,15 @@ body {
 #otp-panel .auth-card-title::before,
 #otpStep .auth-card-title::before {
     content: "Verify your number" !important;
-    font-size: 1.4rem !important;
-    font-weight: 700 !important;
+    font-size: var(--fs-xl) !important;
+    font-weight: 600 !important;
     color: var(--text-100) !important;
     display: block !important;
     line-height: 1.3 !important;
 }
 
 .auth-card-sub {
-    font-size: 0.9rem !important;
+    font-size: var(--fs-base) !important;
     color: var(--text-400) !important;
     margin-bottom: 24px !important;
 }
@@ -1723,7 +1733,7 @@ body {
     /* Fully rounded input field pill */
     height: 52px !important;
     flex-grow: 1 !important;
-    font-size: 1.1rem !important;
+    font-size: var(--fs-lg) !important;
     font-weight: 600 !important;
 }
 
@@ -1740,8 +1750,8 @@ body {
     border-radius: var(--r-md) !important;
     /* Clean rounded OTP boxes */
     background: var(--surface-1) !important;
-    font-size: 1.5rem !important;
-    font-weight: 700 !important;
+    font-size: var(--fs-2xl) !important;
+    font-weight: 600 !important;
     color: var(--text-100) !important;
 }
 
@@ -1779,8 +1789,8 @@ body {
 
 .promo-eyebrow::before {
     content: "GET THE APP" !important;
-    font-size: 0.75rem !important;
-    font-weight: 800 !important;
+    font-size: var(--fs-xs) !important;
+    font-weight: 600 !important;
     color: var(--text-400) !important;
     letter-spacing: 0.5px !important;
 }
@@ -1791,8 +1801,8 @@ body {
 
 .promo-title::before {
     content: "Get the app and never miss your bus again" !important;
-    font-size: 1.05rem !important;
-    font-weight: 800 !important;
+    font-size: var(--fs-lg) !important;
+    font-weight: 600 !important;
     color: var(--text-100) !important;
     line-height: 1.3 !important;
     display: block !important;
@@ -1819,8 +1829,8 @@ body {
 
 .promo-feature:first-of-type::before {
     content: "Live track buses" !important;
-    font-size: 0.75rem !important;
-    font-weight: 700 !important;
+    font-size: var(--fs-xs) !important;
+    font-weight: 600 !important;
     color: var(--surface-0) !important;
     display: inline-block !important;
 }
@@ -1843,7 +1853,7 @@ body {
     color: var(--surface-0) !important;
     border-radius: 9999px !important;
     /* Pill style */
-    font-size: 0.8rem !important;
+    font-size: var(--fs-sm) !important;
     padding: 10px 18px !important;
 }
 
@@ -1886,7 +1896,7 @@ body {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
     border: none !important;
     color: var(--surface-0) !important;
-    font-size: 0.90rem !important;
+    font-size: var(--fs-base) !important;
     font-weight: 600 !important;
     letter-spacing: 0.8px !important;
     text-transform: uppercase !important;
@@ -1911,7 +1921,7 @@ body {
 #req-btn span::before,
 #sendOtpBtn span::before {
     content: "GET OTP" !important;
-    font-size: 0.95rem !important;
+    font-size: var(--fs-base) !important;
 }
 
 #verify-btn span,
@@ -1922,7 +1932,7 @@ body {
 #verify-btn span::before,
 #verifyOtpBtn span::before {
     content: "CONFIRM & ACCESS" !important;
-    font-size: 0.95rem !important;
+    font-size: var(--fs-base) !important;
 }
 
 #req-btn i,
@@ -2071,7 +2081,7 @@ body {
 .side-panel-back-btn {
     background: transparent !important;
     border: none !important;
-    font-size: 1.2rem !important;
+    font-size: var(--fs-lg) !important;
     color: var(--text-100) !important;
     cursor: pointer !important;
     display: flex !important;
@@ -2079,8 +2089,8 @@ body {
 }
 
 .side-panel-title {
-    font-weight: 800 !important;
-    font-size: 1.2rem !important;
+    font-weight: 600 !important;
+    font-size: var(--fs-lg) !important;
     color: var(--text-100) !important;
 }
 
@@ -2128,19 +2138,19 @@ body {
 
 .profile-card-name {
     font-weight: 600 !important;
-    font-size: 1.1rem !important;
+    font-size: var(--fs-lg) !important;
     color: var(--text-100) !important;
 }
 
 .profile-card-phone {
-    font-size: 0.85rem !important;
+    font-size: var(--fs-sm) !important;
     color: var(--text-400) !important;
     margin-top: 2px !important;
     font-weight: 600 !important;
 }
 
 .profile-card-edit {
-    font-size: 0.84rem !important;
+    font-size: var(--fs-sm) !important;
     color: var(--text-400) !important;
     font-weight: 500 !important;
     cursor: pointer !important;
@@ -2172,14 +2182,14 @@ body {
 }
 
 .menu-card-icon {
-    font-size: 1.25rem !important;
+    font-size: var(--fs-xl) !important;
     color: var(--text-100) !important;
 }
 
 .menu-card-text {
     font-weight: 500 !important;
     color: var(--text-100) !important;
-    font-size: 1rem !important;
+    font-size: var(--fs-base) !important;
 }
 
 /* Options Lists */
@@ -2211,7 +2221,7 @@ body {
     width: 24px !important;
     display: flex !important;
     justify-content: center !important;
-    font-size: 1.15rem !important;
+    font-size: var(--fs-lg) !important;
     color: var(--text-100) !important;
 }
 
@@ -2222,13 +2232,13 @@ body {
 .side-panel-item-text {
     font-weight: 500 !important;
     color: var(--text-100) !important;
-    font-size: 1rem !important;
+    font-size: var(--fs-base) !important;
 }
 
 .side-panel-item-chevron {
     margin-left: auto !important;
     color: var(--text-500) !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
 }
 
 /* Side Panel Footer */
@@ -2237,7 +2247,7 @@ body {
     padding: 24px 20px 16px !important;
     display: flex !important;
     justify-content: space-between !important;
-    font-size: 0.8rem !important;
+    font-size: var(--fs-sm) !important;
     color: var(--text-400) !important;
     font-weight: 600 !important;
 }
@@ -2253,7 +2263,7 @@ body {
 }
 
 .profile-edit-subtitle {
-    font-size: 0.85rem !important;
+    font-size: var(--fs-sm) !important;
     color: var(--text-400) !important;
     line-height: 1.4 !important;
     font-weight: 500 !important;
@@ -2298,7 +2308,7 @@ body {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    font-size: 0.88rem !important;
+    font-size: var(--fs-base) !important;
     cursor: pointer !important;
     border: 2px solid var(--surface-0) !important;
     box-shadow: var(--shadow-sm) !important;
@@ -2312,8 +2322,8 @@ body {
 }
 
 .form-group-custom label {
-    font-size: 0.85rem !important;
-    font-weight: 800 !important;
+    font-size: var(--fs-sm) !important;
+    font-weight: 600 !important;
     color: var(--text-100) !important;
     text-transform: uppercase !important;
     letter-spacing: 0.5px !important;
@@ -2325,7 +2335,7 @@ body {
     border: 1px solid var(--border) !important;
     border-radius: var(--r-md) !important;
     padding: 0 16px !important;
-    font-size: 0.95rem !important;
+    font-size: var(--fs-base) !important;
     font-weight: 500 !important;
     color: var(--text-100) !important;
     outline: none !important;
@@ -2357,13 +2367,13 @@ body {
 }
 
 .gender-card-icon {
-    font-size: 1.6rem !important;
+    font-size: var(--fs-2xl) !important;
     color: var(--text-400) !important;
 }
 
 .gender-card-label {
-    font-size: 0.78rem !important;
-    font-weight: 800 !important;
+    font-size: var(--fs-sm) !important;
+    font-weight: 600 !important;
     color: var(--text-400) !important;
 }
 
@@ -2413,8 +2423,8 @@ body {
 }
 
 .crop-modal-title {
-    font-weight: 800 !important;
-    font-size: 1.2rem !important;
+    font-weight: 600 !important;
+    font-size: var(--fs-lg) !important;
     color: var(--text-100) !important;
     margin: 0 !important;
 }
@@ -2444,8 +2454,8 @@ body {
     border: 1px solid var(--border) !important;
     border-radius: 9999px !important;
     color: var(--text-100) !important;
-    font-weight: 800 !important;
-    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    font-size: var(--fs-base) !important;
     cursor: pointer !important;
 }
 
@@ -2456,8 +2466,8 @@ body {
     border: none !important;
     border-radius: 9999px !important;
     color: var(--surface-0) !important;
-    font-weight: 800 !important;
-    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    font-size: var(--fs-base) !important;
     cursor: pointer !important;
 }
 
@@ -2468,8 +2478,8 @@ body {
     border: none !important;
     border-radius: var(--r-sm) !important;
     color: var(--surface-0) !important;
-    font-weight: 800 !important;
-    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    font-size: var(--fs-base) !important;
     cursor: pointer !important;
     margin-top: var(--sp-lg);
     margin-bottom: var(--sp-lg);
@@ -2536,8 +2546,8 @@ body {
     top: -45px !important;
     right: 0 !important;
     color: var(--surface-0) !important;
-    font-size: 2.5rem !important;
-    font-weight: 300 !important;
+    font-size: var(--fs-4xl) !important;
+    font-weight: 400 !important;
     cursor: pointer !important;
     transition: color 0.2s ease !important;
     line-height: 1 !important;
@@ -2555,7 +2565,7 @@ body {
     z-index: 5000 !important;
     display: none;
     flex-direction: column !important;
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-family: var(--font) !important;
 }
 
 .planner-header {
@@ -2570,15 +2580,15 @@ body {
 .planner-back-btn {
     background: none !important;
     border: none !important;
-    font-size: 1.25rem !important;
+    font-size: var(--fs-xl) !important;
     color: #18181B !important;
     cursor: pointer !important;
     padding: 4px 12px 4px 4px !important;
 }
 
 .planner-title {
-    font-size: 1.15rem !important;
-    font-weight: 800 !important;
+    font-size: var(--fs-lg) !important;
+    font-weight: 600 !important;
     color: #18181B !important;
     letter-spacing: -0.3px !important;
 }
@@ -2654,7 +2664,7 @@ body {
     width: 100% !important;
     border: none !important;
     outline: none !important;
-    font-size: 0.95rem !important;
+    font-size: var(--fs-base) !important;
     font-weight: 500 !important;
     color: #18181B !important;
     background: transparent !important;
@@ -2666,7 +2676,7 @@ body {
     right: 0 !important;
     background: none !important;
     border: none !important;
-    font-size: 1.15rem !important;
+    font-size: var(--fs-lg) !important;
     color: var(--text-500) !important;
     cursor: pointer !important;
     padding: 2px !important;
@@ -2721,7 +2731,7 @@ body {
     gap: 12px !important;
     cursor: pointer !important;
     transition: background 0.2s ease !important;
-    border-bottom: 1px solid var(--surface-1) !important;
+    border-bottom: 1px solid var(--surface-2) !important;
 }
 
 .autocomplete-item:last-child {
@@ -2733,7 +2743,7 @@ body {
 }
 
 .autocomplete-icon {
-    font-size: 1.05rem !important;
+    font-size: var(--fs-lg) !important;
     color: var(--text-400) !important;
     width: 20px !important;
     text-align: center !important;
@@ -2745,13 +2755,13 @@ body {
 }
 
 .autocomplete-name {
-    font-size: 0.92rem !important;
-    font-weight: 700 !important;
+    font-size: var(--fs-sm) !important;
+    font-weight: 600 !important;
     color: #18181B !important;
 }
 
 .autocomplete-sub {
-    font-size: 0.75rem !important;
+    font-size: var(--fs-xs) !important;
     color: var(--text-400) !important;
 }
 
@@ -2768,8 +2778,8 @@ body {
     border-radius: var(--r-lg) !important;
     border: 1px solid var(--border) !important;
     background: var(--surface-0) !important;
-    font-weight: 700 !important;
-    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    font-size: var(--fs-sm) !important;
     color: var(--text-400) !important;
     cursor: pointer !important;
     transition: all 0.2s ease !important;
@@ -2800,13 +2810,13 @@ body {
 }
 
 .journey-duration {
-    font-size: 1.1rem !important;
+    font-size: var(--fs-lg) !important;
     font-weight: 600 !important;
     color: #18181B !important;
 }
 
 .journey-direct-pill {
-    font-size: 0.62rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 500 !important;
     color: var(--text-400) !important;
     border: 1px solid var(--border) !important;
@@ -2817,8 +2827,8 @@ body {
 }
 
 .journey-price {
-    font-size: 1.05rem !important;
-    font-weight: 850 !important;
+    font-size: var(--fs-lg) !important;
+    font-weight: 600 !important;
     color: var(--text-100) !important;
 }
 
@@ -2838,24 +2848,24 @@ body {
     background: var(--surface-1) !important;
     padding: 6px 12px !important;
     border-radius: var(--r-lg) !important;
-    font-size: 0.78rem !important;
-    font-weight: 700 !important;
+    font-size: var(--fs-sm) !important;
+    font-weight: 600 !important;
     color: var(--brand-deep) !important;
 }
 
 .timeline-leg i {
-    font-size: 0.88rem !important;
+    font-size: var(--fs-base) !important;
     color: #52525B !important;
 }
 
 .timeline-arrow {
     color: var(--text-500) !important;
-    font-size: 0.75rem !important;
+    font-size: var(--fs-xs) !important;
 }
 
 .journey-details-text {
-    font-size: 0.75rem !important;
-    font-weight: var(--r-sm);
+    font-size: var(--fs-xs) !important;
+    font-weight: 400;
     color: var(--text-400) !important;
     display: flex !important;
     justify-content: space-between !important;
@@ -2877,20 +2887,20 @@ body {
 }
 
 .empty-results-icon {
-    font-size: 2.5rem !important;
+    font-size: var(--fs-4xl) !important;
     color: #D4D4D8 !important;
     margin-bottom: 16px !important;
 }
 
 .empty-results-title {
-    font-size: 1.05rem !important;
-    font-weight: 800 !important;
+    font-size: var(--fs-lg) !important;
+    font-weight: 600 !important;
     color: var(--brand-deep) !important;
     margin-bottom: 6px !important;
 }
 
 .empty-results-desc {
-    font-size: 0.85rem !important;
+    font-size: var(--fs-sm) !important;
     max-width: 260px !important;
     line-height: 1.4 !important;
 }
@@ -2903,7 +2913,7 @@ body {
     z-index: 6000 !important;
     display: none;
     flex-direction: column !important;
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-family: var(--font) !important;
 }
 
 .search-panel-header {
@@ -2912,13 +2922,12 @@ body {
     display: flex !important;
     align-items: center !important;
     gap: 12px !important;
-    border-bottom: 1px solid var(--border) !important;
 }
 
 .search-panel-back-btn {
     background: none !important;
     border: none !important;
-    font-size: 1.2rem !important;
+    font-size: var(--fs-lg) !important;
     color: #18181B !important;
     cursor: pointer !important;
     padding: 6px !important;
@@ -2941,7 +2950,7 @@ body {
     border: none !important;
     outline: none !important;
     background: transparent !important;
-    font-size: 0.95rem !important;
+    font-size: var(--fs-base) !important;
     font-weight: 500 !important;
     color: #18181B !important;
     padding-right: 24px !important;
@@ -2952,7 +2961,7 @@ body {
     right: 15px !important;
     background: none !important;
     border: none !important;
-    font-size: 1.1rem !important;
+    font-size: var(--fs-lg) !important;
     color: var(--text-500) !important;
     cursor: pointer !important;
 }
@@ -3012,7 +3021,7 @@ body {
 
 .jd-header-separator {
     color: var(--text-400) !important;
-    font-size: 0.82rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
 }
 
@@ -3045,16 +3054,16 @@ body {
 .jd-route-badge {
     background: var(--text-100) !important;
     color: var(--surface-0) !important;
-    font-weight: 800 !important;
-    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    font-size: var(--fs-sm) !important;
     padding: 4px 10px !important;
     border-radius: var(--r-sm) !important;
     text-transform: uppercase !important;
 }
 
 .jd-direction {
-    font-size: 0.95rem !important;
-    font-weight: 800 !important;
+    font-size: var(--fs-base) !important;
+    font-weight: 600 !important;
     color: var(--text-100) !important;
 }
 
@@ -3094,13 +3103,13 @@ body {
 }
 
 .jd-time-val {
-    font-size: 0.8rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
     color: var(--text-100) !important;
 }
 
 .jd-price {
-    font-size: 0.8rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
     color: var(--text-100) !important;
 }
@@ -3147,7 +3156,7 @@ body {
     justify-content: center !important;
     border: 1px solid var(--surface-0) !important;
     z-index: 2 !important;
-    font-size: 0.85rem !important;
+    font-size: var(--fs-sm) !important;
     background: var(--surface-1) !important;
     color: var(--text-200) !important;
     border-color: var(--border) !important;
@@ -3184,13 +3193,13 @@ body {
 }
 
 .timeline-card-title {
-    font-size: 16px !important;
-    font-weight: 800 !important;
+    font-size: var(--fs-base) !important;
+    font-weight: 600 !important;
     color: var(--text-100) !important;
 }
 
 .timeline-card-details {
-    font-size: 0.76rem !important;
+    font-size: var(--fs-xs) !important;
     color: var(--text-400) !important;
     font-weight: 600 !important;
 }
@@ -3208,14 +3217,14 @@ body {
     border: 1px solid var(--border) !important;
     color: var(--text-100) !important;
     font-weight: 600 !important;
-    font-size: 0.84rem !important;
+    font-size: var(--fs-sm) !important;
     padding: 8px 16px !important;
     border-radius: var(--r-lg) !important;
 
 }
 
 .bus-card-status {
-    font-size: 0.8rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
     display: flex !important;
     align-items: center !important;
@@ -3240,7 +3249,7 @@ body {
     display: flex !important;
     align-items: center !important;
     gap: 8px !important;
-    font-size: 16px !important;
+    font-size: var(--fs-base) !important;
     font-weight: 600 !important;
     color: var(--text-100) !important;
 }
@@ -3269,8 +3278,8 @@ body {
     border: none !important;
     padding: 2px 0 !important;
     color: var(--accent-green) !important;
-    font-size: 14px !important;
-    font-weight: 800 !important;
+    font-size: var(--fs-sm) !important;
+    font-weight: 600 !important;
     display: flex !important;
     align-items: center !important;
     gap: 5px !important;
@@ -3280,7 +3289,7 @@ body {
 
 
 .accordion-toggle .toggle-icon {
-    font-size: 0.65rem !important;
+    font-size: var(--fs-xs) !important;
     transition: transform 0.2s ease !important;
 }
 
@@ -3334,7 +3343,7 @@ body {
 }
 
 .sub-stop-name {
-    font-size: 14px !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
     color: var(--text-200) !important;
 }
@@ -3349,7 +3358,7 @@ body {
     width: 18px !important;
     height: 18px !important;
     border-radius: 50% !important;
-    font-size: 0.6rem !important;
+    font-size: var(--fs-xs) !important;
     border: 1.5px solid var(--surface-0) !important;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15) !important;
     margin-left: 6px !important;
@@ -3388,7 +3397,7 @@ body {
     border: 1px solid var(--border) !important;
     border-radius: 32px !important;
     padding: 12px !important;
-    font-size: 0.8rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 600 !important;
     display: flex !important;
     align-items: center !important;
@@ -3415,14 +3424,14 @@ body {
 }
 
 .section-title-lg {
-    font-size: 1.15rem !important;
-    font-weight: 850 !important;
+    font-size: var(--fs-lg) !important;
+    font-weight: 600 !important;
     color: var(--text-100) !important;
     letter-spacing: -0.2px !important;
 }
 
 .stop-dot-bus-icon {
-    font-size: 0.7rem !important;
+    font-size: var(--fs-xs) !important;
 }
 
 .see-all-buses-container {
@@ -3446,7 +3455,7 @@ body {
 .menu-card-chevron {
     margin-left: auto !important;
     color: var(--text-500) !important;
-    font-size: 0.8rem !important;
+    font-size: var(--fs-sm) !important;
 }
 
 .location-search-icon {

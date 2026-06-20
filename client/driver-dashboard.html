@@ -44,7 +44,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
+            font-size: var(--fs-base);
             color: var(--text-100);
             cursor: pointer;
             transition: background .15s;
@@ -55,8 +55,8 @@
         }
 
         .map-title {
-            font-weight: 700;
-            font-size: 0.95rem;
+            font-weight:600;
+            font-size: var(--fs-base);
             color: var(--text-100);
         }
 
@@ -77,7 +77,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: var(--fs-sm);
             transition: background .15s, color .15s, border-color .15s;
         }
 
@@ -119,8 +119,8 @@
         }
 
         .layer-eyebrow {
-            font-size: 10px;
-            font-weight: 800;
+            font-size: var(--fs-xs);
+            font-weight:600;
             color: var(--text-500);
             text-transform: uppercase;
             letter-spacing: 0.8px;
@@ -134,8 +134,8 @@
             display: flex;
             align-items: center;
             gap: 9px;
-            font-size: 0.83rem;
-            font-weight: 600;
+            font-size: var(--fs-sm);
+            font-weight:600;
             color: var(--text-400);
             transition: background .1s, color .1s;
         }
@@ -186,8 +186,8 @@
             align-items: center;
             justify-content: center;
             color: var(--text-100);
-            font-size: 1.1rem;
-            font-weight: 700;
+            font-size: var(--fs-lg);
+            font-weight:600;
             transition: background .1s;
         }
 
@@ -215,7 +215,7 @@
             justify-content: center;
             cursor: pointer;
             color: var(--accent-teal);
-            font-size: 1rem;
+            font-size: var(--fs-base);
             transition: background .15s, transform .15s;
         }
 
@@ -262,8 +262,8 @@
         }
 
         .traffic-legend-title {
-            font-size: 10px;
-            font-weight: 800;
+            font-size: var(--fs-xs);
+            font-weight:600;
             color: var(--text-500);
             text-transform: uppercase;
             letter-spacing: .6px;
@@ -273,9 +273,9 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.78rem;
+            font-size: var(--fs-sm);
             color: var(--text-400);
-            font-weight: 600;
+            font-weight:600;
         }
 
         .t-dot {
@@ -295,9 +295,9 @@
             border: 1.5px solid var(--border);
             border-radius: var(--r-sm);
             padding: 4px 10px;
-            font-size: 10px;
+            font-size: var(--fs-xs);
             color: var(--text-400);
-            font-weight: 600;
+            font-weight:600;
             box-shadow: var(--shadow-sm);
         }
 
@@ -311,8 +311,8 @@
             color: #fff;
             padding: 10px 18px;
             border-radius: var(--r-full);
-            font-size: 0.82rem;
-            font-weight: 600;
+            font-size: var(--fs-sm);
+            font-weight:600;
             opacity: 0;
             transition: all .25s;
             pointer-events: none;
@@ -402,7 +402,7 @@
                 <div id="live-trip-stats" class="hidden">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
                         <div class="live-dot"></div>
-                        <span style="font-weight:800; font-size:0.9rem; color:var(--accent-green);">Broadcasting
+                        <span style="font-weight:600; font-size: var(--fs-base); color:var(--accent-green);">Broadcasting
                             Coordinates</span>
                     </div>
 
@@ -487,7 +487,7 @@
                 <button class="float-btn" onclick="map.zoomOut()" title="Zoom out">−</button>
             </div>
             <div class="float-btns">
-                <button class="float-btn" onclick="map.setZoom(13)" title="Reset" style="font-size:.85rem;">↺</button>
+                <button class="float-btn" onclick="map.setZoom(13)" title="Reset" style="font-size: var(--fs-sm);">↺</button>
             </div>
         </div>
 
@@ -621,7 +621,7 @@
                 const icon = L.divIcon({
                     html: `<div style="display: flex; flex-direction: column; align-items: center; width: 38px; height: 49px;">
           <div style="width: 38px; height: 38px; border-radius: 50%; background: #000000; border: 2.5px solid #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 2;">
-              <i class="fa-solid fa-bus" style="color: #ffffff; font-size: 16px;"></i>
+              <i class="fa-solid fa-bus" style="color: #ffffff; font-size: var(--fs-base);"></i>
           </div>
           <div style="width: 2.5px; height: 12px; background: #000000; margin-top: -1px; z-index: 1;"></div>
         </div>`,
@@ -952,14 +952,14 @@
                 <div class="menu-card">
                     <i class="fa-solid fa-ticket menu-card-icon"></i>
                     <span class="menu-card-text">My tickets / passes</span>
-                    <i class="fa-solid fa-chevron-right" style="margin-left:auto;color:#A1A1AA;font-size:0.8rem;"></i>
+                    <i class="fa-solid fa-chevron-right" style="margin-left:auto;color:#A1A1AA;font-size: var(--fs-sm);"></i>
                 </div>
 
                 <!-- Manage travel card -->
                 <div class="menu-card">
                     <i class="fa-solid fa-credit-card menu-card-icon"></i>
                     <span class="menu-card-text">Manage travel card</span>
-                    <i class="fa-solid fa-chevron-right" style="margin-left:auto;color:#A1A1AA;font-size:0.8rem;"></i>
+                    <i class="fa-solid fa-chevron-right" style="margin-left:auto;color:#A1A1AA;font-size: var(--fs-sm);"></i>
                 </div>
 
                 <!-- Settings & Info List -->
