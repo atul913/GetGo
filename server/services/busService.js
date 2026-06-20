@@ -1,5 +1,6 @@
 // services/busService.js
 const redisClient = require("./redisClient");
+const Route = require("../models/routeModel");
 
 // Default TTL: if a driver doesn't send location coordinates for 60 seconds (customizable),
 // they are considered offline and the trip will automatically expire.
@@ -9,8 +10,21 @@ const TRIP_EXPIRY_SECONDS = parseInt(process.env.TRIP_TTL_SECONDS) || 60;
  * Start a trip for a given busId.
  * Overwrites any previous trip data for this busId.
  */
-const startTrip = async (busId, driverPhone) => {
+const startTrip = async (busId, driverPhone, routeId) => {
     const now = Date.now();
+    let routeName = null;
+
+    if (routeId) {
+        try {
+            const route = await Route.findOne({ routeId: parseInt(routeId, 10) });
+            if (route) {
+                routeName = route.routeName;
+            }
+        } catch (err) {
+            console.error("Error resolving route in busService:", err.message);
+        }
+    }
+
     const bus = {
         busId,
         driverPhone,
@@ -20,6 +34,8 @@ const startTrip = async (busId, driverPhone) => {
         startedAt: now,
         updatedAt: now,
         endedAt: null,
+        routeId: routeId ? parseInt(routeId, 10) : null,
+        routeName: routeName
     };
     
     // Save the bus object in Redis with expiration

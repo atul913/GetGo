@@ -2039,7 +2039,7 @@ body {
     height: 100vh !important;
     width: 100% !important;
     max-width: 420px !important;
-    background: var(--surface-1) !important;
+    background: var(--surface-0) !important;
     /* Cool Light Gray */
     z-index: 9995 !important;
     box-shadow: var(--shadow-xl) !important;
@@ -2069,7 +2069,6 @@ body {
 /* Side Panel Header */
 .side-panel-header {
     background: var(--surface-0) !important;
-    border-bottom: 1.5px solid var(--border) !important;
     height: 56px !important;
     display: flex !important;
     align-items: center !important;
@@ -2105,7 +2104,7 @@ body {
 /* Profile Summary Card */
 .profile-card {
     background: var(--surface-0) !important;
-    border: 1px solid var(--border) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
     border-radius: var(--r-lg) !important;
     padding: 18px 16px !important;
     display: flex !important;
@@ -2166,7 +2165,6 @@ body {
 
 /* Tickets & Cards Info Panel blocks */
 .menu-card {
-    background: var(--surface-0) !important;
     border: 1px solid var(--border) !important;
     border-radius: var(--r-lg) !important;
     padding: 16px 20px !important;
@@ -2194,9 +2192,8 @@ body {
 
 /* Options Lists */
 .side-panel-list {
-    background: var(--surface-0) !important;
-    border: 1px solid var(--border) !important;
     border-radius: var(--r-lg) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
     padding: 6px 0 !important;
 }
 
@@ -2204,7 +2201,7 @@ body {
     display: flex !important;
     align-items: center !important;
     gap: 16px !important;
-    padding: 14px 20px !important;
+    padding: 16px 20px !important;
     cursor: pointer !important;
     transition: background 0.2s ease !important;
 }
@@ -3464,4 +3461,75 @@ body {
 
 .planner-results-section {
     margin-top: 10px !important;
+}
+
+/* ════ CUSTOM STOP PIN & LIVE BUS PANELS ══════ */
+.custom-stop-pin {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.stop-circle-inner {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 50% !important;
+    background: #FFFFFF !important;
+    border: 2.5px solid #000000 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) !important;
+    z-index: 2 !important;
+    transition: transform 0.2s ease !important;
+}
+
+.stop-circle-inner i {
+    color: #000000 !important;
+    font-size: var(--fs-xs) !important;
+}
+
+.stop-stem-inner {
+    width: 2.5px !important;
+    height: 10px !important;
+    background: #000000 !important;
+    margin-top: -2px !important;
+    z-index: 1 !important;
+}
+
+.custom-stop-pin:hover .stop-circle-inner {
+    transform: scale(1.25) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35) !important;
+}
+
+#stop-search-panel,
+#stop-buses-panel {
+    position: fixed !important;
+    inset: 0 !important;
+    background: var(--surface-0) !important;
+    display: none;
+    flex-direction: column !important;
+    font-family: var(--font) !important;
+}
+
+#stop-search-panel {
+    z-index: 7000 !important;
+}
+
+#stop-buses-panel {
+    z-index: 7500 !important;
+}
+
+.stop-buses-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 16px 20px !important;
+    border-bottom: 1px solid var(--border) !important;
+    background: var(--surface-0) !important;
+}
+
+.stop-buses-item:hover {
+    background: var(--surface-1) !important;
 }

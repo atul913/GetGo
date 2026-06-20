@@ -7,6 +7,7 @@ const { requireAuth } = require("../middleware/authMiddleware");
 // Any authenticated commuter or driver can access these
 router.get("/nearest", requireAuth, stopController.getNearestStops);
 router.get("/search", requireAuth, stopController.searchStops);
+router.get("/:stopId/live-buses", requireAuth, stopController.getLiveBusesForStop);
 router.get("/", requireAuth, stopController.getAllStops);
 
 module.exports = router;

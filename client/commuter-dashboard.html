@@ -464,9 +464,12 @@
             <button class="map-back-btn" onclick="closeMapPanel()">
                 <i class="fa-solid fa-arrow-left"></i>
             </button>
-            <span class="map-title" id="commuter-phone-display">Live Tracking</span>
+            <span class="map-title" id="commuter-phone-display">Near you</span>
 
             <div class="map-actions">
+                <button class="map-icon-btn" id="map-stop-search-btn" title="Search stop" onclick="openStopSearchPanel()">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
                 <button class="map-icon-btn" id="layers-btn" title="Map style" onclick="toggleLayerPanel()">
                     <i class="fa-solid fa-layer-group"></i>
                 </button>
@@ -551,6 +554,54 @@
                 <div class="jd-timeline-vertical" id="jd-timeline-vertical">
                     <!-- Dynamic stop timeline items go here -->
                 </div>
+            </div>
+        </div>
+
+        <!-- Stop Details Bottom Sheet Panel (1st additional functionality) -->
+        <div class="journey-details-panel" id="stop-details-sheet">
+            <div class="drag-handler"></div>
+            <div class="jd-header">
+                <div class="jd-header-title">
+                    <span class="jd-route-badge" style="background: var(--brand-deep) !important;"><i class="fa-solid fa-location-dot"></i></span>
+                    <span class="jd-direction" id="stop-sheet-title">Bus Stop</span>
+                </div>
+                <button class="jd-close-btn" onclick="event.stopPropagation(); closeStopDetailsSheet()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="jd-content" style="padding: 16px; overflow-y: auto;" id="stop-sheet-content">
+                <!-- Live buses will load here -->
+            </div>
+        </div>
+
+        <!-- Stop Search Panel (2nd additional functionality - search screen) -->
+        <div id="stop-search-panel">
+            <header class="search-panel-header" style="height: 56px; border-bottom: 1.5px solid var(--border); display: flex; align-items: center; padding: 0 16px; gap: 12px; background: var(--surface-0);">
+                <button class="search-panel-back-btn" onclick="closeStopSearchPanel()">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="search-input-wrapper" style="flex: 1; display: flex; align-items: center; background: var(--surface-1); border-radius: var(--r-lg); padding: 8px 14px;">
+                    <input type="text" id="stop-search-input" placeholder="Enter stop name" style="width: 100%; border: none; outline: none; background: transparent; font-size: var(--fs-base); font-family: var(--font); color: var(--text-100);" oninput="onStopSearchInput(this.value)">
+                </div>
+            </header>
+            <div class="search-panel-body" id="stop-search-results">
+                <!-- Autocomplete suggestions will appear here -->
+            </div>
+        </div>
+
+        <!-- Stop Live Buses Panel (2nd additional functionality - full screen results) -->
+        <div id="stop-buses-panel">
+            <header class="search-panel-header" style="height: 56px; border-bottom: 1.5px solid var(--border); display: flex; align-items: center; padding: 0 16px; gap: 12px; background: var(--surface-0);">
+                <button class="search-panel-back-btn" onclick="closeStopBusesPanel()">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div style="flex: 1; display: flex; flex-direction: column;">
+                    <span id="stop-buses-title" style="font-weight: 600; font-size: var(--fs-base); color: var(--text-100);">Stop Name</span>
+                    <span id="stop-buses-distance" style="font-size: var(--fs-xs); color: var(--text-400); display: flex; align-items: center; gap: 4px;"></span>
+                </div>
+            </header>
+            <div class="search-panel-body" id="stop-buses-list">
+                <!-- Live buses list -->
             </div>
         </div>
 
@@ -658,7 +709,7 @@
         }
 
         // ── MAP STATE ────────────────────────────
-        let map, tileLayer, userMarker;
+        let map, tileLayer, userMarker, userLocationCircle = null;
         let feedMap, feedUserMarker;
         const busMarkers = new Map();
         const feedBusMarkers = new Map();
@@ -747,6 +798,17 @@
                 if (fly) map.flyTo([lat, lng], 17, { duration: 0.8 });
                 else map.setView([lat, lng], 16);
 
+                // Update proximity search radius circle
+                if (userLocationCircle) map.removeLayer(userLocationCircle);
+                userLocationCircle = L.circle([lat, lng], {
+                    radius: 800, // 800 meters
+                    color: '#0EA5A0',
+                    weight: 1.5,
+                    fillColor: '#0EA5A0',
+                    fillOpacity: 0.12,
+                    interactive: false
+                }).addTo(map);
+
                 // Update feed mini map marker & view
                 if (feedMap) {
                     if (feedUserMarker) feedMap.removeLayer(feedUserMarker);
@@ -756,6 +818,7 @@
 
                 // Fetch nearest stops using commuter's live location
                 fetchNearestStops(lat, lng);
+                updateStopMarkers();
             }, (error) => {
                 if (btn) btn.classList.remove('locating');
                 let errorMsg = 'Location access denied';
@@ -830,26 +893,60 @@
             if (!map) return;
             const currentZoom = map.getZoom();
 
-            // Only render markers when zoomed in to level 15 or higher AND showStopsOnMap flag is enabled
-            if (showStopsOnMap && currentZoom >= 15) {
+            // Clear previous stops
+            stopMarkersLayer.clearLayers();
+
+            // Render markers when zoomed in to level 13 or higher AND showStopsOnMap flag is enabled
+            if (showStopsOnMap && currentZoom >= 13) {
                 if (!map.hasLayer(stopMarkersLayer)) {
                     stopMarkersLayer.addTo(map);
                 }
 
-                if (stopMarkersLayer.getLayers().length === 0 && allStopsList.length > 0) {
-                    allStopsList.forEach(stop => {
-                        const marker = L.marker([stop.latitude, stop.longitude], {
-                            icon: L.divIcon({
-                                html: `<div class="stop-pin-icon"><i class="fa-solid fa-bus" style="color: #FFFFFF; font-size: var(--fs-xs);"></i></div>`,
-                                className: '',
-                                iconSize: [20, 20],
-                                iconAnchor: [10, 10],
-                                popupAnchor: [0, -10]
-                            })
-                        }).bindPopup(`<div style="font-family:'DM Sans',sans-serif;font-weight:600;font-size: var(--fs-sm);color:var(--text-100);">🚏 Stop: ${stop.stationName}</div>`);
-                        stopMarkersLayer.addLayer(marker);
-                    });
+                // Determine center for proximity check
+                let centerLat = 22.7196;
+                let centerLng = 75.8577;
+                if (userMarker) {
+                    const latLng = userMarker.getLatLng();
+                    centerLat = latLng.lat;
+                    centerLng = latLng.lng;
+                } else if (feedUserMarker) {
+                    const latLng = feedUserMarker.getLatLng();
+                    centerLat = latLng.lat;
+                    centerLng = latLng.lng;
+                } else {
+                    const center = map.getCenter();
+                    centerLat = center.lat;
+                    centerLng = center.lng;
                 }
+
+                // Filter stops within 800m
+                const filteredStops = allStopsList.filter(stop => {
+                    return getDistanceMeters(centerLat, centerLng, stop.latitude, stop.longitude) <= 800;
+                });
+
+                filteredStops.forEach(stop => {
+                    const marker = L.marker([stop.latitude, stop.longitude], {
+                        icon: L.divIcon({
+                            html: `<div class="custom-stop-pin">
+                                <div class="stop-circle-inner">
+                                    <i class="fa-solid fa-bus"></i>
+                                </div>
+                                <div class="stop-stem-inner"></div>
+                            </div>`,
+                            className: '',
+                            iconSize: [28, 38],
+                            iconAnchor: [14, 38],
+                            popupAnchor: [0, -38]
+                        })
+                    });
+                    
+                    // Trigger expandable bottom sheet on stop click
+                    marker.on('click', () => {
+                        openStopDetailsSheet(stop);
+                    });
+
+                    stopMarkersLayer.addLayer(marker);
+                });
             } else {
                 if (map.hasLayer(stopMarkersLayer)) {
                     map.removeLayer(stopMarkersLayer);
@@ -2583,6 +2680,10 @@
             const header = document.querySelector('.journey-details-panel .jd-header');
             const dragHandler = document.querySelector('.journey-details-panel .drag-handler');
 
+            const stopPanel = document.getElementById('stop-details-sheet');
+            const stopHeader = document.querySelector('#stop-details-sheet .jd-header');
+            const stopDragHandler = document.querySelector('#stop-details-sheet .drag-handler');
+
             if (header) {
                 header.addEventListener('click', (e) => {
                     // Do not expand if user clicks close button
@@ -2596,109 +2697,478 @@
                 });
             }
 
+            if (stopHeader) {
+                stopHeader.addEventListener('click', (e) => {
+                    // Do not expand if user clicks close button
+                    if (e.target.closest('.jd-close-btn') || e.target.closest('.jd-close-btn *')) {
+                        return;
+                    }
+                    if (stopPanel && stopPanel.classList.contains('open') && stopPanel.classList.contains('collapsed')) {
+                        stopPanel.classList.remove('collapsed');
+                        stopPanel.classList.remove('expanded');
+                    }
+                });
+            }
+
             // Swipeable / draggable sheet behavior
-            let startY = 0;
-            let startTranslateY = 0;
-            let isDragging = false;
-            let panelHeight = 0;
+            function setupDraggableSheet(targetPanel, targetHeader, targetDragHandler) {
+                let startY = 0;
+                let startTranslateY = 0;
+                let isDragging = false;
+                let panelHeight = 0;
 
-            function onTouchStart(e) {
-                if (!panel || !panel.classList.contains('open')) return;
+                function onTouchStart(e) {
+                    if (!targetPanel || !targetPanel.classList.contains('open')) return;
 
-                startY = e.touches[0].clientY;
-                panelHeight = panel.offsetHeight;
+                    startY = e.touches[0].clientY;
+                    panelHeight = targetPanel.offsetHeight;
 
-                // Parse current translateY from computed styles transform matrix
-                const style = window.getComputedStyle(panel);
-                const transform = style.transform;
-                const MatrixClass = window.DOMMatrix || window.WebKitCSSMatrix;
+                    // Parse current translateY from computed styles transform matrix
+                    const style = window.getComputedStyle(targetPanel);
+                    const transform = style.transform;
+                    const MatrixClass = window.DOMMatrix || window.WebKitCSSMatrix;
 
-                if (transform && transform !== 'none' && MatrixClass) {
-                    const matrix = new MatrixClass(transform);
-                    startTranslateY = matrix.m42; // vertical translation (translateY)
-                } else {
-                    startTranslateY = 0;
+                    if (transform && transform !== 'none' && MatrixClass) {
+                        const matrix = new MatrixClass(transform);
+                        startTranslateY = matrix.m42; // vertical translation (translateY)
+                    } else {
+                        startTranslateY = 0;
+                    }
+
+                    isDragging = true;
+                    targetPanel.style.setProperty('transition', 'none', 'important');
                 }
 
-                isDragging = true;
-                panel.style.setProperty('transition', 'none', 'important');
-            }
+                function onTouchMove(e) {
+                    if (!isDragging) return;
+                    const currentY = e.touches[0].clientY;
+                    const deltaY = currentY - startY;
+                    let newTranslateY = startTranslateY + deltaY;
 
-            function onTouchMove(e) {
-                if (!isDragging) return;
-                const currentY = e.touches[0].clientY;
-                const deltaY = currentY - startY;
-                let newTranslateY = startTranslateY + deltaY;
+                    const maxTranslateY = Math.max(0, panelHeight - 62);
+                    const minTranslateY = 0;
 
-                const maxTranslateY = Math.max(0, panelHeight - 62);
-                const minTranslateY = 0;
+                    // Add resistance when pulling past limits
+                    if (newTranslateY < minTranslateY) {
+                        newTranslateY = newTranslateY * 0.2;
+                    }
+                    if (newTranslateY > maxTranslateY) {
+                        newTranslateY = maxTranslateY + (newTranslateY - maxTranslateY) * 0.2;
+                    }
 
-                // Add resistance when pulling past limits
-                if (newTranslateY < minTranslateY) {
-                    newTranslateY = newTranslateY * 0.2;
-                }
-                if (newTranslateY > maxTranslateY) {
-                    newTranslateY = maxTranslateY + (newTranslateY - maxTranslateY) * 0.2;
-                }
-
-                panel.style.setProperty('transform', `translateX(-50%) translateY(${newTranslateY}px)`, 'important');
-                panel.style.setProperty('--translate-y', `${newTranslateY}px`);
-            }
-
-            function onTouchEnd(e) {
-                if (!isDragging) return;
-                isDragging = false;
-                panel.style.removeProperty('transition');
-
-                // Read current translation to snap to closest state
-                const style = window.getComputedStyle(panel);
-                const transform = style.transform;
-                const MatrixClass = window.DOMMatrix || window.WebKitCSSMatrix;
-                let finalTranslateY = 0;
-
-                if (transform && transform !== 'none' && MatrixClass) {
-                    const matrix = new MatrixClass(transform);
-                    finalTranslateY = matrix.m42;
+                    targetPanel.style.setProperty('transform', `translateX(-50%) translateY(${newTranslateY}px)`, 'important');
+                    targetPanel.style.setProperty('--translate-y', `${newTranslateY}px`);
                 }
 
-                panel.style.removeProperty('transform');
-                panel.style.removeProperty('--translate-y');
+                function onTouchEnd(e) {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    targetPanel.style.removeProperty('transition');
 
-                const targetExpanded = 0;
-                const targetMedium = Math.max(0, Math.min(panelHeight - 62, panelHeight - 360));
-                const targetCollapsed = panelHeight - 62;
+                    // Read current translation to snap to closest state
+                    const style = window.getComputedStyle(targetPanel);
+                    const transform = style.transform;
+                    const MatrixClass = window.DOMMatrix || window.WebKitCSSMatrix;
+                    let finalTranslateY = 0;
 
-                const diffExpanded = Math.abs(finalTranslateY - targetExpanded);
-                const diffMedium = Math.abs(finalTranslateY - targetMedium);
-                const diffCollapsed = Math.abs(finalTranslateY - targetCollapsed);
+                    if (transform && transform !== 'none' && MatrixClass) {
+                        const matrix = new MatrixClass(transform);
+                        finalTranslateY = matrix.m42;
+                    }
 
-                if (diffExpanded < diffMedium && diffExpanded < diffCollapsed) {
-                    // Snap to Expanded
-                    panel.classList.remove('collapsed');
-                    panel.classList.add('expanded');
-                } else if (diffMedium < diffExpanded && diffMedium < diffCollapsed) {
-                    // Snap to Medium (Default Open)
-                    panel.classList.remove('collapsed');
-                    panel.classList.remove('expanded');
-                } else {
-                    // Snap to Collapsed
-                    panel.classList.add('collapsed');
-                    panel.classList.remove('expanded');
+                    targetPanel.style.removeProperty('transform');
+                    targetPanel.style.removeProperty('--translate-y');
+
+                    const targetExpanded = 0;
+                    const targetMedium = Math.max(0, Math.min(panelHeight - 62, panelHeight - 360));
+                    const targetCollapsed = panelHeight - 62;
+
+                    const diffExpanded = Math.abs(finalTranslateY - targetExpanded);
+                    const diffMedium = Math.abs(finalTranslateY - targetMedium);
+                    const diffCollapsed = Math.abs(finalTranslateY - targetCollapsed);
+
+                    if (diffExpanded < diffMedium && diffExpanded < diffCollapsed) {
+                        // Snap to Expanded
+                        targetPanel.classList.remove('collapsed');
+                        targetPanel.classList.add('expanded');
+                    } else if (diffMedium < diffExpanded && diffMedium < diffCollapsed) {
+                        // Snap to Medium (Default Open)
+                        targetPanel.classList.remove('collapsed');
+                        targetPanel.classList.remove('expanded');
+                    } else {
+                        // Snap to Collapsed
+                        targetPanel.classList.add('collapsed');
+                        targetPanel.classList.remove('expanded');
+                    }
+                }
+
+                // Attach touch event listeners
+                if (targetDragHandler) {
+                    targetDragHandler.addEventListener('touchstart', onTouchStart, { passive: true });
+                    targetDragHandler.addEventListener('touchmove', onTouchMove, { passive: true });
+                    targetDragHandler.addEventListener('touchend', onTouchEnd, { passive: true });
+                }
+                if (targetHeader) {
+                    targetHeader.addEventListener('touchstart', onTouchStart, { passive: true });
+                    targetHeader.addEventListener('touchmove', onTouchMove, { passive: true });
+                    targetHeader.addEventListener('touchend', onTouchEnd, { passive: true });
                 }
             }
 
-            // Attach touch event listeners
-            if (dragHandler) {
-                dragHandler.addEventListener('touchstart', onTouchStart, { passive: true });
-                dragHandler.addEventListener('touchmove', onTouchMove, { passive: true });
-                dragHandler.addEventListener('touchend', onTouchEnd, { passive: true });
-            }
-            if (header) {
-                header.addEventListener('touchstart', onTouchStart, { passive: true });
-                header.addEventListener('touchmove', onTouchMove, { passive: true });
-                header.addEventListener('touchend', onTouchEnd, { passive: true });
-            }
+            setupDraggableSheet(panel, header, dragHandler);
+            setupDraggableSheet(stopPanel, stopHeader, stopDragHandler);
         });
+
+        /* --- STOP CUSTOM SEARCH & LIVE BUSES FUNCTIONALITIES --- */
+        let recentStopSearches = [];
+
+        function getRecentStopSearches() {
+            try {
+                const userKey = phone ? `getgo_recent_stop_searches_${phone}` : 'getgo_recent_stop_searches_anonymous';
+                const stored = localStorage.getItem(userKey);
+                recentStopSearches = stored ? JSON.parse(stored) : [];
+            } catch (err) {
+                console.error("Error reading recent stop searches:", err);
+                recentStopSearches = [];
+            }
+            return recentStopSearches;
+        }
+
+        function saveRecentStopSearch(stop) {
+            try {
+                const userKey = phone ? `getgo_recent_stop_searches_${phone}` : 'getgo_recent_stop_searches_anonymous';
+                recentStopSearches = recentStopSearches.filter(s => s._id !== stop._id);
+                recentStopSearches.unshift(stop);
+                if (recentStopSearches.length > 5) {
+                    recentStopSearches = recentStopSearches.slice(0, 5);
+                }
+                localStorage.setItem(userKey, JSON.stringify(recentStopSearches));
+            } catch (err) {
+                console.error("Error saving recent stop search:", err);
+            }
+        }
+
+        function clearAllRecentStopSearches(event) {
+            if (event) event.stopPropagation();
+            try {
+                const userKey = phone ? `getgo_recent_stop_searches_${phone}` : 'getgo_recent_stop_searches_anonymous';
+                localStorage.removeItem(userKey);
+                recentStopSearches = [];
+                renderRecentStopSearches();
+            } catch (err) {
+                console.error("Error clearing recent stop searches:", err);
+            }
+        }
+
+        function deleteRecentStopSearchItem(event, id) {
+            if (event) event.stopPropagation();
+            try {
+                const userKey = phone ? `getgo_recent_stop_searches_${phone}` : 'getgo_recent_stop_searches_anonymous';
+                recentStopSearches = recentStopSearches.filter(s => s._id !== id);
+                localStorage.setItem(userKey, JSON.stringify(recentStopSearches));
+                renderRecentStopSearches();
+            } catch (err) {
+                console.error("Error deleting recent stop search item:", err);
+            }
+        }
+
+        function renderRecentStopSearches() {
+            const resultsDiv = document.getElementById('stop-search-results');
+            if (!resultsDiv) return;
+
+            const list = getRecentStopSearches();
+            if (list.length === 0) {
+                resultsDiv.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: var(--text-400); font-family: 'DM Sans', sans-serif;">
+                        <i class="fa-regular fa-clock" style="font-size: var(--fs-3xl); margin-bottom: 12px; opacity: 0.4; color: var(--text-400);"></i>
+                        <div style="font-size: var(--fs-base); font-weight: 600; color: var(--text-100);">No recent searches</div>
+                        <div style="font-size: var(--fs-sm); margin-top: 4px; color: var(--text-400);">Your search history will appear here.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const headerHtml = `
+                <div class="recent-searches-header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid var(--surface-2); font-size: var(--fs-xs); font-weight: 600; color: var(--text-500); text-transform: uppercase; letter-spacing: 0.4px; font-family: 'DM Sans', sans-serif;">
+                    <span>Recent Searches</span>
+                    <button class="clear-all-recent-btn" onclick="clearAllRecentStopSearches(event)" style="background: none; border: none; font-size: var(--fs-xs); font-weight: 600; color: #EF4444; cursor: pointer; letter-spacing: 0.5px; padding: 4px; text-transform: uppercase; transition: color 0.15s ease;">Clear</button>
+                </div>
+            `;
+
+            const itemsHtml = list.map(stop => {
+                const escapedStop = JSON.stringify(stop).replace(/"/g, '&quot;');
+                return `
+                    <div class="autocomplete-item recent-search-item" onclick="selectStopSearchResult(${escapedStop})" style="display: flex; align-items: center; justify-content: space-between; position: relative; padding-right: 8px;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; overflow: hidden;">
+                            <div class="autocomplete-icon">
+                                <i class="fa-regular fa-clock" style="color: var(--text-400);"></i>
+                            </div>
+                            <div class="autocomplete-details" style="overflow: hidden;">
+                                <span class="autocomplete-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${stop.stationName}</span>
+                                <span class="autocomplete-sub">Bus Stop</span>
+                            </div>
+                        </div>
+                        <button class="delete-recent-item-btn" onclick="deleteRecentStopSearchItem(event, '${stop._id}')" style="background: none; border: none; font-size: var(--fs-xl); color: var(--text-400); cursor: pointer; padding: 10px 14px; display: flex; align-items: center; justify-content: center; z-index: 10; transition: color 0.15s ease;">
+                            &times;
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            resultsDiv.innerHTML = headerHtml + itemsHtml;
+        }
+
+        function openStopSearchPanel() {
+            document.getElementById('stop-search-panel').style.display = 'flex';
+            const input = document.getElementById('stop-search-input');
+            if (input) {
+                input.value = '';
+                setTimeout(() => input.focus(), 150);
+            }
+            renderRecentStopSearches();
+        }
+
+        function closeStopSearchPanel() {
+            document.getElementById('stop-search-panel').style.display = 'none';
+        }
+
+        let stopSearchDebounceTimer;
+        function onStopSearchInput(val) {
+            clearTimeout(stopSearchDebounceTimer);
+            const query = val.trim();
+
+            if (query.length === 0) {
+                renderRecentStopSearches();
+                return;
+            }
+
+            if (query.length < 2) {
+                document.getElementById('stop-search-results').innerHTML = '';
+                return;
+            }
+
+            stopSearchDebounceTimer = setTimeout(async () => {
+                const resultsDiv = document.getElementById('stop-search-results');
+                resultsDiv.innerHTML = `
+                    <div style="text-align: center; padding: 40px 0; color: #71717A;">
+                        <i class="fa-solid fa-spinner fa-spin" style="font-size: var(--fs-2xl); margin-bottom: 12px;"></i>
+                        <div>Searching stops...</div>
+                    </div>
+                `;
+
+                try {
+                    const res = await fetch(`/api/stops/search?q=${encodeURIComponent(query)}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        const stops = data.stops || [];
+                        if (stops.length === 0) {
+                            resultsDiv.innerHTML = `
+                                <div style="text-align: center; padding: 40px 20px; color: var(--text-400); font-family: 'DM Sans', sans-serif;">
+                                    <div style="font-size: var(--fs-base); font-weight: 600; color: var(--text-100);">No stops found</div>
+                                    <div style="font-size: var(--fs-sm); margin-top: 4px; color: var(--text-400);">Try searching with a different name.</div>
+                                </div>
+                            `;
+                        } else {
+                            resultsDiv.innerHTML = stops.map(stop => {
+                                const escapedStop = JSON.stringify(stop).replace(/"/g, '&quot;');
+                                return `
+                                    <div class="autocomplete-item" onclick="selectStopSearchResult(${escapedStop})">
+                                        <div class="autocomplete-icon">
+                                            <i class="fa-solid fa-bus-simple"></i>
+                                        </div>
+                                        <div class="autocomplete-details">
+                                            <span class="autocomplete-name">${stop.stationName}</span>
+                                            <span class="autocomplete-sub">Bus Stop</span>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('');
+                        }
+                    } else {
+                        resultsDiv.innerHTML = `<div style="text-align: center; padding: 20px; color: #ef4444;">Search failed</div>`;
+                    }
+                } catch (err) {
+                    console.error("Stop search error:", err);
+                    resultsDiv.innerHTML = `<div style="text-align: center; padding: 20px; color: #ef4444;">Connection error</div>`;
+                }
+            }, 300);
+        }
+
+        function selectStopSearchResult(stop) {
+            saveRecentStopSearch(stop);
+            closeStopSearchPanel();
+            showStopLiveBuses(stop._id, stop.stationName, stop.latitude, stop.longitude);
+        }
+
+        async function showStopLiveBuses(stopId, stopName, stopLat, stopLng) {
+            document.getElementById('stop-buses-panel').style.display = 'flex';
+            document.getElementById('stop-buses-title').textContent = stopName;
+
+            const distSpan = document.getElementById('stop-buses-distance');
+            // Calculate distance to stop from user location
+            let distanceText = "";
+            if (userMarker) {
+                const userLatLng = userMarker.getLatLng();
+                const distM = getDistanceMeters(userLatLng.lat, userLatLng.lng, stopLat, stopLng);
+                const walkingMin = Math.max(1, Math.round(distM / 80));
+                distanceText = `<i class="fa-solid fa-person-walking"></i> ${walkingMin} min (${distM >= 1000 ? (distM / 1000).toFixed(1) + ' km' : Math.round(distM) + ' m'}) away`;
+            }
+            distSpan.innerHTML = distanceText;
+
+            const listDiv = document.getElementById('stop-buses-list');
+            listDiv.innerHTML = `
+                <div style="text-align: center; padding: 40px 0; color: #71717A;">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: var(--fs-2xl); margin-bottom: 12px;"></i>
+                    <div>Fetching live buses...</div>
+                </div>
+            `;
+
+            try {
+                const res = await fetch(`/api/stops/${stopId}/live-buses`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const buses = data.buses || [];
+                    if (buses.length === 0) {
+                        listDiv.innerHTML = `
+                            <div style="text-align: center; padding: 60px 20px; color: var(--text-400); font-family: 'DM Sans', sans-serif;">
+                                <i class="fa-solid fa-bus-simple" style="font-size: var(--fs-4xl); margin-bottom: 16px; opacity: 0.3; color: var(--text-400);"></i>
+                                <div style="font-size: var(--fs-base); font-weight: 600; color: var(--text-100);">No live buses active</div>
+                                <div style="font-size: var(--fs-sm); margin-top: 4px; color: var(--text-400);">There are currently no active drivers broadcasting location on routes passing through this stop.</div>
+                            </div>
+                        `;
+                    } else {
+                        listDiv.innerHTML = buses.map(bus => {
+                            const elapsed = Math.round((Date.now() - new Date(bus.lastUpdated)) / 1000);
+                            const updatedText = elapsed < 60 ? `${elapsed}s ago` : `${Math.round(elapsed / 60)}m ago`;
+                            
+                            const distToStop = getDistanceMeters(bus.lat, bus.lng, stopLat, stopLng);
+                            const etaMin = Math.max(1, Math.round(distToStop / 400));
+                            const routePrefix = bus.routeName.split(' ')[0].replace(/[:-]+$/, '');
+
+                            return `
+                                <div class="stop-buses-item">
+                                    <div style="display: flex; align-items: center; gap: 16px;">
+                                        <div style="width: 42px; height: 42px; border-radius: var(--r-md); background: var(--surface-1); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: var(--fs-lg); color: var(--text-100);">
+                                            <i class="fa-solid fa-bus"></i>
+                                        </div>
+                                        <div style="display: flex; flex-direction: column;">
+                                            <span style="font-weight: 600; font-size: var(--fs-base); color: var(--text-100);">${routePrefix}</span>
+                                            <span style="font-size: var(--fs-xs); color: var(--text-400); font-weight: 500;">To destination • Driver +91 ${bus.driverPhone.slice(-10)}</span>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                                        <span style="font-weight: 600; font-size: var(--fs-base); color: var(--accent-green); display: flex; align-items: center; gap: 4px;">
+                                            <span style="width: 6px; height: 6px; border-radius: 50%; background: #10B981; animation: live-pulse 1s infinite;"></span>
+                                            ${etaMin} min
+                                        </span>
+                                        <span style="font-size: var(--fs-xs); color: var(--text-400); font-weight: 500;">Live • ${updatedText}</span>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                } else {
+                    listDiv.innerHTML = `<div style="text-align: center; padding: 20px; color: #ef4444;">Failed to load live buses</div>`;
+                }
+            } catch (err) {
+                console.error("Fetch stop live buses error:", err);
+                listDiv.innerHTML = `<div style="text-align: center; padding: 20px; color: #ef4444;">Connection error</div>`;
+            }
+        }
+
+        function closeStopBusesPanel() {
+            document.getElementById('stop-buses-panel').style.display = 'none';
+        }
+
+        function openStopDetailsSheet(stop) {
+            hideJourneyDetails();
+            document.getElementById('stop-sheet-title').textContent = stop.stationName;
+            const sheet = document.getElementById('stop-details-sheet');
+            sheet.classList.add('open');
+            sheet.classList.remove('collapsed');
+            sheet.classList.remove('expanded');
+
+            const contentDiv = document.getElementById('stop-sheet-content');
+            contentDiv.innerHTML = `
+                <div style="text-align: center; padding: 20px 0; color: #71717A;">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: var(--fs-xl); margin-bottom: 8px;"></i>
+                    <div>Checking live buses...</div>
+                </div>
+            `;
+
+            // Load buses immediately
+            fetchStopDetailsLiveBuses(stop);
+        }
+
+        async function fetchStopDetailsLiveBuses(stop) {
+            const contentDiv = document.getElementById('stop-sheet-content');
+            try {
+                const res = await fetch(`/api/stops/${stop._id}/live-buses`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const buses = data.buses || [];
+                    if (buses.length === 0) {
+                        contentDiv.innerHTML = `
+                            <div style="text-align: center; padding: 24px 10px; color: var(--text-400); font-family: 'DM Sans', sans-serif;">
+                                <i class="fa-solid fa-bus-simple" style="font-size: var(--fs-3xl); margin-bottom: 12px; opacity: 0.3; color: var(--text-400);"></i>
+                                <div style="font-size: var(--fs-sm); font-weight: 600; color: var(--text-100);">No live buses active</div>
+                                <div style="font-size: var(--fs-xs); margin-top: 4px; color: var(--text-400); line-height: 1.4;">There are currently no active buses on routes passing through this stop.</div>
+                            </div>
+                        `;
+                    } else {
+                        contentDiv.innerHTML = buses.map(bus => {
+                            const elapsed = Math.round((Date.now() - new Date(bus.lastUpdated)) / 1000);
+                            const updatedText = elapsed < 60 ? `${elapsed}s ago` : `${Math.round(elapsed / 60)}m ago`;
+                            
+                            const distToStop = getDistanceMeters(bus.lat, bus.lng, stop.latitude, stop.longitude);
+                            const etaMin = Math.max(1, Math.round(distToStop / 400));
+                            const routePrefix = bus.routeName.split(' ')[0].replace(/[:-]+$/, '');
+
+                            return `
+                                <div class="stop-buses-item" style="border: 1px solid var(--border); border-radius: var(--r-md); margin-bottom: 8px; padding: 12px 14px; display: flex !important; justify-content: space-between !important; align-items: center !important;">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div style="width: 36px; height: 36px; border-radius: var(--r-sm); background: var(--surface-1); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: var(--fs-base); color: var(--text-100);">
+                                            <i class="fa-solid fa-bus"></i>
+                                        </div>
+                                        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                                            <span style="font-weight: 600; font-size: var(--fs-sm); color: var(--text-100);">${routePrefix}</span>
+                                            <span style="font-size: var(--fs-xs); color: var(--text-400); font-weight: 500;">Driver: +91 ${bus.driverPhone.slice(-10)}</span>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">
+                                        <span style="font-weight: 600; font-size: var(--fs-sm); color: var(--accent-green); display: flex; align-items: center; gap: 4px;">
+                                            <span style="width: 6px; height: 6px; border-radius: 50%; background: #10B981; animation: live-pulse 1s infinite;"></span>
+                                            ${etaMin} min
+                                        </span>
+                                        <span style="font-size: var(--fs-xs); color: var(--text-400); font-weight: 500;">Live • ${updatedText}</span>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                } else {
+                    contentDiv.innerHTML = `<div style="text-align: center; padding: 10px; color: #ef4444; font-size: var(--fs-sm);">Failed to load live buses</div>`;
+                }
+            } catch (err) {
+                console.error("Fetch details stop live buses error:", err);
+                contentDiv.innerHTML = `<div style="text-align: center; padding: 10px; color: #ef4444; font-size: var(--fs-sm);">Connection error</div>`;
+            }
+        }
+
+        function closeStopDetailsSheet() {
+            const sheet = document.getElementById('stop-details-sheet');
+            if (sheet) {
+                sheet.classList.remove('open');
+                sheet.classList.remove('collapsed');
+                sheet.classList.remove('expanded');
+            }
+        }
     </script>
 </body>
 

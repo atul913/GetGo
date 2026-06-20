@@ -393,7 +393,13 @@
                         <label class="form-label">Bus / Vehicle Code</label>
                         <input type="text" id="bus-id" class="field" placeholder="e.g. MH12-AB-9876 or BUS-101">
                     </div>
-                    <button class="btn btn-primary" id="trip-btn" onclick="handleStartTrip()">
+                    <div class="field-group" style="margin-top: 12px;">
+                        <label class="form-label">Assigned Route</label>
+                        <select id="route-id-select" class="field" style="background-color: var(--surface-0); color: var(--text-100); width: 100%; border: 1.5px solid var(--border); border-radius: var(--r-md); height: 50px; padding: 0 14px; font-family: var(--font);">
+                            <option value="">Select Route (Optional)</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="trip-btn" onclick="handleStartTrip()" style="margin-top: 16px;">
                         <span>Start Live Trip</span> <i class="fa-solid fa-play"></i>
                     </button>
                 </div>
@@ -704,7 +710,26 @@
         window.addEventListener("DOMContentLoaded", () => {
             initMap();
             fetchUserProfile();
+            fetchRoutes();
         });
+
+        async function fetchRoutes() {
+            try {
+                const res = await fetch("/api/routes", {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const select = document.getElementById("route-id-select");
+                    if (select) {
+                        select.innerHTML = '<option value="">Select Route (Optional)</option>' + 
+                            data.routes.map(r => `<option value="${r.routeId}">${r.routeName}</option>`).join('');
+                    }
+                }
+            } catch (err) {
+                console.error("fetchRoutes error:", err);
+            }
+        }
 
         function showToast(message, type = "success") {
             const toastEl = document.getElementById("toast");
@@ -735,6 +760,8 @@
         async function handleStartTrip(event) {
             if (event && event.preventDefault) event.preventDefault();
             const busInput = document.getElementById("bus-id").value.trim().toUpperCase();
+            const routeSelect = document.getElementById("route-id-select");
+            const routeIdVal = routeSelect ? routeSelect.value : "";
             const startBtn = document.getElementById("trip-btn");
 
             if (!busInput) {
@@ -752,7 +779,7 @@
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${token}`
                     },
-                    body: JSON.stringify({ busId: busInput })
+                    body: JSON.stringify({ busId: busInput, routeId: routeIdVal })
                 });
 
                 const data = await response.json();

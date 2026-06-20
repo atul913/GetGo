@@ -7,14 +7,14 @@ const busService = require("../services/busService");
  * auth: driver
  */
 const startTrip = async (req, res) => {
-    const { busId } = req.body;
+    const { busId, routeId } = req.body;
 
     if (!busId) {
         return res.status(400).json({ success: false, message: "busId is required" });
     }
 
     try {
-        const bus = await busService.startTrip(busId, req.user.phone);
+        const bus = await busService.startTrip(busId, req.user.phone, routeId);
         res.status(200).json({ success: true, bus });
     } catch (error) {
         console.error("startTrip error:", error.message);
