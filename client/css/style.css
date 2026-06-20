@@ -6,40 +6,69 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cuprum:ital,wght@0,400..700;1,400..700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
 :root {
-    /* Brand */
-    --brand-amber: #000000;
-    --brand-deep: #27272A;
-    --brand-dark: #18181B;
-    --brand-ink: #09090B;
+    /* Map Base Layer (Geography) */
+    --map-land: #EBECE4;
+    /* Soft, warm beige for default landmass */
+    --map-water: #A3CCFF;
+    /* Clear, legible light blue for water bodies */
+    --map-park: #C5E3C6;
+    /* Muted, natural green for parks and forests */
+    --map-building: #E0E0E0;
+    /* Subtle gray for 3D building footprints */
+    --map-transit: #F2F2F2;
+    /* Very light gray for airports/transit hubs */
 
-    /* Accent */
-    --accent-teal: #27272A;
-    --accent-green: #000000;
-    --accent-rose: #71717A;
+    /* Infrastructure & Roads */
+    --road-local: #FFFFFF;
+    /* Pure white for standard local streets */
+    --road-highway: #FDE293;
+    /* High-visibility pale yellow for highways */
+    --road-arterial: #FEFEFE;
+    /* Slightly off-white for main connecting roads */
+    --road-outline: #D4D4D8;
+    /* Soft gray outline to separate adjacent roads */
 
-    /* Surface */
+    /* Routing & Accents (The "Google" UI Colors) */
+    --route-active: #1A73E8;
+    /* Primary bright blue for the active navigation path */
+    --route-alt: #8AB4F8;
+    /* Faded blue for alternative, unselected routes */
+    --pin-primary: #EA4335;
+    /* Crisp red for destination markers */
+    --user-location: #4285F4;
+    /* Distinct blue for the user's current dot */
+
+    /* Traffic Indicators */
+    --traffic-heavy: #EA4335;
+    /* Red */
+    --traffic-mod: #FBBC04;
+    /* Yellow/Amber */
+    --traffic-light: #34A853;
+    /* Green */
+
+    /* UI Surfaces (Floating search bars, side panels, cards) */
     --surface-0: #FFFFFF;
-    --surface-1: #F4F4F5;
-    --surface-2: #FAFAFA;
-    --border: #E4E4E7;
-    --border-strong: #71717A;
+    /* Pure white for high-contrast UI overlays */
+    --surface-1: #F8F9FA;
+    /* Very light gray for hover states on list items */
+    --surface-2: #F1F3F4;
+    /* Divider or secondary panel background */
+    --border: #DADCE0;
+    /* Crisp, subtle border for search bars and cards */
 
-    /* Text */
-    --text-100: #000000;
-    --text-200: #18181B;
-    --text-400: #71717A;
-    --text-500: #A1A1AA;
+    /* Typography (Optimized for map labels and UI panels) */
+    --text-100: #202124;
+    /* Almost black for primary city names and UI text */
+    --text-200: #3C4043;
+    /* Dark gray for secondary labels (neighborhoods) */
+    --text-400: #5F6368;
+    /* Muted text (business categories, minor streets) */
+    --text-500: #70757A;
+    /* Fine print (copyright, scale indicators) */
 
-    /* Gradients */
-    --grad-amber: linear-gradient(135deg, #000000 0%, #27272A 100%);
-    --grad-teal: linear-gradient(135deg, #27272A 0%, #18181B 100%);
-    --grad-hero: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
-
-    /* Elevation */
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, .07), 0 1px 2px rgba(0, 0, 0, .04);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, .08), 0 2px 4px rgba(0, 0, 0, .04);
-    --shadow-lg: 0 12px 32px rgba(0, 0, 0, .10), 0 4px 8px rgba(0, 0, 0, .05);
-    --shadow-xl: 0 24px 48px rgba(0, 0, 0, .12);
+    /* Map UI Elevation (Slightly harsher, sharper shadows for floating elements over maps) */
+    --shadow-floating: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+    --shadow-dropdown: 0 2px 6px 2px rgba(60, 64, 67, 0.15), 0 8px 12px 6px rgba(60, 64, 67, 0.15);
 
     /* Geometry */
     --r-sm: 8px;

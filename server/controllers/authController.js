@@ -158,25 +158,25 @@ const uploadProfileImage = async (req, res) => {
             imageUrl = await cloudinaryService.uploadBuffer(req.file.buffer);
         } catch (cloudinaryError) {
             console.warn("[Cloudinary] Upload failed, falling back to local storage:", cloudinaryError.message);
-            
+
             // local uploads directory path inside static client folder
             const uploadsDir = path.join(__dirname, "..", "..", "client", "uploads", "profile_images");
-            
+
             // Ensure directory exists
             if (!fs.existsSync(uploadsDir)) {
                 fs.mkdirSync(uploadsDir, { recursive: true });
             }
-            
+
             // Clean up mobile number (remove spaces/dashes/plus)
             const cleanPhone = phone.toString().replace(/[\s-+]/g, "");
-            
+
             const fileExt = req.file.mimetype === "image/png" ? "png" : "jpg";
             const filename = `${role.toLowerCase()}_${cleanPhone}.${fileExt}`;
             const filePath = path.join(uploadsDir, filename);
-            
+
             // Save buffer locally
             fs.writeFileSync(filePath, req.file.buffer);
-            
+
             // Relative URL for browser to load from static express serving
             imageUrl = `/uploads/profile_images/${filename}`;
         }

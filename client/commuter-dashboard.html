@@ -1776,6 +1776,122 @@
 
         /* --- LOCATION OVERLAY SEARCH LOGIC --- */
         let locationSearchMode = 'start'; // 'start' or 'end'
+        let recentSearches = [];
+
+        function fetchRecentSearches() {
+            try {
+                const userKey = phone ? `getgo_recent_searches_${phone}` : 'getgo_recent_searches_anonymous';
+                const stored = localStorage.getItem(userKey);
+                recentSearches = stored ? JSON.parse(stored) : [];
+            } catch (err) {
+                console.error("Error reading recent searches from localStorage:", err);
+                recentSearches = [];
+            }
+            return Promise.resolve(recentSearches);
+        }
+
+        function renderRecentSearches() {
+            const suggestionsList = document.getElementById('location-suggestions-list');
+            if (!suggestionsList) return;
+
+            if (recentSearches.length === 0) {
+                suggestionsList.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: var(--text-400); font-family: 'Plus Jakarta Sans', sans-serif;">
+                        <i class="fa-regular fa-clock" style="font-size: 2rem; margin-bottom: 12px; opacity: 0.4; color: var(--text-400);"></i>
+                        <div style="font-size: 0.95rem; font-weight: 750; color: var(--text-100);">No recent searches</div>
+                        <div style="font-size: 0.8rem; margin-top: 4px; color: var(--text-400);">Your search history will appear here.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const headerHtml = `
+                <div class="recent-searches-header" style="display: flex; justify-content: space-between; align-items: center; padding: 14px 20px 8px; border-bottom: 1px solid var(--border); font-size: 0.78rem; font-weight: 800; color: var(--text-500); text-transform: uppercase; letter-spacing: 0.6px; font-family: 'Plus Jakarta Sans', sans-serif;">
+                    <span>Recent Searches</span>
+                    <button class="clear-all-recent-btn" onclick="clearAllRecentSearches(event)" style="background: none; border: none; font-size: 0.75rem; font-weight: 700; color: #EF4444; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px; transition: color 0.15s ease;" onmouseover="this.style.color='#DC2626'" onmouseout="this.style.color='#EF4444'">Clear All</button>
+                </div>
+            `;
+
+            const itemsHtml = recentSearches.map(item => {
+                const escapedItem = JSON.stringify(item).replace(/"/g, '&quot;');
+                const itemId = item.id || item.timestamp || Date.now();
+                return `
+                    <div class="autocomplete-item recent-search-item" onclick="selectSearchLocationItem(${escapedItem})" style="display: flex; align-items: center; justify-content: space-between; position: relative; padding-right: 8px;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; overflow: hidden;">
+                            <div class="autocomplete-icon">
+                                <i class="fa-regular fa-clock" style="color: var(--text-400);"></i>
+                            </div>
+                            <div class="autocomplete-details" style="overflow: hidden;">
+                                <span class="autocomplete-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.name}</span>
+                                <span class="autocomplete-sub">${item.isStop ? 'Bus Stop' : 'Recent Search'}</span>
+                            </div>
+                        </div>
+                        <button class="delete-recent-item-btn" onclick="deleteRecentSearchItem(event, '${itemId}')" style="background: none; border: none; font-size: 1.25rem; color: var(--text-400); cursor: pointer; padding: 10px 14px; display: flex; align-items: center; justify-content: center; z-index: 10; transition: color 0.15s ease;" onmouseover="this.style.color='#EF4444'" onmouseout="this.style.color='var(--text-400)'">
+                            &times;
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            suggestionsList.innerHTML = headerHtml + itemsHtml;
+        }
+
+        function saveRecentSearch(item) {
+            try {
+                const userKey = phone ? `getgo_recent_searches_${phone}` : 'getgo_recent_searches_anonymous';
+
+                recentSearches = recentSearches.filter(r => {
+                    const isSameName = r.name.toLowerCase().trim() === item.name.toLowerCase().trim();
+                    const isSameStop = item.stopId && r.stopId && r.stopId.toString() === item.stopId.toString();
+                    return !isSameName && !isSameStop;
+                });
+
+                const timestamp = Date.now();
+                recentSearches.unshift({
+                    id: timestamp.toString(),
+                    name: item.name,
+                    coords: item.coords,
+                    isStop: !!item.isStop,
+                    stopId: item.stopId || null,
+                    timestamp: timestamp
+                });
+
+                if (recentSearches.length > 5) {
+                    recentSearches = recentSearches.slice(0, 5);
+                }
+
+                localStorage.setItem(userKey, JSON.stringify(recentSearches));
+            } catch (err) {
+                console.error("Error saving recent search to localStorage:", err);
+            }
+        }
+
+        function clearAllRecentSearches(event) {
+            if (event) event.stopPropagation();
+            try {
+                const userKey = phone ? `getgo_recent_searches_${phone}` : 'getgo_recent_searches_anonymous';
+                localStorage.removeItem(userKey);
+                recentSearches = [];
+                renderRecentSearches();
+            } catch (err) {
+                console.error("Error clearing recent searches from localStorage:", err);
+            }
+        }
+
+        function deleteRecentSearchItem(event, id) {
+            if (event) event.stopPropagation();
+            try {
+                const userKey = phone ? `getgo_recent_searches_${phone}` : 'getgo_recent_searches_anonymous';
+                recentSearches = recentSearches.filter(item => {
+                    const itemId = item.id || item.timestamp || "";
+                    return itemId.toString() !== id.toString();
+                });
+                localStorage.setItem(userKey, JSON.stringify(recentSearches));
+                renderRecentSearches();
+            } catch (err) {
+                console.error("Error deleting recent search item from localStorage:", err);
+            }
+        }
 
         function openLocationSearch(mode) {
             locationSearchMode = mode;
@@ -1796,6 +1912,21 @@
             // Show Location Search Overlay Panel
             searchPanel.style.display = 'flex';
 
+            // Fetch and show recent searches immediately for destination search
+            if (mode === 'end') {
+                suggestionsList.innerHTML = `
+                    <div style="text-align:center; padding: 30px 0; color: var(--text-400); font-family: 'Plus Jakarta Sans', sans-serif;">
+                        <i class="fa-solid fa-spinner fa-spin" style="margin-right: 8px;"></i> Loading recent searches...
+                    </div>
+                `;
+                fetchRecentSearches().then(() => {
+                    const query = searchInput.value.trim();
+                    if (query.length < 2) {
+                        renderRecentSearches();
+                    }
+                });
+            }
+
             // Auto-focus search input
             setTimeout(() => {
                 searchInput.focus();
@@ -1812,8 +1943,12 @@
         function clearSearchInput() {
             const searchInput = document.getElementById('location-search-input');
             searchInput.value = '';
-            document.getElementById('location-suggestions-list').innerHTML = '';
             searchInput.focus();
+            if (locationSearchMode === 'end') {
+                renderRecentSearches();
+            } else {
+                document.getElementById('location-suggestions-list').innerHTML = '';
+            }
         }
 
         async function fetchLocationSearchSuggestions(query) {
@@ -1886,6 +2021,9 @@
                 const endInput = document.getElementById('planner-end');
                 endInput.value = item.name;
                 plannerEndLocation = item;
+
+                // Save destination search history to localStorage
+                saveRecentSearch(item);
             }
 
             showPlannerPanel();
