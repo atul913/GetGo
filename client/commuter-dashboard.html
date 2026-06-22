@@ -21,7 +21,7 @@
 
         .map-topbar {
             height: 56px;
-            background: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
+            background: var(--surface-1);
             border-bottom: 1.5px solid var(--border);
             display: flex;
             align-items: center;
@@ -71,7 +71,7 @@
             height: 36px;
             border-radius: var(--r-full);
             border: 1.5px solid var(--border);
-            background: var(--surface-0);
+            background: var(--surface-1);
             color: var(--text-200);
             display: flex;
             align-items: center;
@@ -467,14 +467,9 @@
             <span class="map-title" id="commuter-phone-display">Near you</span>
 
             <div class="map-actions">
-                <button class="map-icon-btn" id="map-stop-search-btn" title="Search stop" onclick="openStopSearchPanel()">
+                <button class="map-icon-btn" id="map-stop-search-btn" title="Search stop"
+                    onclick="openStopSearchPanel()">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                </button>
-                <button class="map-icon-btn" id="layers-btn" title="Map style" onclick="toggleLayerPanel()">
-                    <i class="fa-solid fa-layer-group"></i>
-                </button>
-                <button class="map-icon-btn" id="traffic-btn" title="Traffic" onclick="toggleTraffic()">
-                    <i class="fa-solid fa-traffic-light"></i>
                 </button>
             </div>
         </header>
@@ -537,12 +532,10 @@
 
         <!-- Journey Details Bottom Sheet Panel -->
         <div class="journey-details-panel" id="journey-details-panel">
+            <div class="drag-handler"></div>
             <div class="jd-header">
                 <div class="jd-header-title">
-                    <span class="jd-route-badge" id="jd-route-badge">—</span>
-                    <span class="jd-direction" id="jd-direction">Select a journey</span>
                     <span class="jd-time-val" id="jd-total-time">—</span>
-                    <span class="jd-header-separator">•</span>
                     <span class="jd-price" id="jd-total-price">₹—</span>
                 </div>
                 <button class="jd-close-btn" onclick="event.stopPropagation(); hideJourneyDetails()">
@@ -562,7 +555,8 @@
             <div class="drag-handler"></div>
             <div class="jd-header">
                 <div class="jd-header-title">
-                    <span class="jd-route-badge" style="background: var(--brand-deep) !important;"><i class="fa-solid fa-location-dot"></i></span>
+                    <span class="jd-route-badge" style="background: var(--brand-deep) !important;"><i
+                            class="fa-solid fa-location-dot"></i></span>
                     <span class="jd-direction" id="stop-sheet-title">Bus Stop</span>
                 </div>
                 <button class="jd-close-btn" onclick="event.stopPropagation(); closeStopDetailsSheet()">
@@ -574,14 +568,44 @@
             </div>
         </div>
 
+        <!-- Live Bus Tracking Drawer -->
+        <div class="journey-details-panel" id="stop-detailed-sheet">
+            <div class="drag-handler"></div>
+            <div class="jd-header"
+                style="justify-content: space-between !important; padding: 14px 20px 12px !important; align-items: flex-start !important;">
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div
+                            style="display: inline-flex; align-items: center; gap: 5px; background: var(--surface-1); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px 4px 8px; width: fit-content;">
+                            <i class="fa-solid fa-bus" style="font-size: 13px; color: var(--text-300);"></i>
+                            <span id="tracking-bus-title"
+                                style="font-weight: 500; font-size: var(--fs-sm); color: var(--text-100); font-family: var(--font);">T852</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="jd-close-btn" onclick="event.stopPropagation(); closeBusTracking()"
+                    style="background: none; border: none; color: var(--text-300); font-size: 18px; padding: 4px; margin-top: 2px;">
+                    <i class="fa-regular fa-star"></i>
+                </button>
+            </div>
+            <div style="height: 0.5px; background: var(--border);"></div>
+            <div class="jd-content" style="padding: 0; overflow-y: auto;" id="tracking-sheet-content">
+                <div id="tracking-progress-container"></div>
+            </div>
+        </div>
+
         <!-- Stop Search Panel (2nd additional functionality - search screen) -->
         <div id="stop-search-panel">
-            <header class="search-panel-header" style="height: 56px; border-bottom: 1.5px solid var(--border); display: flex; align-items: center; padding: 0 16px; gap: 12px; background: var(--surface-0);">
+            <header class="search-panel-header"
+                style="height: 56px; display: flex; align-items: center; padding: 0 16px; gap: 12px; background: var(--surface-0);">
                 <button class="search-panel-back-btn" onclick="closeStopSearchPanel()">
                     <i class="fa-solid fa-arrow-left"></i>
                 </button>
-                <div class="search-input-wrapper" style="flex: 1; display: flex; align-items: center; background: var(--surface-1); border-radius: var(--r-lg); padding: 8px 14px;">
-                    <input type="text" id="stop-search-input" placeholder="Enter stop name" style="width: 100%; border: none; outline: none; background: transparent; font-size: var(--fs-base); font-family: var(--font); color: var(--text-100);" oninput="onStopSearchInput(this.value)">
+                <div class="search-input-wrapper"
+                    style="flex: 1; display: flex; align-items: center; background: var(--surface-1); border-radius: var(--r-lg); padding: 8px 14px;">
+                    <input type="text" id="stop-search-input" placeholder="Enter stop name"
+                        style="width: 100%; border: none; outline: none; background: transparent; font-size: var(--fs-base); font-family: var(--font); color: var(--text-100);"
+                        oninput="onStopSearchInput(this.value)">
                 </div>
             </header>
             <div class="search-panel-body" id="stop-search-results">
@@ -591,13 +615,16 @@
 
         <!-- Stop Live Buses Panel (2nd additional functionality - full screen results) -->
         <div id="stop-buses-panel">
-            <header class="search-panel-header" style="height: 56px; border-bottom: 1.5px solid var(--border); display: flex; align-items: center; padding: 0 16px; gap: 12px; background: var(--surface-0);">
+            <header class="search-panel-header"
+                style="height: 56px; border-bottom: 1.5px solid var(--border); display: flex; align-items: center; padding: 0 16px; gap: 12px; background: var(--surface-0);">
                 <button class="search-panel-back-btn" onclick="closeStopBusesPanel()">
                     <i class="fa-solid fa-arrow-left"></i>
                 </button>
                 <div style="flex: 1; display: flex; flex-direction: column;">
-                    <span id="stop-buses-title" style="font-weight: 600; font-size: var(--fs-base); color: var(--text-100);">Stop Name</span>
-                    <span id="stop-buses-distance" style="font-size: var(--fs-xs); color: var(--text-400); display: flex; align-items: center; gap: 4px;"></span>
+                    <span id="stop-buses-title"
+                        style="font-weight: 600; font-size: var(--fs-base); color: var(--text-100);">Stop Name</span>
+                    <span id="stop-buses-distance"
+                        style="font-size: var(--fs-xs); color: var(--text-400); display: flex; align-items: center; gap: 4px;"></span>
                 </div>
             </header>
             <div class="search-panel-body" id="stop-buses-list">
@@ -690,9 +717,24 @@
                 routeMarkersList = [];
             }
 
-            // Hide the live map panel
+            // Hide the live map panel and all sub-drawers/sheets
             document.getElementById('live-map-panel').style.display = 'none';
             hideJourneyDetails();
+            closeStopDetailsSheet();
+            closeStopSearchPanel();
+            closeStopBusesPanel();
+
+            // Clear bus tracking drawer if active
+            trackingBusId = null;
+            trackingRouteId = null;
+            trackingRouteStops = [];
+            const sheet = document.getElementById('stop-detailed-sheet');
+            if (sheet) {
+                sheet.classList.remove('open');
+                sheet.classList.remove('collapsed');
+                sheet.classList.remove('expanded');
+            }
+            clearTrackingLayers();
 
             // Navigate back to the source panel
             if (mapSourcePanel === 'search') {
@@ -801,7 +843,7 @@
                 // Update proximity search radius circle
                 if (userLocationCircle) map.removeLayer(userLocationCircle);
                 userLocationCircle = L.circle([lat, lng], {
-                    radius: 800, // 800 meters
+                    radius: 1000, // 1000 meters (1km)
                     color: '#0EA5A0',
                     weight: 1.5,
                     fillColor: '#0EA5A0',
@@ -814,6 +856,16 @@
                     if (feedUserMarker) feedMap.removeLayer(feedUserMarker);
                     feedUserMarker = L.marker([lat, lng], { icon, zIndexOffset: 1000 }).addTo(feedMap);
                     feedMap.setView([lat, lng], 14);
+                }
+
+                // Update plannerStartLocation coordinates if it is "Current location"
+                if (plannerStartLocation && plannerStartLocation.name === "Current location") {
+                    plannerStartLocation.coords = [lat, lng];
+                    // If the trip planner is currently open/visible, recalculate the trip
+                    const plannerPanel = document.getElementById('trip-planner-panel');
+                    if (plannerPanel && plannerPanel.style.display !== 'none') {
+                        calculateTrip();
+                    }
                 }
 
                 // Fetch nearest stops using commuter's live location
@@ -919,9 +971,9 @@
                     centerLng = center.lng;
                 }
 
-                // Filter stops within 800m
+                // Filter stops within 1000m (1km)
                 const filteredStops = allStopsList.filter(stop => {
-                    return getDistanceMeters(centerLat, centerLng, stop.latitude, stop.longitude) <= 800;
+                    return getDistanceMeters(centerLat, centerLng, stop.latitude, stop.longitude) <= 1000;
                 });
 
                 filteredStops.forEach(stop => {
@@ -939,7 +991,7 @@
                             popupAnchor: [0, -38]
                         })
                     });
-                    
+
                     // Trigger expandable bottom sheet on stop click
                     marker.on('click', () => {
                         openStopDetailsSheet(stop);
@@ -962,24 +1014,6 @@
             tileLayer = L.tileLayer(TILES[name] || TILES.standard, { maxZoom: 19 }).addTo(map);
             document.getElementById('layer-panel').classList.remove('open');
             document.getElementById('layers-btn').classList.toggle('active', name !== 'standard');
-        }
-
-        function toggleLayerPanel() {
-            document.getElementById('layer-panel').classList.toggle('open');
-        }
-
-        function toggleTraffic() {
-            trafficOn = !trafficOn;
-            const btn = document.getElementById('traffic-btn');
-            const legend = document.getElementById('traffic-legend');
-            if (trafficOn) {
-                trafficLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=h,traffic&x={x}&y={y}&z={z}', { maxZoom: 19 }).addTo(map);
-                btn.classList.add('active'); legend.classList.add('visible');
-                showMapToast('Traffic layer enabled');
-            } else {
-                if (trafficLayer) { map.removeLayer(trafficLayer); trafficLayer = null; }
-                btn.classList.remove('active'); legend.classList.remove('visible');
-            }
         }
 
         // Close layer panel on outside click
@@ -1046,7 +1080,7 @@
           </div>`;
                 } else {
                     listEl.innerHTML = buses.map(b => `
-          <div class="bus-row" onclick="showMapPanel()">
+          <div class="bus-row" onclick="openBusTracking('${b.busId}', '${b.routeId || ''}', '${b.routeName ? b.routeName.replace(/'/g, "\\'") : ''}', 'feed')" style="cursor: pointer;">
             <div class="bus-row-left">
               <i class="bus-row-icon fa-solid fa-bus" style="color:var(--brand-amber);"></i>
               <div><div class="bus-num">${b.busId}</div><div class="bus-dir">Live Tracking Active</div></div>
@@ -1136,6 +1170,15 @@
             }
             if (typeof updateTimelineLiveBuses === 'function') {
                 updateTimelineLiveBuses(buses);
+            }
+
+            // Real-time tracking panel active check
+            if (trackingBusId) {
+                const activeBus = buses.find(b => b.busId === trackingBusId);
+                if (!activeBus) {
+                    showMapToast(`Trip ended for bus ${trackingBusId}`);
+                    closeBusTracking();
+                }
             }
         }
         // ── LOGOUT ───────────────────────────────
@@ -1369,7 +1412,7 @@
                     </div>
                     <div class="inputs-col-swap">
                         <button class="swap-btn" onclick="swapLocations()">
-                            <i class="fa-solid fa-arrowsleg-up-down"></i>
+                            <i class="fa-solid fa-arrows-up-down"></i>
                         </button>
                     </div>
                 </div>
@@ -1890,6 +1933,7 @@
                     <span>History</span>
                     <button class="clear-all-recent-btn" onclick="clearAllRecentSearches(event)" style="background: none; border: none; font-size: var(--fs-xs); font-weight:600; color: #EF4444; cursor: pointer; letter-spacing: 0.5px; padding: 4px; text-transform: uppercase; transition: color 0.15s ease;" onmouseover="this.style.color='#DC2626'" onmouseout="this.style.color='#EF4444'">Clear</button>
                 </div>
+
             `;
 
             const itemsHtml = recentSearches.map(item => {
@@ -2543,8 +2587,10 @@
 
             // Populate Bottom Sheet details
             currentlySelectedRoute = route;
-            document.getElementById('jd-route-badge').textContent = routeNamePrefix;
-            document.getElementById('jd-direction').textContent = `To ${lastStop.stopName}`;
+            const badgeEl = document.getElementById('jd-route-badge');
+            if (badgeEl) badgeEl.textContent = routeNamePrefix;
+            const dirEl = document.getElementById('jd-direction');
+            if (dirEl) dirEl.textContent = `To ${lastStop.stopName}`;
             document.getElementById('jd-total-time').textContent = `${totalDuration} min`;
             document.getElementById('jd-total-price').textContent = `₹${totalCost}`;
             document.getElementById('jd-timeline-vertical').innerHTML = timelineHtml;
@@ -2690,6 +2736,9 @@
                     if (e.target.closest('.jd-close-btn') || e.target.closest('.jd-close-btn *')) {
                         return;
                     }
+                    if (panel && panel.dataset.dragMoved === 'true') {
+                        return;
+                    }
                     if (panel && panel.classList.contains('open') && panel.classList.contains('collapsed')) {
                         panel.classList.remove('collapsed');
                         panel.classList.remove('expanded');
@@ -2703,6 +2752,9 @@
                     if (e.target.closest('.jd-close-btn') || e.target.closest('.jd-close-btn *')) {
                         return;
                     }
+                    if (stopPanel && stopPanel.dataset.dragMoved === 'true') {
+                        return;
+                    }
                     if (stopPanel && stopPanel.classList.contains('open') && stopPanel.classList.contains('collapsed')) {
                         stopPanel.classList.remove('collapsed');
                         stopPanel.classList.remove('expanded');
@@ -2710,17 +2762,27 @@
                 });
             }
 
-            // Swipeable / draggable sheet behavior
+            // Swipeable / draggable sheet behavior (Laptop and Mobile unified)
             function setupDraggableSheet(targetPanel, targetHeader, targetDragHandler) {
                 let startY = 0;
                 let startTranslateY = 0;
                 let isDragging = false;
                 let panelHeight = 0;
 
-                function onTouchStart(e) {
+                // Grab/grabbing cursor styles for laptop
+                if (targetDragHandler) targetDragHandler.style.cursor = 'grab';
+                if (targetHeader) targetHeader.style.cursor = 'grab';
+
+                function onDragStart(e) {
                     if (!targetPanel || !targetPanel.classList.contains('open')) return;
 
-                    startY = e.touches[0].clientY;
+                    // If it is a click on a button, input, or other interactive element inside the header, don't drag
+                    if (e.target.closest('button') || e.target.closest('input') || e.target.closest('a') || e.target.closest('.jd-close-btn')) {
+                        return;
+                    }
+
+                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                    startY = clientY;
                     panelHeight = targetPanel.offsetHeight;
 
                     // Parse current translateY from computed styles transform matrix
@@ -2736,14 +2798,26 @@
                     }
 
                     isDragging = true;
+                    targetPanel.dataset.dragMoved = 'false';
                     targetPanel.style.setProperty('transition', 'none', 'important');
+                    if (targetDragHandler) targetDragHandler.style.cursor = 'grabbing';
+                    if (targetHeader) targetHeader.style.cursor = 'grabbing';
+
+                    // Prevent text selection during drag on laptop
+                    if (e.cancelable && !e.touches) {
+                        e.preventDefault();
+                    }
                 }
 
-                function onTouchMove(e) {
+                function onDragMove(e) {
                     if (!isDragging) return;
-                    const currentY = e.touches[0].clientY;
-                    const deltaY = currentY - startY;
+                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                    const deltaY = clientY - startY;
                     let newTranslateY = startTranslateY + deltaY;
+
+                    if (Math.abs(clientY - startY) > 5) {
+                        targetPanel.dataset.dragMoved = 'true';
+                    }
 
                     const maxTranslateY = Math.max(0, panelHeight - 62);
                     const minTranslateY = 0;
@@ -2760,10 +2834,12 @@
                     targetPanel.style.setProperty('--translate-y', `${newTranslateY}px`);
                 }
 
-                function onTouchEnd(e) {
+                function onDragEnd(e) {
                     if (!isDragging) return;
                     isDragging = false;
                     targetPanel.style.removeProperty('transition');
+                    if (targetDragHandler) targetDragHandler.style.cursor = 'grab';
+                    if (targetHeader) targetHeader.style.cursor = 'grab';
 
                     // Read current translation to snap to closest state
                     const style = window.getComputedStyle(targetPanel);
@@ -2804,19 +2880,46 @@
 
                 // Attach touch event listeners
                 if (targetDragHandler) {
-                    targetDragHandler.addEventListener('touchstart', onTouchStart, { passive: true });
-                    targetDragHandler.addEventListener('touchmove', onTouchMove, { passive: true });
-                    targetDragHandler.addEventListener('touchend', onTouchEnd, { passive: true });
+                    targetDragHandler.addEventListener('touchstart', onDragStart, { passive: true });
+                    targetDragHandler.addEventListener('touchmove', onDragMove, { passive: true });
+                    targetDragHandler.addEventListener('touchend', onDragEnd, { passive: true });
+
+                    targetDragHandler.addEventListener('mousedown', onDragStart);
                 }
                 if (targetHeader) {
-                    targetHeader.addEventListener('touchstart', onTouchStart, { passive: true });
-                    targetHeader.addEventListener('touchmove', onTouchMove, { passive: true });
-                    targetHeader.addEventListener('touchend', onTouchEnd, { passive: true });
+                    targetHeader.addEventListener('touchstart', onDragStart, { passive: true });
+                    targetHeader.addEventListener('touchmove', onDragMove, { passive: true });
+                    targetHeader.addEventListener('touchend', onDragEnd, { passive: true });
+
+                    targetHeader.addEventListener('mousedown', onDragStart);
                 }
+
+                // Global mouse move and mouse up listeners to support dragging outside the handler on laptop
+                window.addEventListener('mousemove', onDragMove);
+                window.addEventListener('mouseup', onDragEnd);
             }
 
             setupDraggableSheet(panel, header, dragHandler);
             setupDraggableSheet(stopPanel, stopHeader, stopDragHandler);
+
+            const trackingPanel = document.getElementById('stop-detailed-sheet');
+            const trackingHeader = document.querySelector('#stop-detailed-sheet .jd-header');
+            const trackingDragHandler = document.querySelector('#stop-detailed-sheet .drag-handler');
+            if (trackingHeader) {
+                trackingHeader.addEventListener('click', (e) => {
+                    if (e.target.closest('.jd-close-btn') || e.target.closest('.jd-close-btn *')) {
+                        return;
+                    }
+                    if (trackingPanel && trackingPanel.dataset.dragMoved === 'true') {
+                        return;
+                    }
+                    if (trackingPanel && trackingPanel.classList.contains('open') && trackingPanel.classList.contains('collapsed')) {
+                        trackingPanel.classList.remove('collapsed');
+                        trackingPanel.classList.remove('expanded');
+                    }
+                });
+            }
+            setupDraggableSheet(trackingPanel, trackingHeader, trackingDragHandler);
         });
 
         /* --- STOP CUSTOM SEARCH & LIVE BUSES FUNCTIONALITIES --- */
@@ -2889,9 +2992,9 @@
             }
 
             const headerHtml = `
-                <div class="recent-searches-header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid var(--surface-2); font-size: var(--fs-xs); font-weight: 600; color: var(--text-500); text-transform: uppercase; letter-spacing: 0.4px; font-family: 'DM Sans', sans-serif;">
-                    <span>Recent Searches</span>
-                    <button class="clear-all-recent-btn" onclick="clearAllRecentStopSearches(event)" style="background: none; border: none; font-size: var(--fs-xs); font-weight: 600; color: #EF4444; cursor: pointer; letter-spacing: 0.5px; padding: 4px; text-transform: uppercase; transition: color 0.15s ease;">Clear</button>
+                <div class="recent-searches-header" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 16px; border-bottom: 1px solid var(--surface-2); font-size: var(--fs-xs); font-weight:600; color: var(--text-500); text-transform: uppercase; letter-spacing: 0.4px; font-family: 'DM Sans', sans-serif;">
+                    <span>History</span>
+                    <button class="clear-all-recent-btn" onclick="clearAllRecentStopSearches(event)" style="background: none; border: none; font-size: var(--fs-xs); font-weight:600; color: #EF4444; cursor: pointer; letter-spacing: 0.5px; padding: 4px; text-transform: uppercase; transition: color 0.15s ease;" onmouseover="this.style.color='#DC2626'" onmouseout="this.style.color='#EF4444'">Clear</button>
                 </div>
             `;
 
@@ -3044,13 +3147,13 @@
                         listDiv.innerHTML = buses.map(bus => {
                             const elapsed = Math.round((Date.now() - new Date(bus.lastUpdated)) / 1000);
                             const updatedText = elapsed < 60 ? `${elapsed}s ago` : `${Math.round(elapsed / 60)}m ago`;
-                            
+
                             const distToStop = getDistanceMeters(bus.lat, bus.lng, stopLat, stopLng);
                             const etaMin = Math.max(1, Math.round(distToStop / 400));
                             const routePrefix = bus.routeName.split(' ')[0].replace(/[:-]+$/, '');
 
                             return `
-                                <div class="stop-buses-item">
+                                <div class="stop-buses-item" onclick="openBusTracking('${bus.busId}', '${bus.routeId || ''}', '${bus.routeName ? bus.routeName.replace(/'/g, "\\'") : ''}', 'map')" style="cursor: pointer;">
                                     <div style="display: flex; align-items: center; gap: 16px;">
                                         <div style="width: 42px; height: 42px; border-radius: var(--r-md); background: var(--surface-1); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: var(--fs-lg); color: var(--text-100);">
                                             <i class="fa-solid fa-bus"></i>
@@ -3125,13 +3228,13 @@
                         contentDiv.innerHTML = buses.map(bus => {
                             const elapsed = Math.round((Date.now() - new Date(bus.lastUpdated)) / 1000);
                             const updatedText = elapsed < 60 ? `${elapsed}s ago` : `${Math.round(elapsed / 60)}m ago`;
-                            
+
                             const distToStop = getDistanceMeters(bus.lat, bus.lng, stop.latitude, stop.longitude);
                             const etaMin = Math.max(1, Math.round(distToStop / 400));
                             const routePrefix = bus.routeName.split(' ')[0].replace(/[:-]+$/, '');
 
                             return `
-                                <div class="stop-buses-item" style="border: 1px solid var(--border); border-radius: var(--r-md); margin-bottom: 8px; padding: 12px 14px; display: flex !important; justify-content: space-between !important; align-items: center !important;">
+                                <div class="stop-buses-item" onclick="openBusTracking('${bus.busId}', '${bus.routeId || ''}', '${bus.routeName ? bus.routeName.replace(/'/g, "\\'") : ''}', 'map')" style="border: 1px solid var(--border); border-radius: var(--r-md); margin-bottom: 8px; padding: 12px 14px; display: flex !important; justify-content: space-between !important; align-items: center !important; cursor: pointer;">
                                     <div style="display: flex; align-items: center; gap: 12px;">
                                         <div style="width: 36px; height: 36px; border-radius: var(--r-sm); background: var(--surface-1); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: var(--fs-base); color: var(--text-100);">
                                             <i class="fa-solid fa-bus"></i>
@@ -3167,6 +3270,279 @@
                 sheet.classList.remove('open');
                 sheet.classList.remove('collapsed');
                 sheet.classList.remove('expanded');
+            }
+        }
+
+        /* --- LIVE BUS TRACKING & PROGRESS TIMELINE --- */
+        let trackingBusId = null;
+        let trackingRouteId = null;
+        let trackingSourcePanel = 'feed';
+        let trackingRouteStops = [];
+        let trackingRoutePolyline = null;
+        let trackingRouteMarkers = [];
+        let trackingApproachPolyline = null; // for approach segment
+
+        // Helper to project bus location P onto line segment AB
+        function projectPointOnSegment(p, a, b) {
+            const dx = b.lng - a.lng;
+            const dy = b.lat - a.lat;
+            if (dx === 0 && dy === 0) {
+                return { t: 0, distance: getDistanceMeters(p.lat, p.lng, a.lat, a.lng), projLat: a.lat, projLng: a.lng };
+            }
+
+            // Projection factor t (unclamped)
+            const t = ((p.lng - a.lng) * dx + (p.lat - a.lat) * dy) / (dx * dx + dy * dy);
+
+            // Clamped point on segment for actual distance calculation
+            const tClamped = Math.max(0, Math.min(1, t));
+            const projLat = a.lat + tClamped * dy;
+            const projLng = a.lng + tClamped * dx;
+
+            const distance = getDistanceMeters(p.lat, p.lng, projLat, projLng);
+            return { t, distance, projLat, projLng };
+        }
+
+        // Get matching active segment for the bus along the stops sequence
+        function getBusRouteProgress(busLat, busLng, stops) {
+            if (stops.length < 2) return { state: 'before_start', segmentIndex: 0, t: 0, minDistance: 0 };
+
+            let bestSegment = 0;
+            let minDistance = Infinity;
+            let bestT = 0;
+            const p = { lat: busLat, lng: busLng };
+
+            // Find closest segment
+            for (let i = 0; i < stops.length - 1; i++) {
+                const a = { lat: stops[i].latitude, lng: stops[i].longitude };
+                const b = { lat: stops[i + 1].latitude, lng: stops[i + 1].longitude };
+
+                const proj = projectPointOnSegment(p, a, b);
+                if (proj.distance < minDistance) {
+                    minDistance = proj.distance;
+                    bestSegment = i;
+                    bestT = proj.t;
+                }
+            }
+
+            // Categorize based on projection factor t and segment position
+            if (bestSegment === 0 && bestT < 0) {
+                return {
+                    state: 'before_start',
+                    segmentIndex: 0,
+                    t: bestT,
+                    minDistance: getDistanceMeters(busLat, busLng, stops[0].latitude, stops[0].longitude)
+                };
+            } else if (bestSegment === stops.length - 2 && bestT > 1) {
+                return {
+                    state: 'past_end',
+                    segmentIndex: stops.length - 2,
+                    t: bestT,
+                    minDistance: getDistanceMeters(busLat, busLng, stops[stops.length - 1].latitude, stops[stops.length - 1].longitude)
+                };
+            } else {
+                return {
+                    state: 'mid_route',
+                    segmentIndex: bestSegment,
+                    t: Math.max(0, Math.min(1, bestT)),
+                    minDistance: minDistance
+                };
+            }
+        }
+
+        async function openBusTracking(busId, routeId, routeName, source = 'feed') {
+            trackingBusId = busId;
+            trackingRouteId = routeId;
+            trackingRouteStops = [];
+            trackingSourcePanel = source;
+
+            // Close other panels
+            closeStopDetailsSheet();
+            closeStopBusesPanel();
+            closeStopSearchPanel();
+            if (typeof hideJourneyDetails === 'function') hideJourneyDetails();
+
+            // Show live map screen
+            showMapPanel(false, 'feed');
+
+            // Reset current tracking layers if any
+            clearTrackingLayers();
+
+            // Open bottom sheet
+            const sheet = document.getElementById('stop-detailed-sheet');
+            if (sheet) {
+                sheet.classList.add('open');
+                sheet.classList.remove('collapsed');
+                sheet.classList.remove('expanded');
+            }
+
+            const titleEl = document.getElementById('tracking-bus-title');
+            if (titleEl) titleEl.textContent = busId;
+            const badgeEl = document.getElementById('tracking-route-badge');
+            if (badgeEl) badgeEl.textContent = routeName ? routeName.split(' ')[0].replace(/[:-]+$/, '') : '—';
+
+            const contentDiv = document.getElementById('tracking-progress-container');
+            if (contentDiv) {
+                contentDiv.innerHTML = `
+                    <div style="text-align: center; padding: 20px 0; color: #71717A;">
+                        <i class="fa-solid fa-spinner fa-spin" style="font-size: var(--fs-xl); margin-bottom: 8px;"></i>
+                        <div>Resolving route stops...</div>
+                    </div>
+                `;
+            }
+
+            if (routeId) {
+                try {
+                    const res = await fetch(`/api/routes/${routeId}/stops`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await res.json();
+                    if (data.success && data.stops && data.stops.length > 0) {
+                        trackingRouteStops = data.stops;
+
+                        // Draw route on map
+                        drawTrackingRouteOnMap();
+
+                        // Render static stops timeline
+                        renderStaticStopsTimeline();
+                    } else {
+                        if (contentDiv) contentDiv.innerHTML = `<div style="text-align: center; padding: 20px; color: #ef4444;">Failed to load route stops</div>`;
+                    }
+                } catch (err) {
+                    console.error("openBusTracking route stops fetch error:", err);
+                    if (contentDiv) contentDiv.innerHTML = `<div style="text-align: center; padding: 20px; color: #ef4444;">Connection error</div>`;
+                }
+            } else {
+                if (contentDiv) contentDiv.innerHTML = `<div style="text-align: center; padding: 20px; color: #ef4444;">No assigned route for this bus</div>`;
+            }
+        }
+
+
+
+
+        function clearTrackingLayers() {
+            if (trackingRoutePolyline) {
+                map.removeLayer(trackingRoutePolyline);
+                trackingRoutePolyline = null;
+            }
+            if (trackingRouteMarkers && trackingRouteMarkers.length > 0) {
+                trackingRouteMarkers.forEach(m => map.removeLayer(m));
+                trackingRouteMarkers = [];
+            }
+            if (trackingApproachPolyline) {
+                map.removeLayer(trackingApproachPolyline);
+                trackingApproachPolyline = null;
+            }
+        }
+
+        function drawTrackingRouteOnMap() {
+            if (!map || trackingRouteStops.length === 0) return;
+
+            const latlngs = trackingRouteStops.map(s => [s.latitude, s.longitude]);
+
+            // Casing path + inner blue core path
+            const casing = L.polyline(latlngs, {
+                color: '#1557b0',
+                weight: 10,
+                opacity: 0.35,
+                lineJoin: 'round',
+                lineCap: 'round'
+            });
+
+            const core = L.polyline(latlngs, {
+                color: '#1a73e8',
+                weight: 5,
+                opacity: 0.9,
+                lineJoin: 'round',
+                lineCap: 'round'
+            });
+
+            trackingRoutePolyline = L.featureGroup([casing, core]).addTo(map);
+
+            // Add stop nodes as pins
+            trackingRouteStops.forEach((stop, index) => {
+                const isStart = index === 0;
+                const isEnd = index === trackingRouteStops.length - 1;
+
+                const pinHtml = `<div class="custom-stop-pin" style="transform: scale(0.85);">
+                    <div class="stop-circle-inner" style="border-color: ${isStart ? '#10B981' : isEnd ? '#EF4444' : '#000000'} !important;">
+                        <i class="fa-solid fa-bus" style="font-size: 10px;"></i>
+                    </div>
+                    <div class="stop-stem-inner" style="background: ${isStart ? '#10B981' : isEnd ? '#EF4444' : '#000000'} !important;"></div>
+                </div>`;
+
+                const marker = L.marker([stop.latitude, stop.longitude], {
+                    icon: L.divIcon({
+                        html: pinHtml,
+                        className: '',
+                        iconSize: [24, 34],
+                        iconAnchor: [12, 34],
+                        popupAnchor: [0, -34]
+                    })
+                }).bindPopup(`<b>Stop ${index + 1}:</b> ${stop.stopName}`).addTo(map);
+
+                trackingRouteMarkers.push(marker);
+            });
+
+            // Fit map bounds to show route initially
+            const bounds = L.latLngBounds(latlngs);
+            map.fitBounds(bounds, { padding: [60, 60] });
+        }
+
+        function renderStaticStopsTimeline() {
+            const container = document.getElementById('tracking-progress-container');
+            if (!container || trackingRouteStops.length === 0) return;
+
+            const stopsCount = trackingRouteStops.length;
+            let timelineHtml = '<div class="vertical-timeline">';
+
+            for (let i = 0; i < stopsCount; i++) {
+                const stop = trackingRouteStops[i];
+                let rowClass = '';
+                if (i === 0) rowClass += ' first-stop';
+                if (i === stopsCount - 1) rowClass += ' last-stop';
+
+                timelineHtml += `
+                    <div class="timeline-row${rowClass}">
+                        <div class="timeline-left">
+                            <div class="timeline-node"></div>
+                        </div>
+                        <div class="timeline-right">
+                            <div class="timeline-label">${stop.stopName}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            timelineHtml += '</div>';
+            container.innerHTML = timelineHtml;
+        }
+
+        function closeBusTracking() {
+            trackingBusId = null;
+            trackingRouteId = null;
+            trackingRouteStops = [];
+
+            // Remove drawer classes
+            const sheet = document.getElementById('stop-detailed-sheet');
+            if (sheet) {
+                sheet.classList.remove('open');
+                sheet.classList.remove('collapsed');
+                sheet.classList.remove('expanded');
+            }
+
+            clearTrackingLayers();
+
+            // Restore general bus markers on map
+            toggleBusMarkersOnMap();
+
+            // Return to the previous view source panel
+            if (trackingSourcePanel === 'map') {
+                // Stay on map view!
+            } else if (mapSourcePanel === 'search') {
+                showFeedPanel();
+                showPlannerPanel();
+            } else {
+                showFeedPanel();
             }
         }
     </script>

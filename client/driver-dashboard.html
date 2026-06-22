@@ -21,7 +21,7 @@
 
         .map-topbar {
             height: 56px;
-            background: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
+            background: var(--surface-1);
             border-bottom: 1.5px solid var(--border);
             display: flex;
             align-items: center;
@@ -55,7 +55,7 @@
         }
 
         .map-title {
-            font-weight:600;
+            font-weight: 600;
             font-size: var(--fs-base);
             color: var(--text-100);
         }
@@ -71,7 +71,7 @@
             height: 36px;
             border-radius: var(--r-full);
             border: 1.5px solid var(--border);
-            background: var(--surface-0);
+            background: var(--surface-1);
             color: var(--text-200);
             display: flex;
             align-items: center;
@@ -120,7 +120,7 @@
 
         .layer-eyebrow {
             font-size: var(--fs-xs);
-            font-weight:600;
+            font-weight: 600;
             color: var(--text-500);
             text-transform: uppercase;
             letter-spacing: 0.8px;
@@ -135,7 +135,7 @@
             align-items: center;
             gap: 9px;
             font-size: var(--fs-sm);
-            font-weight:600;
+            font-weight: 600;
             color: var(--text-400);
             transition: background .1s, color .1s;
         }
@@ -187,7 +187,7 @@
             justify-content: center;
             color: var(--text-100);
             font-size: var(--fs-lg);
-            font-weight:600;
+            font-weight: 600;
             transition: background .1s;
         }
 
@@ -263,7 +263,7 @@
 
         .traffic-legend-title {
             font-size: var(--fs-xs);
-            font-weight:600;
+            font-weight: 600;
             color: var(--text-500);
             text-transform: uppercase;
             letter-spacing: .6px;
@@ -275,7 +275,7 @@
             gap: 8px;
             font-size: var(--fs-sm);
             color: var(--text-400);
-            font-weight:600;
+            font-weight: 600;
         }
 
         .t-dot {
@@ -297,7 +297,7 @@
             padding: 4px 10px;
             font-size: var(--fs-xs);
             color: var(--text-400);
-            font-weight:600;
+            font-weight: 600;
             box-shadow: var(--shadow-sm);
         }
 
@@ -312,7 +312,7 @@
             padding: 10px 18px;
             border-radius: var(--r-full);
             font-size: var(--fs-sm);
-            font-weight:600;
+            font-weight: 600;
             opacity: 0;
             transition: all .25s;
             pointer-events: none;
@@ -395,7 +395,8 @@
                     </div>
                     <div class="field-group" style="margin-top: 12px;">
                         <label class="form-label">Assigned Route</label>
-                        <select id="route-id-select" class="field" style="background-color: var(--surface-0); color: var(--text-100); width: 100%; border: 1.5px solid var(--border); border-radius: var(--r-md); height: 50px; padding: 0 14px; font-family: var(--font);">
+                        <select id="route-id-select" class="field"
+                            style="background-color: var(--surface-0); color: var(--text-100); width: 100%; border: 1.5px solid var(--border); border-radius: var(--r-md); height: 50px; padding: 0 14px; font-family: var(--font);">
                             <option value="">Select Route (Optional)</option>
                         </select>
                     </div>
@@ -408,7 +409,8 @@
                 <div id="live-trip-stats" class="hidden">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
                         <div class="live-dot"></div>
-                        <span style="font-weight:600; font-size: var(--fs-base); color:var(--accent-green);">Broadcasting
+                        <span
+                            style="font-weight:600; font-size: var(--fs-base); color:var(--accent-green);">Broadcasting
                             Coordinates</span>
                     </div>
 
@@ -458,12 +460,6 @@
             <span class="map-title" id="driver-map-title">Live Tracking</span>
 
             <div class="map-actions">
-                <button class="map-icon-btn" id="layers-btn" title="Map style" onclick="toggleLayerPanel()">
-                    <i class="fa-solid fa-layer-group"></i>
-                </button>
-                <button class="map-icon-btn" id="traffic-btn" title="Traffic" onclick="toggleTraffic()">
-                    <i class="fa-solid fa-traffic-light"></i>
-                </button>
             </div>
         </header>
 
@@ -493,7 +489,8 @@
                 <button class="float-btn" onclick="map.zoomOut()" title="Zoom out">−</button>
             </div>
             <div class="float-btns">
-                <button class="float-btn" onclick="map.setZoom(13)" title="Reset" style="font-size: var(--fs-sm);">↺</button>
+                <button class="float-btn" onclick="map.setZoom(13)" title="Reset"
+                    style="font-size: var(--fs-sm);">↺</button>
             </div>
         </div>
 
@@ -679,23 +676,6 @@
             document.getElementById('layers-btn').classList.toggle('active', name !== 'standard');
         }
 
-        function toggleLayerPanel() {
-            document.getElementById('layer-panel').classList.toggle('open');
-        }
-
-        function toggleTraffic() {
-            trafficOn = !trafficOn;
-            const btn = document.getElementById('traffic-btn');
-            const legend = document.getElementById('traffic-legend');
-            if (trafficOn) {
-                trafficLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=h,traffic&x={x}&y={y}&z={z}', { maxZoom: 19 }).addTo(map);
-                btn.classList.add('active'); legend.classList.add('visible');
-                showMapToast('Traffic layer enabled');
-            } else {
-                if (trafficLayer) { map.removeLayer(trafficLayer); trafficLayer = null; }
-                btn.classList.remove('active'); legend.classList.remove('visible');
-            }
-        }
 
         // Close layer panel on outside click
         document.addEventListener('click', e => {
@@ -722,7 +702,7 @@
                 if (data.success) {
                     const select = document.getElementById("route-id-select");
                     if (select) {
-                        select.innerHTML = '<option value="">Select Route (Optional)</option>' + 
+                        select.innerHTML = '<option value="">Select Route (Optional)</option>' +
                             data.routes.map(r => `<option value="${r.routeId}">${r.routeName}</option>`).join('');
                     }
                 }
@@ -979,14 +959,16 @@
                 <div class="menu-card">
                     <i class="fa-solid fa-ticket menu-card-icon"></i>
                     <span class="menu-card-text">My tickets / passes</span>
-                    <i class="fa-solid fa-chevron-right" style="margin-left:auto;color:#A1A1AA;font-size: var(--fs-sm);"></i>
+                    <i class="fa-solid fa-chevron-right"
+                        style="margin-left:auto;color:#A1A1AA;font-size: var(--fs-sm);"></i>
                 </div>
 
                 <!-- Manage travel card -->
                 <div class="menu-card">
                     <i class="fa-solid fa-credit-card menu-card-icon"></i>
                     <span class="menu-card-text">Manage travel card</span>
-                    <i class="fa-solid fa-chevron-right" style="margin-left:auto;color:#A1A1AA;font-size: var(--fs-sm);"></i>
+                    <i class="fa-solid fa-chevron-right"
+                        style="margin-left:auto;color:#A1A1AA;font-size: var(--fs-sm);"></i>
                 </div>
 
                 <!-- Settings & Info List -->

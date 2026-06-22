@@ -99,7 +99,9 @@ const getAllBuses = async (req, res) => {
             lat: b.lat,
             lng: b.lng,
             startedAt: b.startedAt,
-            updatedAt: b.updatedAt
+            updatedAt: b.updatedAt,
+            routeId: b.routeId,
+            routeName: b.routeName
         }));
 
         res.status(200).json({
