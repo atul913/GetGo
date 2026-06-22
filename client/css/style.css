@@ -3056,16 +3056,6 @@ body {
     gap: 10px !important;
 }
 
-.jd-route-badge {
-    background: var(--text-100) !important;
-    color: var(--surface-0) !important;
-    font-weight: 600 !important;
-    font-size: var(--fs-sm) !important;
-    padding: 4px 10px !important;
-    border-radius: var(--r-sm) !important;
-    text-transform: uppercase !important;
-}
-
 .jd-direction {
     font-size: var(--fs-base) !important;
     font-weight: 600 !important;
