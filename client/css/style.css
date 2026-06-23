@@ -2730,7 +2730,7 @@ body {
 }
 
 .autocomplete-item {
-    padding: 12px 16px !important;
+    padding: 12px 24px !important;
     display: flex !important;
     align-items: center !important;
     gap: 12px !important;
@@ -2762,7 +2762,6 @@ body {
 .autocomplete-name {
     font-size: var(--fs-sm) !important;
     font-weight: 600 !important;
-    color: #18181B !important;
 }
 
 .autocomplete-sub {

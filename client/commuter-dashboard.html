@@ -1844,11 +1844,11 @@
             // Set default start location as current location
             const startInput = document.getElementById('planner-start');
             if (!startInput.value) {
-                startInput.value = "Current location";
+                startInput.value = "Your location";
                 if (userMarker) {
                     const latlng = userMarker.getLatLng();
                     plannerStartLocation = {
-                        name: "Current location",
+                        name: "Your location",
                         coords: [latlng.lat, latlng.lng],
                         isStop: false,
                         stopId: null
@@ -2047,6 +2047,11 @@
                         renderRecentSearches();
                     }
                 });
+            } else if (mode === 'start') {
+                const query = searchInput.value.trim();
+                if (query.length === 0) {
+                    renderYourLocationSuggestion();
+                }
             }
 
             // Auto-focus search input
@@ -2068,9 +2073,63 @@
             searchInput.focus();
             if (locationSearchMode === 'end') {
                 renderRecentSearches();
+            } else if (locationSearchMode === 'start') {
+                renderYourLocationSuggestion();
             } else {
                 document.getElementById('location-suggestions-list').innerHTML = '';
             }
+        }
+
+        function renderYourLocationSuggestion() {
+            const suggestionsList = document.getElementById('location-suggestions-list');
+            if (!suggestionsList) return;
+            suggestionsList.innerHTML = `
+                <div class="autocomplete-item current-location-option" onclick="selectCurrentLocationAsStart()" style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 12px 24px;">
+                    <div class="autocomplete-icon" style="color: #4285F4; font-size: var(--fs-lg); display: flex; align-items: center; justify-content: center;">
+                        <i class="fa-solid fa-location-crosshairs" style="color: #4285F4;"></i>
+                    </div>
+                    <div class="autocomplete-details" style="display: flex; align-items: center;">
+                        <span class="autocomplete-name" style="color: #4285F4; font-weight: 500; font-family: 'DM Sans', sans-serif; font-size: var(--fs-base);">Your location</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectCurrentLocationAsStart() {
+            hideLocationSearchPanel();
+
+            const startInput = document.getElementById('planner-start');
+            startInput.value = "Your location";
+
+            let coords = null;
+            if (userMarker) {
+                const latlng = userMarker.getLatLng();
+                coords = [latlng.lat, latlng.lng];
+            }
+
+            plannerStartLocation = {
+                name: "Your location",
+                coords: coords,
+                isStop: false,
+                stopId: null
+            };
+
+            if (!coords) {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(pos => {
+                        const { latitude: lat, longitude: lng } = pos.coords;
+                        plannerStartLocation.coords = [lat, lng];
+                        const plannerPanel = document.getElementById('trip-planner-panel');
+                        if (plannerPanel && plannerPanel.style.display !== 'none') {
+                            calculateTrip();
+                        }
+                    }, (err) => {
+                        console.error("Geolocation error:", err);
+                    });
+                }
+            }
+
+            showPlannerPanel();
         }
 
         async function fetchLocationSearchSuggestions(query) {
@@ -2162,8 +2221,14 @@
                     const query = searchInput.value.trim();
 
                     if (query.length < 2) {
-                        if (query.length === 0 && locationSearchMode === 'end') {
-                            renderRecentSearches();
+                        if (query.length === 0) {
+                            if (locationSearchMode === 'end') {
+                                renderRecentSearches();
+                            } else if (locationSearchMode === 'start') {
+                                renderYourLocationSuggestion();
+                            } else {
+                                document.getElementById('location-suggestions-list').innerHTML = '';
+                            }
                         } else {
                             document.getElementById('location-suggestions-list').innerHTML = '';
                         }
