@@ -10,8 +10,8 @@ const Route = require("../models/routeModel");
 const RouteStop = require("../models/routeStopModel");
 const Stop = require("../models/stopModel");
 
-const routesCsvPath = path.join(__dirname, "..", "..", "client", "routes.csv");
-const routeStopsCsvPath = path.join(__dirname, "..", "..", "client", "route_stops.csv");
+const routesCsvPath = path.join(__dirname, "..", "..", "client", "resources", "routes.csv");
+const routeStopsCsvPath = path.join(__dirname, "..", "..", "client", "resources", "route_stops.csv");
 const mongoUri = process.env.MONGODB_ATLAS_URI || process.env.MONGODB_URI;
 
 if (!mongoUri) {

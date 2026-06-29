@@ -8,7 +8,7 @@ require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
 const Stop = require("../models/stopModel");
 
-const csvPath = path.join(__dirname, "..", "..", "client", "aictsl_stops.csv");
+const csvPath = path.join(__dirname, "..", "..", "client", "resources", "aictsl_stops.csv");
 const mongoUri = process.env.MONGODB_ATLAS_URI || process.env.MONGODB_URI;
 
 if (!mongoUri) {
