@@ -357,6 +357,175 @@
         .leaflet-popup-tip {
             background: var(--surface-0) !important;
         }
+
+        /* ─ CUSTOMER SUPPORT CHAT VIEW ──────────────── */
+        #supportChatView {
+            overflow: hidden !important;
+        }
+
+        .support-chat-container {
+            display: flex !important;
+            flex-direction: column !important;
+            height: calc(100vh - 56px) !important;
+            background: var(--surface-1) !important;
+        }
+
+        .support-chat-body {
+            flex: 1 !important;
+            overflow-y: auto !important;
+            padding: 16px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+        }
+
+        .chat-message {
+            display: flex !important;
+            flex-direction: column !important;
+            max-width: 80% !important;
+            margin-bottom: 4px !important;
+            animation: fadeInSupportMsg 0.25s ease-out forwards;
+        }
+
+        @keyframes fadeInSupportMsg {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-message.user {
+            align-self: flex-end !important;
+        }
+
+        .chat-message.bot {
+            align-self: flex-start !important;
+        }
+
+        .chat-message .message-content {
+            padding: 10px 14px !important;
+            border-radius: 16px !important;
+            font-size: var(--fs-base) !important;
+            line-height: 1.4 !important;
+            word-wrap: break-word !important;
+        }
+
+        .chat-message.user .message-content {
+            background: var(--route-active) !important;
+            color: #ffffff !important;
+            border-bottom-right-radius: 4px !important;
+        }
+
+        .chat-message.bot .message-content {
+            background: var(--surface-0) !important;
+            color: var(--text-100) !important;
+            border-bottom-left-radius: 4px !important;
+            border: 1.5px solid var(--border) !important;
+        }
+
+        .chat-message .message-time {
+            font-size: 10px !important;
+            color: var(--text-500) !important;
+            margin-top: 4px !important;
+            align-self: flex-end !important;
+            padding: 0 4px !important;
+        }
+
+        .chat-message.bot .message-time {
+            align-self: flex-start !important;
+        }
+
+        .support-chat-footer {
+            padding: 12px 16px !important;
+            background: var(--surface-0) !important;
+            border-top: 1.5px solid var(--border) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            flex-shrink: 0 !important;
+        }
+
+        .support-chat-footer input {
+            flex: 1 !important;
+            height: 40px !important;
+            padding: 0 16px !important;
+            border: 1.5px solid var(--border) !important;
+            border-radius: var(--r-full) !important;
+            outline: none !important;
+            font-size: var(--fs-base) !important;
+            color: var(--text-100) !important;
+            background: var(--surface-1) !important;
+            transition: border-color 0.15s, background-color 0.15s !important;
+        }
+
+        .support-chat-footer input:focus {
+            border-color: var(--route-active) !important;
+            background: var(--surface-0) !important;
+        }
+
+        .support-send-btn {
+            width: 40px !important;
+            height: 40px !important;
+            border-radius: var(--r-full) !important;
+            background: var(--route-active) !important;
+            color: #ffffff !important;
+            border: none !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            font-size: var(--fs-base) !important;
+            transition: opacity 0.15s, transform 0.1s !important;
+        }
+
+        .support-send-btn:hover {
+            opacity: 0.9 !important;
+        }
+
+        .support-send-btn:active {
+            transform: scale(0.95) !important;
+        }
+
+        .typing-indicator {
+            display: flex !important;
+            align-items: center !important;
+            gap: 4px !important;
+            padding: 8px 12px !important;
+        }
+
+        .typing-indicator span {
+            width: 6px !important;
+            height: 6px !important;
+            background: var(--text-400) !important;
+            border-radius: 50% !important;
+            display: inline-block !important;
+            animation: supportDotBounce 1.3s infinite ease-in-out !important;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.15s !important;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.3s !important;
+        }
+
+        @keyframes supportDotBounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-6px); }
+        }
+
+        .support-status-dot {
+            width: 8px !important;
+            height: 8px !important;
+            border-radius: var(--r-full) !important;
+            background: var(--accent-green) !important;
+            display: inline-block !important;
+        }
+
+        .support-status-text {
+            font-size: var(--fs-xs) !important;
+            color: var(--text-400) !important;
+            font-weight: 600 !important;
+        }
     </style>
 </head>
 
@@ -1260,7 +1429,7 @@
                     </div>
 
                     <span class="stop-card-divider"></span>
-                    <div class="side-panel-item">
+                    <div class="side-panel-item" onclick="showSupportChatView()">
                         <i class="fa-solid fa-headset side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Customer support</span>
                     </div>
@@ -1283,6 +1452,36 @@
                 <span>Terms and conditions</span>
                 <span>V 2.0.79</span>
             </footer>
+        </div>
+
+        <!-- VIEW 3: CUSTOMER SUPPORT CHAT -->
+        <div class="side-panel-view" id="supportChatView">
+            <header class="side-panel-header">
+                <button class="side-panel-back-btn" onclick="showAccountView()">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="side-panel-title">Customer support</div>
+                <div style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
+                    <span class="support-status-dot"></span>
+                    <span class="support-status-text">AI Agent</span>
+                </div>
+            </header>
+            <div class="support-chat-container">
+                <div class="support-chat-body" id="supportChatBody">
+                    <div class="chat-message bot">
+                        <div class="message-content">
+                            Hello! I am your GetGo Transit Assistant. How can I help you today?
+                        </div>
+                        <div class="message-time">12:00 PM</div>
+                    </div>
+                </div>
+                <div class="support-chat-footer">
+                    <input type="text" id="supportChatInput" placeholder="Ask about routes, stops, or buses..." onkeydown="handleSupportChatKey(event)">
+                    <button class="support-send-btn" onclick="sendSupportChatMessage()">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- VIEW 2: EDIT PROFILE FORM -->
@@ -1500,6 +1699,138 @@
         function showAccountView() {
             document.getElementById("accountView").classList.add("active");
             document.getElementById("editProfileView").classList.remove("active");
+            document.getElementById("supportChatView").classList.remove("active");
+        }
+
+        function showSupportChatView() {
+            document.getElementById("accountView").classList.remove("active");
+            document.getElementById("editProfileView").classList.remove("active");
+            document.getElementById("supportChatView").classList.add("active");
+            
+            // Scroll chat to bottom
+            const body = document.getElementById("supportChatBody");
+            if (body) body.scrollTop = body.scrollHeight;
+            
+            // Focus on input
+            setTimeout(() => {
+                const input = document.getElementById("supportChatInput");
+                if (input) input.focus();
+            }, 100);
+        }
+
+        function handleSupportChatKey(e) {
+            if (e.key === "Enter") {
+                sendSupportChatMessage();
+            }
+        }
+
+        function sendSupportChatMessage() {
+            const input = document.getElementById("supportChatInput");
+            if (!input) return;
+            const text = input.value.trim();
+            if (!text) return;
+
+            // Clear input
+            input.value = "";
+
+            // Append user message
+            appendSupportMessage(text, "user");
+
+            // Show typing indicator
+            showSupportTyping(true);
+
+            // Fetch current position if active
+            let userLocation = null;
+            if (typeof userMarker !== 'undefined' && userMarker && typeof userMarker.getLatLng === 'function') {
+                const latlng = userMarker.getLatLng();
+                userLocation = { latitude: latlng.lat, longitude: latlng.lng };
+            }
+
+            const token = localStorage.getItem("getgo_token");
+
+            fetch("/api/support/message", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    message: text,
+                    userLocation
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                showSupportTyping(false);
+                if (data.success) {
+                    appendSupportMessage(data.response, "bot");
+                } else {
+                    appendSupportMessage(data.message || "Something went wrong.", "bot");
+                }
+            })
+            .catch(err => {
+                showSupportTyping(false);
+                console.error("Support message error:", err);
+                appendSupportMessage("Error communicating with support agent. Please check your internet connection.", "bot");
+            });
+        }
+
+        function appendSupportMessage(text, sender) {
+            const body = document.getElementById("supportChatBody");
+            if (!body) return;
+            
+            const msgDiv = document.createElement("div");
+            msgDiv.className = `chat-message ${sender}`;
+
+            const contentDiv = document.createElement("div");
+            contentDiv.className = "message-content";
+            contentDiv.innerText = text;
+
+            const timeDiv = document.createElement("div");
+            timeDiv.className = "message-time";
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            minutes = minutes < 10 ? '0'+minutes : minutes;
+            timeDiv.innerText = `${hours}:${minutes} ${ampm}`;
+
+            msgDiv.appendChild(contentDiv);
+            msgDiv.appendChild(timeDiv);
+            body.appendChild(msgDiv);
+
+            // Scroll to bottom
+            body.scrollTop = body.scrollHeight;
+        }
+
+        function showSupportTyping(show) {
+            const body = document.getElementById("supportChatBody");
+            if (!body) return;
+            
+            // Remove existing indicator if any
+            const existing = document.getElementById("support-typing-indicator");
+            if (existing) existing.remove();
+
+            if (show) {
+                const indicatorDiv = document.createElement("div");
+                indicatorDiv.className = "chat-message bot";
+                indicatorDiv.id = "support-typing-indicator";
+
+                const contentDiv = document.createElement("div");
+                contentDiv.className = "message-content";
+                
+                const typingDiv = document.createElement("div");
+                typingDiv.className = "typing-indicator";
+                typingDiv.innerHTML = "<span></span><span></span><span></span>";
+
+                contentDiv.appendChild(typingDiv);
+                indicatorDiv.appendChild(contentDiv);
+                body.appendChild(indicatorDiv);
+                
+                body.scrollTop = body.scrollHeight;
+            }
         }
 
         function showEditProfileView() {
