@@ -6,6 +6,39 @@ const Route = require("../models/routeModel");
 const RouteStop = require("../models/routeStopModel");
 const busService = require("../services/busService");
 
+// In-memory cache for stops and routes to make parsing instantaneous
+let stopsCache = null;
+let routesCache = null;
+let cacheTimestamp = 0;
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes cache TTL
+
+const getCachedStopsAndRoutes = async () => {
+    const now = Date.now();
+    if (stopsCache && routesCache && (now - cacheTimestamp < CACHE_TTL)) {
+        return { stops: stopsCache, routes: routesCache };
+    }
+    
+    try {
+        const [routes, stops] = await Promise.all([
+            Route.find({}).lean().maxTimeMS(2000),
+            Stop.find({}, { stationName: 1, latitude: 1, longitude: 1 }).lean().maxTimeMS(2000)
+        ]);
+        
+        routesCache = routes;
+        // Sort stops by length descending so we match longer names first
+        stopsCache = stops.sort((a, b) => b.stationName.length - a.stationName.length);
+        cacheTimestamp = now;
+        
+        console.log(`[Support API] Cached ${routesCache.length} routes and ${stopsCache.length} stops for query parser.`);
+    } catch (err) {
+        console.error("[Support API] Failed to refresh stops/routes cache:", err.message);
+        routesCache = routesCache || [];
+        stopsCache = stopsCache || [];
+    }
+    
+    return { stops: stopsCache, routes: routesCache };
+};
+
 /**
  * POST /api/support/message
  * Sends user message along with user context and active buses to n8n AI Agent.
@@ -81,16 +114,17 @@ const sendMessage = async (req, res) => {
                             }
                         }
                     }
-                }).limit(5).maxTimeMS(3000);
+                }).limit(3).maxTimeMS(3000);
 
                 const nearestStopsWithRoutes = [];
                 for (const stop of nearest) {
                     const routeStops = await RouteStop.find({ stopId: stop._id });
                     const routeIds = routeStops.map(rs => rs.routeId);
                     const routes = await Route.find({ routeId: { $in: routeIds } });
+                    const routeNames = routes.map(r => r.routeName);
                     nearestStopsWithRoutes.push({
                         name: stop.stationName,
-                        routes: routes.map(r => r.routeName),
+                        routes: routeNames.length > 4 ? [...routeNames.slice(0, 4), "..."] : routeNames,
                         lat: stop.latitude,
                         lng: stop.longitude
                     });
@@ -104,14 +138,10 @@ const sendMessage = async (req, res) => {
         // 2. Intelligent Search Parser on User Query
         const cleanMessage = message.toLowerCase();
 
-        // 2a. Find matches for route IDs or names in the message
-        let allRoutes = [];
-        try {
-            allRoutes = await Route.find({}).maxTimeMS(3000);
-        } catch (err) {
-            console.warn(`[Support API] Route load failed: ${err.message}`);
-        }
+        // Fetch stops and routes from cache (instantaneous)
+        const { stops: sortedAllStops, routes: allRoutes } = await getCachedStopsAndRoutes();
 
+        // 2a. Find matches for route IDs or names in the message
         let matchedRoute = null;
         for (const route of allRoutes) {
             const nameLower = route.routeName.toLowerCase();
@@ -140,15 +170,6 @@ const sendMessage = async (req, res) => {
         }
 
         // 2b. Find matches for stops mentioned in the message
-        let allStops = [];
-        try {
-            allStops = await Stop.find({}, { stationName: 1, latitude: 1, longitude: 1 }).maxTimeMS(3000);
-        } catch (err) {
-            console.warn(`[Support API] Stop load failed: ${err.message}`);
-        }
-
-        // Sort stops by length descending so we match longer names first
-        const sortedAllStops = [...allStops].sort((a, b) => b.stationName.length - a.stationName.length);
         let remainingMessage = cleanMessage;
         const matchedStops = [];
         for (const stop of sortedAllStops) {

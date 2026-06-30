@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         /* ─ MAP PANEL ──────────────────────────── */
         #live-map-panel {
@@ -395,6 +396,23 @@
             font-size: var(--fs-base) !important;
             line-height: 1.4 !important;
             word-wrap: break-word !important;
+        }
+
+        .chat-message .message-content p {
+            margin: 0 0 6px 0 !important;
+        }
+
+        .chat-message .message-content p:last-child {
+            margin-bottom: 0 !important;
+        }
+
+        .chat-message .message-content ul {
+            margin: 0 !important;
+            padding-left: 20px !important;
+        }
+
+        .chat-message .message-content li {
+            margin-bottom: 4px !important;
         }
 
         .chat-message.user .message-content {
@@ -1439,7 +1457,11 @@
 
             const contentDiv = document.createElement("div");
             contentDiv.className = "message-content";
-            contentDiv.innerText = text;
+            if (typeof marked !== 'undefined' && typeof marked.parse === 'function') {
+                contentDiv.innerHTML = marked.parse(text);
+            } else {
+                contentDiv.innerText = text;
+            }
 
             const timeDiv = document.createElement("div");
             timeDiv.className = "message-time";
