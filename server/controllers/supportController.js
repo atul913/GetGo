@@ -1,6 +1,9 @@
 // controllers/supportController.js
 const axios = require("axios");
 const User = require("../models/userModel");
+const Stop = require("../models/stopModel");
+const Route = require("../models/routeModel");
+const RouteStop = require("../models/routeStopModel");
 const busService = require("../services/busService");
 
 /**
@@ -33,6 +36,216 @@ const sendMessage = async (req, res) => {
             console.error("Error retrieving active buses in supportController:", busErr.message);
         }
 
+        // Construct transitContext
+        let normalizedLocation = null;
+        if (userLocation) {
+            const rawLat = userLocation.latitude !== undefined ? userLocation.latitude : userLocation.lat;
+            const rawLng = userLocation.longitude !== undefined ? userLocation.longitude : userLocation.lng;
+            if (rawLat !== undefined && rawLng !== undefined) {
+                const latNum = parseFloat(rawLat);
+                const lngNum = parseFloat(rawLng);
+                if (!isNaN(latNum) && !isNaN(lngNum)) {
+                    normalizedLocation = { lat: latNum, lng: lngNum };
+                }
+            }
+        }
+
+        const transitContext = {
+            activeBuses: activeBuses.map(b => ({
+                busId: b.busId,
+                driverPhone: b.driverPhone,
+                routeId: b.routeId,
+                routeName: b.routeName,
+                lat: b.lat,
+                lng: b.lng,
+                lastUpdated: b.updatedAt
+            })),
+            userReportedLocation: normalizedLocation,
+            systemTime: new Date().toISOString(),
+            nearestStops: [],
+            plannedRoute: null,
+            searchedStop: null,
+            searchedRoute: null
+        };
+
+        // 1. Dynamic Nearest Stops (If Location coordinates are provided)
+        if (normalizedLocation) {
+            try {
+                const { lat, lng } = normalizedLocation;
+                const nearest = await Stop.find({
+                    location: {
+                        $nearSphere: {
+                            $geometry: {
+                                type: "Point",
+                                coordinates: [lng, lat]
+                            }
+                        }
+                    }
+                }).limit(5).maxTimeMS(3000);
+
+                const nearestStopsWithRoutes = [];
+                for (const stop of nearest) {
+                    const routeStops = await RouteStop.find({ stopId: stop._id });
+                    const routeIds = routeStops.map(rs => rs.routeId);
+                    const routes = await Route.find({ routeId: { $in: routeIds } });
+                    nearestStopsWithRoutes.push({
+                        name: stop.stationName,
+                        routes: routes.map(r => r.routeName),
+                        lat: stop.latitude,
+                        lng: stop.longitude
+                    });
+                }
+                transitContext.nearestStops = nearestStopsWithRoutes;
+            } catch (stopErr) {
+                console.warn(`[Support API] Error finding nearest stops: ${stopErr.message}`);
+            }
+        }
+
+        // 2. Intelligent Search Parser on User Query
+        const cleanMessage = message.toLowerCase();
+
+        // 2a. Find matches for route IDs or names in the message
+        let allRoutes = [];
+        try {
+            allRoutes = await Route.find({}).maxTimeMS(3000);
+        } catch (err) {
+            console.warn(`[Support API] Route load failed: ${err.message}`);
+        }
+
+        let matchedRoute = null;
+        for (const route of allRoutes) {
+            const nameLower = route.routeName.toLowerCase();
+            const idStr = route.routeId.toString();
+            if (cleanMessage.includes(nameLower) || 
+                cleanMessage.includes(`route ${idStr}`) || 
+                cleanMessage.includes(`bus ${idStr}`) ||
+                cleanMessage.endsWith(` ${idStr}`) || 
+                cleanMessage.includes(` ${idStr} `)) {
+                matchedRoute = route;
+                break;
+            }
+        }
+
+        if (matchedRoute) {
+            try {
+                const routeStops = await RouteStop.find({ routeId: matchedRoute.routeId }).sort({ stopSequence: 1 });
+                transitContext.searchedRoute = {
+                    routeId: matchedRoute.routeId,
+                    routeName: matchedRoute.routeName,
+                    stops: routeStops.map(rs => rs.stopName)
+                };
+            } catch (err) {
+                console.warn(`[Support API] Route stops load failed: ${err.message}`);
+            }
+        }
+
+        // 2b. Find matches for stops mentioned in the message
+        let allStops = [];
+        try {
+            allStops = await Stop.find({}, { stationName: 1, latitude: 1, longitude: 1 }).maxTimeMS(3000);
+        } catch (err) {
+            console.warn(`[Support API] Stop load failed: ${err.message}`);
+        }
+
+        // Sort stops by length descending so we match longer names first
+        const sortedAllStops = [...allStops].sort((a, b) => b.stationName.length - a.stationName.length);
+        let remainingMessage = cleanMessage;
+        const matchedStops = [];
+        for (const stop of sortedAllStops) {
+            const stopNameLower = stop.stationName.toLowerCase();
+            if (remainingMessage.includes(stopNameLower)) {
+                matchedStops.push(stop);
+                remainingMessage = remainingMessage.replace(stopNameLower, "");
+            }
+        }
+
+        if (matchedStops.length >= 2) {
+            // Respect the order of occurrence in the query (from X to Y)
+            matchedStops.sort((a, b) => cleanMessage.indexOf(a.stationName.toLowerCase()) - cleanMessage.indexOf(b.stationName.toLowerCase()));
+            const startStop = matchedStops[0];
+            const endStop = matchedStops[1];
+
+            try {
+                const startRouteStops = await RouteStop.find({ stopId: startStop._id });
+                const endRouteStops = await RouteStop.find({ stopId: endStop._id });
+
+                const startMap = new Map();
+                for (const rs of startRouteStops) {
+                    startMap.set(rs.routeId, rs.stopSequence);
+                }
+
+                const plannedRoutes = [];
+                for (const rs of endRouteStops) {
+                    const routeId = rs.routeId;
+                    if (startMap.has(routeId)) {
+                        const startSeq = startMap.get(routeId);
+                        const endSeq = rs.stopSequence;
+                        if (startSeq < endSeq) {
+                            const route = await Route.findOne({ routeId });
+                            if (route) {
+                                plannedRoutes.push({
+                                    routeId,
+                                    routeName: route.routeName,
+                                    stopsCount: endSeq - startSeq
+                                });
+                            }
+                        }
+                    }
+                }
+
+                transitContext.plannedRoute = {
+                    startStop: startStop.stationName,
+                    endStop: endStop.stationName,
+                    routes: plannedRoutes
+                };
+            } catch (routeErr) {
+                console.warn(`[Support API] Route planning failed: ${routeErr.message}`);
+            }
+        } else if (matchedStops.length === 1) {
+            const stop = matchedStops[0];
+            try {
+                const routeStops = await RouteStop.find({ stopId: stop._id });
+                const routeIds = routeStops.map(rs => rs.routeId);
+                const routes = await Route.find({ routeId: { $in: routeIds } });
+                const routeMap = new Map(routes.map(r => [r.routeId, r.routeName]));
+
+                const stopBuses = [];
+                for (const bus of activeBuses) {
+                    let isMatch = false;
+                    let matchedRouteName = "";
+                    if (bus.routeId && routeIds.includes(bus.routeId)) {
+                        isMatch = true;
+                        matchedRouteName = routeMap.get(bus.routeId) || `Route ${bus.routeId}`;
+                    } else {
+                        const busIdClean = bus.busId.split(" ")[0].replace(/[:-]+$/, "").toLowerCase();
+                        for (const route of routes) {
+                            const routeCode = route.routeName.split(" ")[0].replace(/[:-]+$/, "").toLowerCase();
+                            if (busIdClean === routeCode || bus.busId.toLowerCase().includes(routeCode)) {
+                                isMatch = true;
+                                matchedRouteName = route.routeName;
+                                break;
+                            }
+                        }
+                    }
+                    if (isMatch) {
+                        stopBuses.push({
+                            busId: bus.busId,
+                            routeName: matchedRouteName,
+                            lastUpdated: bus.updatedAt
+                        });
+                    }
+                }
+
+                transitContext.searchedStop = {
+                    name: stop.stationName,
+                    servingRoutes: routes.map(r => r.routeName),
+                    liveBuses: stopBuses
+                };
+            } catch (stopErr) {
+                console.warn(`[Support API] Stop query failed: ${stopErr.message}`);
+            }
+        }
+
         // Construct payload context for n8n
         const n8nPayload = {
             message,
@@ -45,19 +258,7 @@ const sendMessage = async (req, res) => {
                 age: userProfile?.age || null,
                 gender: userProfile?.gender || ""
             },
-            transitContext: {
-                activeBuses: activeBuses.map(b => ({
-                    busId: b.busId,
-                    driverPhone: b.driverPhone,
-                    routeId: b.routeId,
-                    routeName: b.routeName,
-                    lat: b.lat,
-                    lng: b.lng,
-                    lastUpdated: b.updatedAt
-                })),
-                userReportedLocation: userLocation || null,
-                systemTime: new Date().toISOString()
-            }
+            transitContext
         };
 
         console.log(`[Support API] Forwarding query to n8n webhook for user ${phone} (${role})`);
