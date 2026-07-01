@@ -282,6 +282,49 @@ const getMcpServer = async () => {
     return serverInstance;
 };
 
+// GET /api/mcp (Streamable HTTP)
+router.get("/", async (req, res) => {
+    try {
+        const { StreamableHTTPServerTransport } = await import("@modelcontextprotocol/sdk/server/streamableHttp.js");
+        const server = await getMcpServer();
+
+        if (!server) {
+            return res.status(500).send("MCP Server not initialized");
+        }
+
+        console.log("[MCP Streamable HTTP] Handling GET request...");
+        res.setHeader("Content-Encoding", "none");
+        res.setHeader("X-Accel-Buffering", "no");
+
+        const transport = new StreamableHTTPServerTransport();
+        await server.connect(transport);
+        await transport.handleGetRequest(req, res);
+    } catch (err) {
+        console.error("[MCP Streamable GET] Error:", err.message);
+        res.status(500).send(err.message);
+    }
+});
+
+// POST /api/mcp (Streamable HTTP)
+router.post("/", async (req, res) => {
+    try {
+        const { StreamableHTTPServerTransport } = await import("@modelcontextprotocol/sdk/server/streamableHttp.js");
+        const server = await getMcpServer();
+
+        if (!server) {
+            return res.status(500).send("MCP Server not initialized");
+        }
+
+        console.log("[MCP Streamable HTTP] Handling POST request...");
+        const transport = new StreamableHTTPServerTransport();
+        await server.connect(transport);
+        await transport.handlePostRequest(req, res);
+    } catch (err) {
+        console.error("[MCP Streamable POST] Error:", err.message);
+        res.status(500).send(err.message);
+    }
+});
+
 // GET /api/mcp/sse
 router.get("/sse", async (req, res) => {
     try {
