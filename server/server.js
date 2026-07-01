@@ -11,6 +11,7 @@ const busRoutes = require("./routes/busRoutes");
 const stopRoutes = require("./routes/stopRoutes");
 const routeRoutes = require("./routes/routeRoutes");
 const supportRoutes = require("./routes/supportRoutes");
+const mcpRoutes = require("./routes/mcpRoutes");
 
 // Connect to MongoDB
 const mongoUri = process.env.MONGODB_URI;
@@ -37,6 +38,7 @@ app.use("/api/bus", busRoutes);
 app.use("/api/stops", stopRoutes);
 app.use("/api/routes", routeRoutes);
 app.use("/api/support", supportRoutes);
+app.use("/api/mcp", mcpRoutes);
 
 // Serve the client folder as static files (so you can open everything from one server)
 app.use(express.static(path.join(__dirname, "..", "client")));
