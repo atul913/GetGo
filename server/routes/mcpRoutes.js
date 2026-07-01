@@ -297,6 +297,11 @@ router.get("/sse", async (req, res) => {
         const messagesUrl = `${protocol}://${host}/api/mcp/messages`;
 
         console.log(`[MCP SSE] Establishing new client connection. Messages URL: ${messagesUrl}`);
+        
+        // Disable proxy buffering & compression on Render/Cloudflare to allow direct SSE streaming
+        res.setHeader("Content-Encoding", "none");
+        res.setHeader("X-Accel-Buffering", "no");
+
         const transport = new SSEServerTransport(messagesUrl, res);
         await server.connect(transport);
 
