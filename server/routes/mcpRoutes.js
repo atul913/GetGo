@@ -292,8 +292,12 @@ router.get("/sse", async (req, res) => {
             return res.status(500).send("MCP Server not initialized");
         }
 
-        console.log("[MCP SSE] Establishing new client connection...");
-        const transport = new SSEServerTransport("/api/mcp/messages", res);
+        const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+        const host = req.get('host');
+        const messagesUrl = `${protocol}://${host}/api/mcp/messages`;
+
+        console.log(`[MCP SSE] Establishing new client connection. Messages URL: ${messagesUrl}`);
+        const transport = new SSEServerTransport(messagesUrl, res);
         await server.connect(transport);
 
         const sessionId = transport.sessionId;
