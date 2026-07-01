@@ -298,7 +298,7 @@ router.get("/", async (req, res) => {
 
         const transport = new StreamableHTTPServerTransport();
         await server.connect(transport);
-        await transport.handleGetRequest(req, res);
+        await transport.handleRequest(req, res);
     } catch (err) {
         console.error("[MCP Streamable GET] Error:", err.message);
         res.status(500).send(err.message);
@@ -318,7 +318,7 @@ router.post("/", async (req, res) => {
         console.log("[MCP Streamable HTTP] Handling POST request...");
         const transport = new StreamableHTTPServerTransport();
         await server.connect(transport);
-        await transport.handlePostRequest(req, res);
+        await transport.handleRequest(req, res, req.body);
     } catch (err) {
         console.error("[MCP Streamable POST] Error:", err.message);
         res.status(500).send(err.message);
