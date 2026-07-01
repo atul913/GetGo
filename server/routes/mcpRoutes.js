@@ -302,6 +302,30 @@ router.get("/sse", async (req, res) => {
         res.setHeader("Content-Encoding", "none");
         res.setHeader("X-Accel-Buffering", "no");
 
+        // Monkeypatch res.write to rewrite the relative URL in the endpoint event to an absolute URL.
+        // The SDK's SSEServerTransport automatically strips the host/protocol and sends relative paths.
+        // Intercepting res.write allows us to force it to be an absolute URL for remote clients like n8n.
+        const originalWrite = res.write;
+        res.write = function (chunk, encoding, callback) {
+            let dataStr = typeof chunk === "string" ? chunk : chunk instanceof Buffer ? chunk.toString("utf8") : "";
+            if (dataStr && dataStr.includes("event: endpoint\ndata: ")) {
+                const match = dataStr.match(/data: ([^\n]+)/);
+                if (match) {
+                    const relativeUrl = match[1];
+                    const absoluteUrl = `${protocol}://${host}${relativeUrl}`;
+                    dataStr = dataStr.replace(relativeUrl, absoluteUrl);
+                    console.log(`[MCP SSE HACK] Intercepted res.write and rewrote endpoint to: ${absoluteUrl}`);
+                    
+                    if (chunk instanceof Buffer) {
+                        chunk = Buffer.from(dataStr, "utf8");
+                    } else {
+                        chunk = dataStr;
+                    }
+                }
+            }
+            return originalWrite.call(res, chunk, encoding, callback);
+        };
+
         const transport = new SSEServerTransport(messagesUrl, res);
         await server.connect(transport);
 
