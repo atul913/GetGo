@@ -136,7 +136,13 @@ const planRouteTool = async (req, res) => {
 
         // 1. Resolve start stop
         if (startStopName) {
-            startStop = await Stop.findOne({ stationName: { $regex: startStopName.trim(), $options: "i" } });
+            const trimmedStart = startStopName.trim();
+            // Prefer exact case-insensitive match
+            const escapedStart = trimmedStart.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            startStop = await Stop.findOne({ stationName: { $regex: `^${escapedStart}$`, $options: "i" } });
+            if (!startStop) {
+                startStop = await Stop.findOne({ stationName: { $regex: escapedStart, $options: "i" } });
+            }
         } else if (startLat && startLng) {
             const lat = parseFloat(startLat);
             const lng = parseFloat(startLng);
@@ -153,7 +159,13 @@ const planRouteTool = async (req, res) => {
 
         // 2. Resolve destination stop
         if (endStopName) {
-            endStop = await Stop.findOne({ stationName: { $regex: endStopName.trim(), $options: "i" } });
+            const trimmedEnd = endStopName.trim();
+            // Prefer exact case-insensitive match
+            const escapedEnd = trimmedEnd.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            endStop = await Stop.findOne({ stationName: { $regex: `^${escapedEnd}$`, $options: "i" } });
+            if (!endStop) {
+                endStop = await Stop.findOne({ stationName: { $regex: escapedEnd, $options: "i" } });
+            }
         } else if (endLat && endLng) {
             const lat = parseFloat(endLat);
             const lng = parseFloat(endLng);
