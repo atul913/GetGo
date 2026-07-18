@@ -1460,7 +1460,16 @@
             if (typeof marked !== 'undefined' && typeof marked.parse === 'function') {
                 contentDiv.innerHTML = marked.parse(text);
             } else {
-                contentDiv.innerText = text;
+                // Inline Markdown fallback parser to handle bold, code, and line breaks offline
+                let html = text
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;");
+                html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+                html = html.replace(/\*(.*?)\*/g, "<em>$1</em>");
+                html = html.replace(/`(.*?)`/g, "<code>$1</code>");
+                html = html.replace(/\n/g, "<br>");
+                contentDiv.innerHTML = html;
             }
 
             const timeDiv = document.createElement("div");
