@@ -378,8 +378,15 @@
         }
 
         @keyframes fadeInSupportMsg {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .chat-message.user {
@@ -516,8 +523,16 @@
         }
 
         @keyframes supportDotBounce {
-            0%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-6px); }
+
+            0%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-6px);
+            }
         }
 
         .support-status-dot {
@@ -1160,45 +1175,51 @@
 
                 <!-- Settings & Info List -->
                 <div class="side-panel-list">
-                    <div class="side-panel-item">
+                    <div class="side-panel-item" onclick="showMapPanel();closeSidePanel();" style="cursor:pointer;">
                         <i class="fa-solid fa-location-dot side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Bus stops near me</span>
+                        <i class="fa-solid fa-chevron-right" style="margin-left:auto;font-size:12px;color:var(--text-500);"></i>
                     </div>
 
                     <span class="stop-card-divider"></span>
-                    <div class="side-panel-item">
+                    <div class="side-panel-item" onclick="showLanguageView()" style="cursor:pointer;">
                         <i class="fa-solid fa-language side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Change language</span>
+                        <i class="fa-solid fa-chevron-right" style="margin-left:auto;font-size:12px;color:var(--text-500);"></i>
                     </div>
 
                     <span class="stop-card-divider"></span>
-                    <div class="side-panel-item">
+                    <div class="side-panel-item" onclick="showSosView()" style="cursor:pointer;">
                         <i class="fa-solid fa-circle-exclamation side-panel-item-icon sos-icon"></i>
-                        <span class="side-panel-item-text">SOS</span>
+                        <span class="side-panel-item-text">SOS &amp; Emergency</span>
+                        <i class="fa-solid fa-chevron-right" style="margin-left:auto;font-size:12px;color:var(--text-500);"></i>
                     </div>
 
                     <span class="stop-card-divider"></span>
-                    <div class="side-panel-item" onclick="showSupportChatView()">
+                    <div class="side-panel-item" onclick="showSupportChatView()" style="cursor:pointer;">
                         <i class="fa-solid fa-headset side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Customer support</span>
+                        <i class="fa-solid fa-chevron-right" style="margin-left:auto;font-size:12px;color:var(--text-500);"></i>
                     </div>
 
                     <span class="stop-card-divider"></span>
-                    <div class="side-panel-item">
+                    <div class="side-panel-item" onclick="showConsentView()" style="cursor:pointer;">
                         <i class="fa-solid fa-file-shield side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Manage Consent</span>
+                        <i class="fa-solid fa-chevron-right" style="margin-left:auto;font-size:12px;color:var(--text-500);"></i>
                     </div>
 
                     <span class="stop-card-divider"></span>
-                    <div class="side-panel-item">
+                    <div class="side-panel-item" onclick="showSettingsView()" style="cursor:pointer;">
                         <i class="fa-solid fa-gear side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Account settings</span>
+                        <i class="fa-solid fa-chevron-right" style="margin-left:auto;font-size:12px;color:var(--text-500);"></i>
                     </div>
                 </div>
             </div>
 
             <footer class="side-panel-footer">
-                <span>Terms and conditions</span>
+                <span onclick="showTermsModal()" style="cursor:pointer;">Terms and conditions</span>
                 <span>V 2.0.79</span>
             </footer>
         </div>
@@ -1219,13 +1240,14 @@
                 <div class="support-chat-body" id="supportChatBody">
                     <div class="chat-message bot">
                         <div class="message-content">
-                            Hello! I am your GetGo Transit Assistant. How can I help you today?
+                            Hello Driver! I am your GetGo Transit Assistant. Ask me anything about routes, schedule assistance, or support.
                         </div>
                         <div class="message-time">12:00 PM</div>
                     </div>
                 </div>
                 <div class="support-chat-footer">
-                    <input type="text" id="supportChatInput" placeholder="Ask about routes, stops, or buses..." onkeydown="handleSupportChatKey(event)">
+                    <input type="text" id="supportChatInput" placeholder="Ask about routes, shifts, or buses..."
+                        onkeydown="handleSupportChatKey(event)">
                     <button class="support-send-btn" onclick="sendSupportChatMessage()">
                         <i class="fa-solid fa-paper-plane"></i>
                     </button>
@@ -1239,11 +1261,11 @@
                 <button class="side-panel-back-btn" onclick="showAccountView()">
                     <i class="fa-solid fa-arrow-left"></i>
                 </button>
-                <div class="side-panel-title">My travel profile</div>
+                <div class="side-panel-title">Driver profile</div>
             </header>
             <div class="profile-edit-body">
                 <div class="profile-edit-subtitle">
-                    Your response would help us tailor the app experience more effectively.
+                    Keep your operator profile updated for verified passenger safety.
                 </div>
 
                 <!-- Avatar with camera overlay -->
@@ -1262,7 +1284,7 @@
 
                 <!-- Fields -->
                 <div class="form-group-custom">
-                    <label for="editName">Name</label>
+                    <label for="editName">Driver Name</label>
                     <input type="text" id="editName" placeholder="Enter name">
                 </div>
 
@@ -1272,7 +1294,7 @@
                 </div>
 
                 <div class="form-group-custom">
-                    <label for="editAge">What's your age?</label>
+                    <label for="editAge">Age</label>
                     <input type="number" id="editAge" placeholder="Enter age" min="1" max="120">
                 </div>
 
@@ -1300,6 +1322,253 @@
                     Save
                 </button>
             </div>
+        </div>
+
+        <!-- VIEW 4: CHANGE LANGUAGE -->
+        <div class="side-panel-view" id="languageView">
+            <header class="side-panel-header">
+                <button class="side-panel-back-btn" onclick="showAccountView()">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="side-panel-title">Language</div>
+            </header>
+            <div class="side-panel-body" style="padding:0;">
+                <div style="padding:16px 20px 8px;font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-500);">
+                    Select Language
+                </div>
+                <div id="languageList">
+                    <!-- JS will render language options -->
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 5: SOS & EMERGENCY -->
+        <div class="side-panel-view" id="sosView">
+            <header class="side-panel-header" style="background:#FEF2F2;border-bottom:1px solid #FECACA;">
+                <button class="side-panel-back-btn" onclick="showAccountView()" style="color:#991B1B;">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="side-panel-title" style="color:#991B1B;">SOS &amp; Emergency</div>
+            </header>
+            <div class="side-panel-body" style="padding:20px;">
+                <!-- SOS Call Button -->
+                <button onclick="handleSosCall()"
+                    style="width:100%;height:64px;background:linear-gradient(135deg,#EF4444,#DC2626);border:none;border-radius:16px;color:#fff;font-family:var(--font-head);font-size:var(--fs-lg);font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 8px 24px rgba(220,38,38,0.35);margin-bottom:24px;transition:transform .15s;"
+                    onmouseover="this.style.transform='scale(1.01)'" onmouseout="this.style.transform='scale(1)'">
+                    <i class="fa-solid fa-phone-volume"></i> Call Emergency (112)
+                </button>
+
+                <div style="font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-500);margin-bottom:12px;">
+                    Emergency Contacts
+                </div>
+
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <div style="background:var(--surface-1);border:1.5px solid var(--border);border-radius:var(--r-md);padding:14px 16px;display:flex;align-items:center;gap:14px;">
+                        <div style="width:40px;height:40px;border-radius:50%;background:#FEF2F2;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fa-solid fa-shield-halved" style="color:#DC2626;font-size:18px;"></i>
+                        </div>
+                        <div style="flex:1;">
+                            <div style="font-weight:700;font-size:var(--fs-base);color:var(--text-100);">Police</div>
+                            <div style="font-size:var(--fs-sm);color:var(--text-400);">Dial 100</div>
+                        </div>
+                        <a href="tel:100" style="width:36px;height:36px;background:var(--brand-green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;">
+                            <i class="fa-solid fa-phone"></i>
+                        </a>
+                    </div>
+
+                    <div style="background:var(--surface-1);border:1.5px solid var(--border);border-radius:var(--r-md);padding:14px 16px;display:flex;align-items:center;gap:14px;">
+                        <div style="width:40px;height:40px;border-radius:50%;background:#FFF7ED;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fa-solid fa-truck-medical" style="color:#EA580C;font-size:18px;"></i>
+                        </div>
+                        <div style="flex:1;">
+                            <div style="font-weight:700;font-size:var(--fs-base);color:var(--text-100);">Ambulance</div>
+                            <div style="font-size:var(--fs-sm);color:var(--text-400);">Dial 108</div>
+                        </div>
+                        <a href="tel:108" style="width:36px;height:36px;background:var(--brand-green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;">
+                            <i class="fa-solid fa-phone"></i>
+                        </a>
+                    </div>
+
+                    <div style="background:var(--surface-1);border:1.5px solid var(--border);border-radius:var(--r-md);padding:14px 16px;display:flex;align-items:center;gap:14px;">
+                        <div style="width:40px;height:40px;border-radius:50%;background:#F0FDF4;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fa-solid fa-bus" style="color:#16A34A;font-size:18px;"></i>
+                        </div>
+                        <div style="flex:1;">
+                            <div style="font-weight:700;font-size:var(--fs-base);color:var(--text-100);">Transit Depot Helpline</div>
+                            <div style="font-size:var(--fs-sm);color:var(--text-400);">Indore City Bus Authority</div>
+                        </div>
+                        <a href="tel:07314045210" style="width:36px;height:36px;background:var(--brand-green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;">
+                            <i class="fa-solid fa-phone"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 6: MANAGE CONSENT -->
+        <div class="side-panel-view" id="consentView">
+            <header class="side-panel-header">
+                <button class="side-panel-back-btn" onclick="showAccountView()">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="side-panel-title">Manage Consent</div>
+            </header>
+            <div class="side-panel-body" style="padding:20px;">
+                <p style="font-size:var(--fs-sm);color:var(--text-400);margin-bottom:20px;line-height:1.6;">Control driver data settings and tracking permissions.</p>
+
+                <div style="display:flex;flex-direction:column;gap:0;border:1.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden;">
+                    <div style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--surface-0);">
+                        <div style="flex:1;">
+                            <div style="font-weight:700;font-size:var(--fs-base);color:var(--text-100);">GPS Broadcasting</div>
+                            <div style="font-size:var(--fs-sm);color:var(--text-400);margin-top:2px;">Transmit live location during active shifts</div>
+                        </div>
+                        <label class="consent-toggle">
+                            <input type="checkbox" id="consent-location" checked onchange="saveConsent('location', this.checked)">
+                            <span class="consent-slider"></span>
+                        </label>
+                    </div>
+
+                    <div style="height:1px;background:var(--border);"></div>
+
+                    <div style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--surface-0);">
+                        <div style="flex:1;">
+                            <div style="font-weight:700;font-size:var(--fs-base);color:var(--text-100);">Telemetry &amp; Analytics</div>
+                            <div style="font-size:var(--fs-sm);color:var(--text-400);margin-top:2px;">Route timing and headway analytics</div>
+                        </div>
+                        <label class="consent-toggle">
+                            <input type="checkbox" id="consent-analytics" checked onchange="saveConsent('analytics', this.checked)">
+                            <span class="consent-slider"></span>
+                        </label>
+                    </div>
+
+                    <div style="height:1px;background:var(--border);"></div>
+
+                    <div style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--surface-0);">
+                        <div style="flex:1;">
+                            <div style="font-weight:700;font-size:var(--fs-base);color:var(--text-100);">Shift Notifications</div>
+                            <div style="font-size:var(--fs-sm);color:var(--text-400);margin-top:2px;">Schedule alerts &amp; route advisories</div>
+                        </div>
+                        <label class="consent-toggle">
+                            <input type="checkbox" id="consent-notifications" checked onchange="saveConsent('notifications', this.checked)">
+                            <span class="consent-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 7: ACCOUNT SETTINGS -->
+        <div class="side-panel-view" id="settingsView">
+            <header class="side-panel-header">
+                <button class="side-panel-back-btn" onclick="showAccountView()">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="side-panel-title">Account Settings</div>
+            </header>
+            <div class="side-panel-body" style="padding:0;">
+                <div style="padding:10px 0;">
+                    <div style="padding:8px 20px 6px;font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-500);">Profile</div>
+                    <div class="side-panel-item" onclick="closeSidePanel();showEditProfileView();openSidePanel();" style="cursor:pointer;">
+                        <i class="fa-solid fa-user side-panel-item-icon"></i>
+                        <span class="side-panel-item-text">Edit profile</span>
+                        <i class="fa-solid fa-chevron-right" style="margin-left:auto;font-size:12px;color:var(--text-500);"></i>
+                    </div>
+                    <span class="stop-card-divider"></span>
+                    <div class="side-panel-item" onclick="showEditProfileView(); triggerProfileUpload();" style="cursor:pointer;">
+                        <i class="fa-solid fa-camera side-panel-item-icon"></i>
+                        <span class="side-panel-item-text">Change profile photo</span>
+                        <i class="fa-solid fa-chevron-right" style="margin-left:auto;font-size:12px;color:var(--text-500);"></i>
+                    </div>
+                </div>
+
+                <div style="height:8px;background:var(--surface-2);"></div>
+
+                <div style="padding:10px 0;">
+                    <div style="padding:8px 20px 6px;font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-500);">Preferences</div>
+                    <div class="side-panel-item" onclick="showLanguageView()" style="cursor:pointer;">
+                        <i class="fa-solid fa-language side-panel-item-icon"></i>
+                        <span class="side-panel-item-text">Language</span>
+                        <span id="currentLangLabel" style="margin-left:auto;font-size:var(--fs-sm);color:var(--text-400);font-weight:600;margin-right:6px;">English</span>
+                        <i class="fa-solid fa-chevron-right" style="font-size:12px;color:var(--text-500);"></i>
+                    </div>
+                    <span class="stop-card-divider"></span>
+                    <div class="side-panel-item" onclick="showConsentView()" style="cursor:pointer;">
+                        <i class="fa-solid fa-file-shield side-panel-item-icon"></i>
+                        <span class="side-panel-item-text">Privacy &amp; Consent</span>
+                        <i class="fa-solid fa-chevron-right" style="margin-left:auto;font-size:12px;color:var(--text-500);"></i>
+                    </div>
+                </div>
+
+                <div style="height:8px;background:var(--surface-2);"></div>
+
+                <div style="padding:10px 0;">
+                    <div style="padding:8px 20px 6px;font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-500);">About</div>
+                    <div class="side-panel-item" onclick="showVersionInfo()" style="cursor:pointer;">
+                        <i class="fa-solid fa-circle-info side-panel-item-icon"></i>
+                        <span class="side-panel-item-text">App version</span>
+                        <span style="margin-left:auto;font-size:var(--fs-sm);color:var(--text-400);font-weight:600;">2.0.79</span>
+                    </div>
+                    <span class="stop-card-divider"></span>
+                    <div class="side-panel-item" onclick="showTermsModal()" style="cursor:pointer;">
+                        <i class="fa-solid fa-scroll side-panel-item-icon"></i>
+                        <span class="side-panel-item-text">Terms &amp; Conditions</span>
+                        <i class="fa-solid fa-chevron-right" style="margin-left:auto;font-size:12px;color:var(--text-500);"></i>
+                    </div>
+                    <span class="stop-card-divider"></span>
+                    <div class="side-panel-item" onclick="showPrivacyModal()" style="cursor:pointer;">
+                        <i class="fa-solid fa-shield side-panel-item-icon"></i>
+                        <span class="side-panel-item-text">Privacy policy</span>
+                        <i class="fa-solid fa-chevron-right" style="margin-left:auto;font-size:12px;color:var(--text-500);"></i>
+                    </div>
+                </div>
+
+                <div style="height:8px;background:var(--surface-2);"></div>
+
+                <div style="padding:16px 20px;">
+                    <button onclick="handleLogout()"
+                        style="width:100%;height:48px;background:#FEF2F2;border:1.5px solid #FECACA;border-radius:var(--r-sm);color:#DC2626;font-family:var(--font-head);font-size:var(--fs-base);font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .15s;"
+                        onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FEF2F2'">
+                        <i class="fa-solid fa-right-from-bracket"></i> Sign out
+                    </button>
+                    <button onclick="deleteAccount()"
+                        style="width:100%;height:44px;background:none;border:none;color:var(--text-500);font-family:var(--font-head);font-size:var(--fs-sm);font-weight:600;cursor:pointer;margin-top:8px;transition:color .15s;"
+                        onmouseover="this.style.color='#DC2626'" onmouseout="this.style.color='var(--text-500)'">
+                        Delete account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terms and Conditions Modal -->
+    <div class="lightbox-modal" id="terms-modal" style="display:none; align-items:center; justify-content:center; z-index:1100; position:fixed; inset:0; background:rgba(0,0,0,0.5);">
+        <div style="background:#FFFFFF; border-radius:20px; padding:28px 32px; max-width:540px; width:90%; max-height:80vh; overflow-y:auto; box-shadow:0 12px 36px rgba(0,0,0,0.2);">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+                <h3 style="font-size:20px; font-weight:800; color:#1A1D1A; margin:0;">Terms & Conditions</h3>
+                <span onclick="closeTermsModal()" style="font-size:24px; cursor:pointer; color:#7A8277;">&times;</span>
+            </div>
+            <div style="font-size:14px; color:#5C635A; line-height:1.6;">
+                <p>Welcome to <strong>GetGo / Transitly Driver Portal</strong>. Operating terms:</p>
+                <ul style="padding-left:20px; margin:12px 0;">
+                    <li><strong>Live Broadcast:</strong> Drivers must ensure live GPS broadcast is started when beginning active trips and stopped upon route completion.</li>
+                    <li><strong>Safety:</strong> Do not interact with the mobile screen while the vehicle is in motion.</li>
+                </ul>
+            </div>
+            <button onclick="closeTermsModal()" style="margin-top:20px; width:100%; height:44px; background:#627D52; color:#FFFFFF; border:none; border-radius:12px; font-weight:700; cursor:pointer;">I Understand</button>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div class="lightbox-modal" id="privacy-modal" style="display:none; align-items:center; justify-content:center; z-index:1100; position:fixed; inset:0; background:rgba(0,0,0,0.5);">
+        <div style="background:#FFFFFF; border-radius:20px; padding:28px 32px; max-width:540px; width:90%; max-height:80vh; overflow-y:auto; box-shadow:0 12px 36px rgba(0,0,0,0.2);">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+                <h3 style="font-size:20px; font-weight:800; color:#1A1D1A; margin:0;">Privacy Policy</h3>
+                <span onclick="closePrivacyModal()" style="font-size:24px; cursor:pointer; color:#7A8277;">&times;</span>
+            </div>
+            <div style="font-size:14px; color:#5C635A; line-height:1.6;">
+                <p>Driver location data is transmitted to live passenger feeds only during verified active route shifts.</p>
+            </div>
+            <button onclick="closePrivacyModal()" style="margin-top:20px; width:100%; height:44px; background:#627D52; color:#FFFFFF; border:none; border-radius:12px; font-weight:700; cursor:pointer;">Close</button>
         </div>
     </div>
 
@@ -1379,11 +1648,11 @@
             document.getElementById("accountView").classList.remove("active");
             document.getElementById("editProfileView").classList.remove("active");
             document.getElementById("supportChatView").classList.add("active");
-            
+
             // Scroll chat to bottom
             const body = document.getElementById("supportChatBody");
             if (body) body.scrollTop = body.scrollHeight;
-            
+
             // Focus on input
             setTimeout(() => {
                 const input = document.getElementById("supportChatInput");
@@ -1432,26 +1701,26 @@
                     userLocation
                 })
             })
-            .then(res => res.json())
-            .then(data => {
-                showSupportTyping(false);
-                if (data.success) {
-                    appendSupportMessage(data.response, "bot");
-                } else {
-                    appendSupportMessage(data.message || "Something went wrong.", "bot");
-                }
-            })
-            .catch(err => {
-                showSupportTyping(false);
-                console.error("Support message error:", err);
-                appendSupportMessage("Error communicating with support agent. Please check your internet connection.", "bot");
-            });
+                .then(res => res.json())
+                .then(data => {
+                    showSupportTyping(false);
+                    if (data.success) {
+                        appendSupportMessage(data.response, "bot");
+                    } else {
+                        appendSupportMessage(data.message || "Something went wrong.", "bot");
+                    }
+                })
+                .catch(err => {
+                    showSupportTyping(false);
+                    console.error("Support message error:", err);
+                    appendSupportMessage("Error communicating with support agent. Please check your internet connection.", "bot");
+                });
         }
 
         function appendSupportMessage(text, sender) {
             const body = document.getElementById("supportChatBody");
             if (!body) return;
-            
+
             const msgDiv = document.createElement("div");
             msgDiv.className = `chat-message ${sender}`;
 
@@ -1480,7 +1749,7 @@
             const ampm = hours >= 12 ? 'PM' : 'AM';
             hours = hours % 12;
             hours = hours ? hours : 12;
-            minutes = minutes < 10 ? '0'+minutes : minutes;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
             timeDiv.innerText = `${hours}:${minutes} ${ampm}`;
 
             msgDiv.appendChild(contentDiv);
@@ -1494,7 +1763,7 @@
         function showSupportTyping(show) {
             const body = document.getElementById("supportChatBody");
             if (!body) return;
-            
+
             // Remove existing indicator if any
             const existing = document.getElementById("support-typing-indicator");
             if (existing) existing.remove();
@@ -1506,7 +1775,7 @@
 
                 const contentDiv = document.createElement("div");
                 contentDiv.className = "message-content";
-                
+
                 const typingDiv = document.createElement("div");
                 typingDiv.className = "typing-indicator";
                 typingDiv.innerHTML = "<span></span><span></span><span></span>";
@@ -1514,7 +1783,7 @@
                 contentDiv.appendChild(typingDiv);
                 indicatorDiv.appendChild(contentDiv);
                 body.appendChild(indicatorDiv);
-                
+
                 body.scrollTop = body.scrollHeight;
             }
         }
@@ -1832,6 +2101,164 @@
                     console.error("Save profile error:", err);
                     showToast("Error saving profile details", "error");
                 });
+        }
+
+        /* --- VIEW CONTROLLERS --- */
+        function showAccountView() {
+            const allViews = ['accountView', 'editProfileView', 'supportChatView', 'languageView', 'sosView', 'consentView', 'settingsView'];
+            allViews.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('active');
+            });
+            document.getElementById('accountView').classList.add('active');
+        }
+
+        function showLanguageView() {
+            const allViews = ['accountView', 'editProfileView', 'supportChatView', 'languageView', 'sosView', 'consentView', 'settingsView'];
+            allViews.forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('active'); });
+            document.getElementById('languageView').classList.add('active');
+            renderLanguageList();
+        }
+
+        function showSosView() {
+            const allViews = ['accountView', 'editProfileView', 'supportChatView', 'languageView', 'sosView', 'consentView', 'settingsView'];
+            allViews.forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('active'); });
+            document.getElementById('sosView').classList.add('active');
+        }
+
+        function showConsentView() {
+            const allViews = ['accountView', 'editProfileView', 'supportChatView', 'languageView', 'sosView', 'consentView', 'settingsView'];
+            allViews.forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('active'); });
+            document.getElementById('consentView').classList.add('active');
+            loadConsentPreferences();
+        }
+
+        function showSettingsView() {
+            const allViews = ['accountView', 'editProfileView', 'supportChatView', 'languageView', 'sosView', 'consentView', 'settingsView'];
+            allViews.forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('active'); });
+            document.getElementById('settingsView').classList.add('active');
+        }
+
+        /* --- LANGUAGE PICKER --- */
+        const LANGUAGES = [
+            { code: 'en', label: 'English', native: 'English' },
+            { code: 'hi', label: 'Hindi', native: 'हिन्दी' },
+            { code: 'mr', label: 'Marathi', native: 'मराठी' },
+            { code: 'gu', label: 'Gujarati', native: 'ગુજરાતી' },
+            { code: 'pa', label: 'Punjabi', native: 'ਪੰਜਾਬੀ' },
+            { code: 'ta', label: 'Tamil', native: 'தமிழ்' },
+            { code: 'te', label: 'Telugu', native: 'తెలుగు' },
+            { code: 'kn', label: 'Kannada', native: 'ಕನ್ನಡ' },
+            { code: 'ml', label: 'Malayalam', native: 'മലയാളം' },
+            { code: 'bn', label: 'Bengali', native: 'বাংলা' },
+        ];
+
+        let selectedLanguage = localStorage.getItem('getgo_language') || 'en';
+
+        function renderLanguageList() {
+            const container = document.getElementById('languageList');
+            if (!container) return;
+            container.innerHTML = LANGUAGES.map((lang, i) => {
+                const isSelected = lang.code === selectedLanguage;
+                const border = i < LANGUAGES.length - 1 ? 'border-bottom:1px solid var(--border);' : '';
+                return `<div onclick="selectLanguage('${lang.code}', '${lang.label}')" style="display:flex;align-items:center;gap:14px;padding:14px 20px;cursor:pointer;background:${isSelected ? 'var(--green-tint-1)' : 'var(--surface-0)'};${border}transition:background .12s;" onmouseover="if('${lang.code}'!==selectedLanguage)this.style.background='var(--surface-1)'" onmouseout="if('${lang.code}'!==selectedLanguage)this.style.background='var(--surface-0)'">
+                    <span style="flex:1;">
+                        <span style="font-weight:700;font-size:var(--fs-base);color:var(--text-100);display:block;">${lang.native}</span>
+                        <span style="font-size:var(--fs-sm);color:var(--text-400);">${lang.label}</span>
+                    </span>
+                    ${isSelected ? '<i class="fa-solid fa-circle-check" style="color:var(--brand-deep);font-size:18px;"></i>' : ''}
+                </div>`;
+            }).join('');
+        }
+
+        function selectLanguage(code, label) {
+            selectedLanguage = code;
+            localStorage.setItem('getgo_language', code);
+            const langLabel = document.getElementById('currentLangLabel');
+            if (langLabel) langLabel.textContent = label;
+            renderLanguageList();
+            showToast(`Language set to ${label}`, 'success');
+        }
+
+        /* --- SOS HANDLER --- */
+        function handleSosCall() {
+            if (confirm('Call 112 (National Emergency)?')) {
+                window.location.href = 'tel:112';
+            }
+        }
+
+        /* --- CONSENT PREFERENCES --- */
+        function loadConsentPreferences() {
+            const prefs = JSON.parse(localStorage.getItem('getgo_consent_driver') || '{}');
+            ['location', 'analytics', 'notifications'].forEach(key => {
+                const el = document.getElementById(`consent-${key}`);
+                if (el) {
+                    el.checked = (key in prefs) ? prefs[key] : true;
+                }
+            });
+        }
+
+        function saveConsent(key, value) {
+            const prefs = JSON.parse(localStorage.getItem('getgo_consent_driver') || '{}');
+            prefs[key] = value;
+            localStorage.setItem('getgo_consent_driver', JSON.stringify(prefs));
+            showToast(`${key.charAt(0).toUpperCase() + key.slice(1)} preference saved`, 'success');
+        }
+
+        /* --- TERMS & PRIVACY MODAL HANDLERS --- */
+        function showTermsModal() {
+            const modal = document.getElementById('terms-modal');
+            if (modal) {
+                modal.classList.add('show');
+                modal.style.display = 'flex';
+                modal.style.opacity = '1';
+                modal.style.visibility = 'visible';
+            }
+        }
+
+        function closeTermsModal() {
+            const modal = document.getElementById('terms-modal');
+            if (modal) {
+                modal.classList.remove('show');
+                modal.style.display = 'none';
+                modal.style.opacity = '0';
+                modal.style.visibility = 'hidden';
+            }
+        }
+
+        function showPrivacyModal() {
+            const modal = document.getElementById('privacy-modal');
+            if (modal) {
+                modal.classList.add('show');
+                modal.style.display = 'flex';
+                modal.style.opacity = '1';
+                modal.style.visibility = 'visible';
+            }
+        }
+
+        function closePrivacyModal() {
+            const modal = document.getElementById('privacy-modal');
+            if (modal) {
+                modal.classList.remove('show');
+                modal.style.display = 'none';
+                modal.style.opacity = '0';
+                modal.style.visibility = 'hidden';
+            }
+        }
+
+        function showVersionInfo() {
+            showToast('You are running GetGo Driver v2.0.79 (Latest version)', 'success');
+        }
+
+        /* --- ACCOUNT DELETION --- */
+        function deleteAccount() {
+            if (confirm('Are you sure you want to delete your driver account? All saved shift telemetry and preferences will be permanently cleared.')) {
+                localStorage.clear();
+                showToast('Driver account data cleared. Redirecting...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1200);
+            }
         }
 
         function showToast(message, type = "success") {

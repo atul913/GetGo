@@ -4,66 +4,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GetGo — Select Role</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>GetGo — Know Exactly Where Your Bus Is</title>
+    <meta name="description"
+        content="GetGo puts real-time vehicle positions in commuters' pockets and keeps drivers on headway — one network, two purpose-built logins for Indore transit.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/landing.css">
 </head>
 
 <body>
 
-    <div class="selector-wrap">
-        <div class="selector-inner">
+    <!-- ════ TOP NAVIGATION BAR ════ -->
+    <header class="landing-header">
+        <div class="container header-inner">
+            <a href="index.html" class="brand-logo" aria-label="GetGo Home">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-bus"></i>
+                </div>
+                <div>Get<span class="brand-accent">Go</span></div>
+            </a>
 
-            <div class="selector-brand">
-                <img src="logo.png" alt="GetGo Logo"
-                    style="height: 64px; margin-bottom: 12px; display: block; margin-left: auto; margin-right: auto; width: auto;">
-                <div class="brand-tagline" style="text-align: center;">Real-time bus tracking for everyone</div>
+            <!-- Desktop Login Actions -->
+            <div class="header-actions" id="headerActions">
+                <a href="commuter-login.html" class="btn-commuter-link" id="headerCommuterBtn">
+                    Commuter login
+                </a>
+                <a href="driver-login.html" class="btn-driver-pill" id="headerDriverBtn">
+                    Driver login
+                </a>
             </div>
 
-            <div class="selector-card">
-                <div class="selector-option" id="driverBtn">
-                    <div class="selector-opt-icon icon-amber">
-                        <i class="fa-solid fa-bus"></i>
-                    </div>
-                    <div>
-                        <div class="selector-opt-title">Driver Login</div>
-                        <div class="selector-opt-sub">Share your live location with commuters</div>
-                    </div>
-                    <div class="selector-chevron"><i class="fa-solid fa-chevron-right"></i></div>
-                </div>
+            <!-- Mobile Hamburger Button -->
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+            </button>
+        </div>
 
-                <div class="selector-option" id="commuterBtn">
-                    <div class="selector-opt-icon icon-teal">
+        <!-- Mobile Drawer Menu -->
+        <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+            <div class="mobile-menu-inner">
+                <a href="commuter-login.html" class="mobile-menu-item">
+                    <div class="mobile-menu-icon">
                         <i class="fa-solid fa-person-walking"></i>
                     </div>
                     <div>
-                        <div class="selector-opt-title">Commuter Login</div>
-                        <div class="selector-opt-sub">Track buses and plan your journey</div>
+                        <div class="mobile-menu-title">Commuter Login</div>
+                        <div class="mobile-menu-desc">Track live buses &amp; view stop arrival ETAs</div>
                     </div>
-                    <div class="selector-chevron"><i class="fa-solid fa-chevron-right"></i></div>
+                    <i class="fa-solid fa-arrow-right" style="margin-left:auto;color:var(--text-light);"></i>
+                </a>
+                <a href="driver-login.html" class="mobile-menu-item">
+                    <div class="mobile-menu-icon">
+                        <i class="fa-solid fa-bus"></i>
+                    </div>
+                    <div>
+                        <div class="mobile-menu-title">Driver Login</div>
+                        <div class="mobile-menu-desc">Broadcast GPS telemetry &amp; manage shift</div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right" style="margin-left:auto;color:var(--text-light);"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <main>
+        <!-- ════ HERO SECTION ════ -->
+        <section class="hero-section">
+            <div class="container hero-grid">
+                <!-- Left Column: Copy & Primary CTAs -->
+                <div class="hero-left-column">
+                    <div class="hero-badge">
+                        <span class="badge-dot"></span> LIVE NETWORK · INDORE TRANSIT
+                    </div>
+                    <h1 class="hero-title">
+                        Know exactly where <span class="highlight">your bus</span> is.
+                    </h1>
+                    <p class="hero-subtitle">
+                        GetGo puts real-time vehicle positions in commuters' pockets and keeps drivers on headway —
+                        one network, two purpose-built logins.
+                    </p>
+                    <div class="hero-cta-group">
+                        <a href="commuter-login.html" class="btn-hero-commuter">
+                            <span>I'm a commuter</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                        <a href="driver-login.html" class="btn-hero-driver">
+                            <span>I'm a driver</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right Column: Media Card & Audience Sub-Cards -->
+                <div class="hero-right-column">
+                    <!-- Featured Electric Bus Image -->
+                    <div class="hero-media-card">
+                        <img src="images/hero_transit.jpg" alt="Modern Electric City Bus on Transit Corridor"
+                            class="hero-media-img" loading="eager">
+                    </div>
+
+                    <!-- Dual Portal Sub-Cards -->
+                    <div class="hero-subcards-grid">
+                        <!-- Commuter Sub-card -->
+                        <a href="commuter-login.html" class="portal-subcard commuter">
+                            <div>
+                                <div class="card-badge-icon">
+                                    <i class="fa-solid fa-location-arrow"></i>
+                                </div>
+                                <div class="card-eyebrow">FOR RIDERS</div>
+                                <div class="card-title">Commuter portal</div>
+                                <div class="card-desc">Find live buses, set arrival alerts, and save your favourite
+                                    stops.</div>
+                            </div>
+                            <div class="card-link">
+                                <span>Continue</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </div>
+                        </a>
+
+                        <!-- Driver Sub-card -->
+                        <a href="driver-login.html" class="portal-subcard driver">
+                            <div>
+                                <div class="card-badge-icon">
+                                    <i class="fa-solid fa-user-group"></i>
+                                </div>
+                                <div class="card-eyebrow">FOR OPERATORS</div>
+                                <div class="card-title">Driver portal</div>
+                                <div class="card-desc">Run your shift, keep headway, and report incidents in one tap.
+                                </div>
+                            </div>
+                            <div class="card-link">
+                                <span>Continue</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <p
-                style="text-align:center; margin-top:24px; font-size: var(--fs-sm); color:rgba(255,255,255,.55); font-weight:500;">
-                Powered by live GPS tracking · Indore & beyond
-            </p>
+        <!-- ════ CORE SERVICES SHOWCASE ════ -->
+        <section class="services-section">
+            <div class="container">
 
+                <!-- Feature 3: Smart AI Assistance -->
+                <div class="feature-block">
+                    <div class="feature-content">
+                        <span class="section-eyebrow">Smart Assistance</span>
+                        <h3>24/7 AI Transit Support (GoBuddy)</h3>
+                        <p>
+                            Have questions about which bus to take, nearest stops near Palasia or Vijay Nagar, or app
+                            troubleshooting? GoBuddy provides instant, intelligent transit guidance directly inside your
+                            dashboard.
+                        </p>
+                        <div class="feature-bullets">
+                            <div class="feature-bullet">
+                                <i class="fa-solid fa-circle-check"></i> Instant answers to stop, route, and timing
+                                queries
+                            </div>
+                            <div class="feature-bullet">
+                                <i class="fa-solid fa-circle-check"></i> Local Indore route recommendations
+                            </div>
+                            <div class="feature-bullet">
+                                <i class="fa-solid fa-circle-check"></i> Integrated support tools and quick answers
+                            </div>
+                        </div>
+                        <a href="commuter-login.html" class="btn-feature-commuter">
+                            <i class="fa-solid fa-robot"></i> Access GoBuddy in App
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                    <div class="feature-media">
+                        <img src="images/ai_gobuddy.jpg" alt="GoBuddy AI Transit Assistant" loading="lazy">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ════ AUTH BENEFIT SECTION ════ -->
+        <section class="quick-auth-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-eyebrow">Our Core Platform</span>
+                    <h2 class="section-title">Built for Real-World Urban Transit</h2>
+                    <p class="section-desc">
+                        Everything you need to navigate or operate Indore's bus network with zero guesswork.
+                    </p>
+                </div>
+
+                <div class="auth-benefits-grid">
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fa-solid fa-mobile-screen-button"></i>
+                        </div>
+                        <h4>Instant Phone OTP Login</h4>
+                        <p>No passwords to remember. Log in securely within seconds using a 4-digit SMS OTP on your
+                            mobile number.</p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fa-solid fa-map-pin"></i>
+                        </div>
+                        <h4>Verified Indore Routes</h4>
+                        <p>Accurate bus stop locations and schedules covering major corridors like Palasia, Vijay Nagar,
+                            Geeta Bhawan &amp; Airport.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ════ FOOTER ════ -->
+    <footer class="landing-footer">
+        <div class="container">
+            <div class="footer-copyright">
+                © 2026 GetGo Transit Technologies. Real-time bus tracking and dispatch platform for Indore, Madhya
+                Pradesh.
+            </div>
         </div>
-    </div>
+    </footer>
 
     <script>
-        const token = localStorage.getItem("getgo_token");
-        const role = localStorage.getItem("getgo_role");
+        /* ─── Logged-in session detection ─── */
+        (function () {
+            const token = localStorage.getItem("getgo_token");
+            const role = localStorage.getItem("getgo_role");
 
-        if (token && role === "driver") window.location.href = "driver-dashboard.html";
-        if (token && role === "commuter") window.location.href = "commuter-dashboard.html";
+            if (token && role) {
+                const targetDashboard = role === "driver" ? "driver-dashboard.html" : "commuter-dashboard.html";
+                const roleLabel = role === "driver" ? "Driver Dashboard" : "Commuter Dashboard";
 
-        document.getElementById("driverBtn").addEventListener("click", () => {
-            window.location.href = "driver-login.html";
+                const headerActions = document.getElementById("headerActions");
+                if (headerActions) {
+                    headerActions.innerHTML = `
+                        <a href="${targetDashboard}" class="btn-commuter-link">
+                            <i class="fa-solid fa-gauge-high" style="margin-right:6px;"></i> ${roleLabel} →
+                        </a>
+                        <button class="btn-driver-pill" onclick="handleLogout()" title="Log out">
+                            <i class="fa-solid fa-right-from-bracket" style="margin-right:6px;"></i> Logout
+                        </button>
+                    `;
+                }
+            }
+
+            window.handleLogout = function () {
+                localStorage.removeItem("getgo_token");
+                localStorage.removeItem("getgo_role");
+                localStorage.removeItem("getgo_phone");
+                window.location.reload();
+            };
+        })();
+
+        /* ─── Mobile Hamburger Menu ─── */
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+
+        function openMenu() {
+            mobileMenu.classList.add('is-open');
+            mobileOverlay.classList.add('is-visible');
+            hamburgerBtn.classList.add('is-active');
+            hamburgerBtn.setAttribute('aria-expanded', 'true');
+            mobileMenu.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMenu() {
+            mobileMenu.classList.remove('is-open');
+            mobileOverlay.classList.remove('is-visible');
+            hamburgerBtn.classList.remove('is-active');
+            hamburgerBtn.setAttribute('aria-expanded', 'false');
+            mobileMenu.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        hamburgerBtn.addEventListener('click', () => {
+            if (mobileMenu.classList.contains('is-open')) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
         });
-        document.getElementById("commuterBtn").addEventListener("click", () => {
-            window.location.href = "commuter-login.html";
+
+        mobileOverlay.addEventListener('click', closeMenu);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeMenu();
         });
     </script>
 </body>
