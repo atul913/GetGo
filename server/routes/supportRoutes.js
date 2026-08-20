@@ -8,6 +8,7 @@ const supportAuth = require("../middleware/supportAuth");
 
 // All support requests require user authentication
 router.post("/message", requireAuth, supportController.sendMessage);
+router.delete("/history", requireAuth, supportController.clearHistory);
 
 // n8n AI agent HTTP Request Tool routes (secured by API key middleware)
 router.get("/tools/stops/nearest", supportAuth, supportToolsController.getNearestStopsTool);

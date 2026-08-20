@@ -348,7 +348,7 @@
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
         }
 
-        /* ─ CUSTOMER SUPPORT CHAT VIEW ──────────────── */
+        /* ─ GOBUDDY CHAT VIEW ──────────────── */
         #supportChatView {
             overflow: hidden !important;
         }
@@ -357,7 +357,7 @@
             display: flex !important;
             flex-direction: column !important;
             height: calc(100vh - 56px) !important;
-            background: var(--surface-1) !important;
+            background: linear-gradient(180deg, #F6F7F3 0%, #EEF0EA 100%) !important;
         }
 
         .support-chat-body {
@@ -366,15 +366,35 @@
             padding: 16px !important;
             display: flex !important;
             flex-direction: column !important;
-            gap: 12px !important;
+            gap: 14px !important;
         }
 
         .chat-message {
             display: flex !important;
             flex-direction: column !important;
-            max-width: 80% !important;
-            margin-bottom: 4px !important;
-            animation: fadeInSupportMsg 0.25s ease-out forwards;
+            max-width: 82% !important;
+            margin-bottom: 2px !important;
+            animation: fadeInSupportMsg 0.3s ease-out forwards;
+        }
+
+        .chat-msg-row {
+            display: flex !important;
+            align-items: flex-end !important;
+            gap: 8px !important;
+        }
+
+        .chat-bot-avatar {
+            width: 30px !important;
+            height: 30px !important;
+            border-radius: 50% !important;
+            background: var(--brand-green, #627D52) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+            color: #fff !important;
+            font-size: 13px !important;
+            box-shadow: 0 2px 6px rgba(98, 125, 82, 0.25) !important;
         }
 
         @keyframes fadeInSupportMsg {
@@ -398,10 +418,10 @@
         }
 
         .chat-message .message-content {
-            padding: 10px 14px !important;
-            border-radius: 16px !important;
+            padding: 11px 15px !important;
+            border-radius: 18px !important;
             font-size: var(--fs-base) !important;
-            line-height: 1.4 !important;
+            line-height: 1.5 !important;
             word-wrap: break-word !important;
         }
 
@@ -423,71 +443,107 @@
         }
 
         .chat-message.user .message-content {
-            background: var(--route-active) !important;
+            background: var(--brand-green, #627D52) !important;
             color: #ffffff !important;
             border-bottom-right-radius: 4px !important;
         }
 
         .chat-message.bot .message-content {
-            background: var(--surface-0) !important;
+            background: #FFFFFF !important;
             color: var(--text-100) !important;
             border-bottom-left-radius: 4px !important;
-            border: 1.5px solid var(--border) !important;
+            border: 1px solid var(--border) !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
         }
 
         .chat-message .message-time {
             font-size: 10px !important;
             color: var(--text-500) !important;
-            margin-top: 4px !important;
-            align-self: flex-end !important;
+            margin-top: 3px !important;
             padding: 0 4px !important;
+        }
+
+        .chat-message.user .message-time {
+            align-self: flex-end !important;
         }
 
         .chat-message.bot .message-time {
             align-self: flex-start !important;
+            padding-left: 40px !important;
+        }
+
+        /* Quick-reply pills */
+        .chat-quick-pills {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+            padding: 4px 0 8px 40px !important;
+        }
+
+        .chat-quick-pill {
+            padding: 7px 14px !important;
+            background: #FFFFFF !important;
+            border: 1.5px solid var(--brand-green, #627D52) !important;
+            border-radius: 20px !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            color: var(--brand-green, #627D52) !important;
+            cursor: pointer !important;
+            transition: all 0.15s ease !important;
+            white-space: nowrap !important;
+        }
+
+        .chat-quick-pill:hover {
+            background: var(--brand-green, #627D52) !important;
+            color: #FFFFFF !important;
+        }
+
+        .chat-quick-pill:active {
+            transform: scale(0.95) !important;
         }
 
         .support-chat-footer {
-            padding: 12px 16px !important;
-            background: var(--surface-0) !important;
-            border-top: 1.5px solid var(--border) !important;
+            padding: 10px 14px !important;
+            background: #FFFFFF !important;
+            border-top: 1px solid var(--border) !important;
             display: flex !important;
             align-items: center !important;
-            gap: 10px !important;
+            gap: 8px !important;
             flex-shrink: 0 !important;
         }
 
         .support-chat-footer input {
             flex: 1 !important;
-            height: 40px !important;
+            height: 42px !important;
             padding: 0 16px !important;
             border: 1.5px solid var(--border) !important;
-            border-radius: var(--r-full) !important;
+            border-radius: 22px !important;
             outline: none !important;
             font-size: var(--fs-base) !important;
             color: var(--text-100) !important;
-            background: var(--surface-1) !important;
-            transition: border-color 0.15s, background-color 0.15s !important;
+            background: var(--surface-1, #F6F7F3) !important;
+            transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s !important;
         }
 
         .support-chat-footer input:focus {
-            border-color: var(--route-active) !important;
-            background: var(--surface-0) !important;
+            border-color: var(--brand-green, #627D52) !important;
+            background: #FFFFFF !important;
+            box-shadow: 0 0 0 3px rgba(98, 125, 82, 0.1) !important;
         }
 
         .support-send-btn {
-            width: 40px !important;
-            height: 40px !important;
-            border-radius: var(--r-full) !important;
-            background: var(--route-active) !important;
+            width: 42px !important;
+            height: 42px !important;
+            border-radius: 50% !important;
+            background: var(--brand-green, #627D52) !important;
             color: #ffffff !important;
             border: none !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
             cursor: pointer !important;
-            font-size: var(--fs-base) !important;
-            transition: opacity 0.15s, transform 0.1s !important;
+            font-size: 15px !important;
+            transition: opacity 0.15s, transform 0.1s, background 0.15s !important;
         }
 
         .support-send-btn:hover {
@@ -495,7 +551,13 @@
         }
 
         .support-send-btn:active {
-            transform: scale(0.95) !important;
+            transform: scale(0.93) !important;
+        }
+
+        .support-send-btn:disabled {
+            background: var(--text-400) !important;
+            cursor: not-allowed !important;
+            opacity: 0.5 !important;
         }
 
         .typing-indicator {
@@ -508,7 +570,7 @@
         .typing-indicator span {
             width: 6px !important;
             height: 6px !important;
-            background: var(--text-400) !important;
+            background: var(--brand-green, #627D52) !important;
             border-radius: 50% !important;
             display: inline-block !important;
             animation: supportDotBounce 1.3s infinite ease-in-out !important;
@@ -535,18 +597,59 @@
             }
         }
 
+        .typing-label {
+            font-size: 11px !important;
+            color: var(--text-400) !important;
+            font-weight: 600 !important;
+            margin-left: 6px !important;
+        }
+
         .support-status-dot {
             width: 8px !important;
             height: 8px !important;
-            border-radius: var(--r-full) !important;
-            background: var(--accent-green) !important;
+            border-radius: 50% !important;
+            background: #4ADE80 !important;
             display: inline-block !important;
+            animation: statusPulse 2s infinite !important;
+        }
+
+        @keyframes statusPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 4px rgba(74, 222, 128, 0);
+            }
         }
 
         .support-status-text {
             font-size: var(--fs-xs) !important;
             color: var(--text-400) !important;
             font-weight: 600 !important;
+        }
+
+        .chat-header-clear-btn {
+            width: 32px !important;
+            height: 32px !important;
+            border-radius: 50% !important;
+            border: none !important;
+            background: rgba(0, 0, 0, 0.05) !important;
+            color: var(--text-400) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            font-size: 13px !important;
+            transition: background 0.15s !important;
+            margin-left: 8px !important;
+        }
+
+        .chat-header-clear-btn:hover {
+            background: rgba(0, 0, 0, 0.1) !important;
+            color: var(--text-100) !important;
         }
     </style>
 </head>
@@ -1230,32 +1333,28 @@
             </footer>
         </div>
 
-        <!-- VIEW 3: CUSTOMER SUPPORT CHAT -->
+        <!-- VIEW 3: GOBUDDY CHAT -->
         <div class="side-panel-view" id="supportChatView">
             <header class="side-panel-header">
                 <button class="side-panel-back-btn" onclick="showAccountView()">
                     <i class="fa-solid fa-arrow-left"></i>
                 </button>
-                <div class="side-panel-title">Customer support</div>
+                <div class="side-panel-title">GoBuddy</div>
                 <div style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
                     <span class="support-status-dot"></span>
-                    <span class="support-status-text">AI Agent</span>
+                    <span class="support-status-text">Online</span>
+                    <button class="chat-header-clear-btn" onclick="clearSupportChat()" title="Clear chat">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
                 </div>
             </header>
             <div class="support-chat-container">
                 <div class="support-chat-body" id="supportChatBody">
-                    <div class="chat-message bot">
-                        <div class="message-content">
-                            Hello Driver! I am your GetGo Transit Assistant. Ask me anything about routes, schedule
-                            assistance, or support.
-                        </div>
-                        <div class="message-time">12:00 PM</div>
-                    </div>
                 </div>
                 <div class="support-chat-footer">
                     <input type="text" id="supportChatInput" placeholder="Ask about routes, shifts, or buses..."
-                        onkeydown="handleSupportChatKey(event)">
-                    <button class="support-send-btn" onclick="sendSupportChatMessage()">
+                        onkeydown="handleSupportChatKey(event)" autocomplete="off">
+                    <button class="support-send-btn" id="supportSendBtn" onclick="sendSupportChatMessage()">
                         <i class="fa-solid fa-paper-plane"></i>
                     </button>
                 </div>
@@ -1700,10 +1799,21 @@
             document.getElementById("supportChatView").classList.remove("active");
         }
 
+        let gobbuddyInitialized = false;
+        let isSendingMessage = false;
+
         function showSupportChatView() {
             document.getElementById("accountView").classList.remove("active");
             document.getElementById("editProfileView").classList.remove("active");
             document.getElementById("supportChatView").classList.add("active");
+
+            // First-time: inject welcome message + driver quick-reply pills
+            if (!gobbuddyInitialized) {
+                gobbuddyInitialized = true;
+                const userName = (profileDetails && profileDetails.name) ? profileDetails.name.split(' ')[0] : 'Driver';
+                appendSupportMessage(`Hi ${userName}! 👋 I'm GoBuddy, your GetGo transit assistant. Ask me about routes, your active trip, bus stops, or passenger assistance.`, 'bot');
+                injectDriverQuickReplyPills();
+            }
 
             // Scroll chat to bottom
             const body = document.getElementById("supportChatBody");
@@ -1713,31 +1823,67 @@
             setTimeout(() => {
                 const input = document.getElementById("supportChatInput");
                 if (input) input.focus();
-            }, 100);
+            }, 150);
+        }
+
+        function injectDriverQuickReplyPills() {
+            const body = document.getElementById("supportChatBody");
+            if (!body) return;
+
+            const pillsContainer = document.createElement("div");
+            pillsContainer.className = "chat-quick-pills";
+            pillsContainer.id = "quickPillsContainer";
+
+            const pills = [
+                { emoji: "🗺️", text: "Stops near me" },
+                { emoji: "🚌", text: "My active trip status" },
+                { emoji: "🛣️", text: "Route information" },
+                { emoji: "❓", text: "How to broadcast GPS?" }
+            ];
+
+            pills.forEach(pill => {
+                const btn = document.createElement("button");
+                btn.className = "chat-quick-pill";
+                btn.textContent = `${pill.emoji} ${pill.text}`;
+                btn.onclick = () => {
+                    const container = document.getElementById("quickPillsContainer");
+                    if (container) container.remove();
+                    document.getElementById("supportChatInput").value = pill.text;
+                    sendSupportChatMessage();
+                };
+                pillsContainer.appendChild(btn);
+            });
+
+            body.appendChild(pillsContainer);
+            body.scrollTop = body.scrollHeight;
         }
 
         function handleSupportChatKey(e) {
-            if (e.key === "Enter") {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
                 sendSupportChatMessage();
             }
         }
 
         function sendSupportChatMessage() {
+            if (isSendingMessage) return;
+
             const input = document.getElementById("supportChatInput");
+            const sendBtn = document.getElementById("supportSendBtn");
             if (!input) return;
             const text = input.value.trim();
             if (!text) return;
 
-            // Clear input
+            const pillsEl = document.getElementById("quickPillsContainer");
+            if (pillsEl) pillsEl.remove();
+
+            isSendingMessage = true;
             input.value = "";
+            if (sendBtn) sendBtn.disabled = true;
 
-            // Append user message
             appendSupportMessage(text, "user");
-
-            // Show typing indicator
             showSupportTyping(true);
 
-            // Fetch current position if active
             let userLocation = null;
             if (typeof userMarker !== 'undefined' && userMarker && typeof userMarker.getLatLng === 'function') {
                 const latlng = userMarker.getLatLng();
@@ -1760,6 +1906,8 @@
                 .then(res => res.json())
                 .then(data => {
                     showSupportTyping(false);
+                    isSendingMessage = false;
+                    if (sendBtn) sendBtn.disabled = false;
                     if (data.success) {
                         appendSupportMessage(data.response, "bot");
                     } else {
@@ -1768,8 +1916,10 @@
                 })
                 .catch(err => {
                     showSupportTyping(false);
+                    isSendingMessage = false;
+                    if (sendBtn) sendBtn.disabled = false;
                     console.error("Support message error:", err);
-                    appendSupportMessage("Error communicating with support agent. Please check your internet connection.", "bot");
+                    appendSupportMessage("I'm having trouble connecting right now. Please check your internet and try again.", "bot");
                 });
         }
 
@@ -1780,47 +1930,67 @@
             const msgDiv = document.createElement("div");
             msgDiv.className = `chat-message ${sender}`;
 
-            const contentDiv = document.createElement("div");
-            contentDiv.className = "message-content";
-            if (typeof marked !== 'undefined' && typeof marked.parse === 'function') {
-                contentDiv.innerHTML = marked.parse(text);
+            if (sender === "bot") {
+                const rowDiv = document.createElement("div");
+                rowDiv.className = "chat-msg-row";
+
+                const avatar = document.createElement("div");
+                avatar.className = "chat-bot-avatar";
+                avatar.innerHTML = '<i class="fa-solid fa-robot"></i>';
+
+                const contentDiv = document.createElement("div");
+                contentDiv.className = "message-content";
+                contentDiv.innerHTML = parseMarkdown(text);
+
+                rowDiv.appendChild(avatar);
+                rowDiv.appendChild(contentDiv);
+                msgDiv.appendChild(rowDiv);
             } else {
-                // Inline Markdown fallback parser to handle bold, code, and line breaks offline
-                let html = text
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;");
-                html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-                html = html.replace(/\*(.*?)\*/g, "<em>$1</em>");
-                html = html.replace(/`(.*?)`/g, "<code>$1</code>");
-                html = html.replace(/\n/g, "<br>");
-                contentDiv.innerHTML = html;
+                const contentDiv = document.createElement("div");
+                contentDiv.className = "message-content";
+                contentDiv.innerHTML = parseMarkdown(text);
+                msgDiv.appendChild(contentDiv);
             }
 
             const timeDiv = document.createElement("div");
             timeDiv.className = "message-time";
+            timeDiv.innerText = formatChatTime();
+
+            msgDiv.appendChild(timeDiv);
+            body.appendChild(msgDiv);
+
+            body.scrollTop = body.scrollHeight;
+        }
+
+        function parseMarkdown(text) {
+            if (typeof marked !== 'undefined' && typeof marked.parse === 'function') {
+                return marked.parse(text);
+            }
+            let html = text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+            html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+            html = html.replace(/\*(.*?)\*/g, "<em>$1</em>");
+            html = html.replace(/`(.*?)`/g, "<code>$1</code>");
+            html = html.replace(/\n/g, "<br>");
+            return html;
+        }
+
+        function formatChatTime() {
             const now = new Date();
             let hours = now.getHours();
             let minutes = now.getMinutes();
             const ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12;
-            hours = hours ? hours : 12;
+            hours = hours % 12 || 12;
             minutes = minutes < 10 ? '0' + minutes : minutes;
-            timeDiv.innerText = `${hours}:${minutes} ${ampm}`;
-
-            msgDiv.appendChild(contentDiv);
-            msgDiv.appendChild(timeDiv);
-            body.appendChild(msgDiv);
-
-            // Scroll to bottom
-            body.scrollTop = body.scrollHeight;
+            return `${hours}:${minutes} ${ampm}`;
         }
 
         function showSupportTyping(show) {
             const body = document.getElementById("supportChatBody");
             if (!body) return;
 
-            // Remove existing indicator if any
             const existing = document.getElementById("support-typing-indicator");
             if (existing) existing.remove();
 
@@ -1829,19 +1999,42 @@
                 indicatorDiv.className = "chat-message bot";
                 indicatorDiv.id = "support-typing-indicator";
 
+                const rowDiv = document.createElement("div");
+                rowDiv.className = "chat-msg-row";
+
+                const avatar = document.createElement("div");
+                avatar.className = "chat-bot-avatar";
+                avatar.innerHTML = '<i class="fa-solid fa-robot"></i>';
+
                 const contentDiv = document.createElement("div");
                 contentDiv.className = "message-content";
 
                 const typingDiv = document.createElement("div");
                 typingDiv.className = "typing-indicator";
-                typingDiv.innerHTML = "<span></span><span></span><span></span>";
+                typingDiv.innerHTML = '<span></span><span></span><span></span><span class="typing-label">GoBuddy is typing...</span>';
 
                 contentDiv.appendChild(typingDiv);
-                indicatorDiv.appendChild(contentDiv);
+                rowDiv.appendChild(avatar);
+                rowDiv.appendChild(contentDiv);
+                indicatorDiv.appendChild(rowDiv);
                 body.appendChild(indicatorDiv);
 
                 body.scrollTop = body.scrollHeight;
             }
+        }
+
+        function clearSupportChat() {
+            const body = document.getElementById("supportChatBody");
+            if (body) body.innerHTML = "";
+            gobbuddyInitialized = false;
+
+            const token = localStorage.getItem("getgo_token");
+            fetch("/api/support/history", {
+                method: "DELETE",
+                headers: { "Authorization": `Bearer ${token}` }
+            }).catch(() => {});
+
+            showSupportChatView();
         }
 
         function showEditProfileView() {

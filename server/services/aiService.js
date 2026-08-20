@@ -185,11 +185,10 @@ const executeTool = async (toolName, args) => {
  * @param {Array} messages - Full conversation context (system, history, new user message)
  */
 const CANDIDATE_MODELS = [
-    "llama-3.3-70b-versatile",
-    "llama-3.1-8b-instant",
-    "llama3-70b-8192",
-    "llama3-8b-8192",
-    "mixtral-8x7b-32768"
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+    "qwen/qwen3.6-27b",
+    "groq/compound"
 ];
 
 const getChatResponse = async (messages) => {
@@ -218,7 +217,8 @@ const getChatResponse = async (messages) => {
                         messages: currentMessages,
                         tools: TOOLS,
                         tool_choice: "auto",
-                        temperature: 0.2
+                        temperature: 0.15,
+                        max_tokens: 400
                     },
                     {
                         headers: {
@@ -229,6 +229,7 @@ const getChatResponse = async (messages) => {
                     }
                 );
                 if (response && response.data) {
+                    console.log(`[Groq AI] Success with model: ${modelName}`);
                     break;
                 }
             } catch (err) {
@@ -259,7 +260,7 @@ const getChatResponse = async (messages) => {
 
             for (const toolCall of assistantMessage.tool_calls) {
                 const toolName = toolCall.function.name;
-                
+
                 let toolArgs = {};
                 try {
                     toolArgs = JSON.parse(toolCall.function.arguments);
