@@ -126,7 +126,7 @@ const updateProfile = async (req, res) => {
                     gender: gender !== undefined ? gender : ""
                 }
             },
-            { new: true, runValidators: true }
+            { returnDocument: "after", runValidators: true }
         );
 
         if (!updatedUser) {
@@ -185,7 +185,7 @@ const uploadProfileImage = async (req, res) => {
         const updatedUser = await User.findOneAndUpdate(
             { phone, role },
             { $set: { profileImageUrl: imageUrl } },
-            { new: true }
+            { returnDocument: "after" }
         );
 
         if (!updatedUser) {

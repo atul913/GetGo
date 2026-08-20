@@ -184,6 +184,14 @@ const executeTool = async (toolName, args) => {
  * Core chat completion function featuring local tool loop execution.
  * @param {Array} messages - Full conversation context (system, history, new user message)
  */
+const CANDIDATE_MODELS = [
+    "llama-3.3-70b-versatile",
+    "llama-3.1-8b-instant",
+    "llama3-70b-8192",
+    "llama3-8b-8192",
+    "mixtral-8x7b-32768"
+];
+
 const getChatResponse = async (messages) => {
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
@@ -197,23 +205,46 @@ const getChatResponse = async (messages) => {
     while (loopCount < maxLoops) {
         console.log(`[Groq AI] Sending chat completion request (loop turn ${loopCount + 1})...`);
 
-        const response = await axios.post(
-            "https://api.groq.com/openai/v1/chat/completions",
-            {
-                model: "llama-3.3-70b-versatile",
-                messages: currentMessages,
-                tools: TOOLS,
-                tool_choice: "auto",
-                temperature: 0.2
-            },
-            {
-                headers: {
-                    "Authorization": `Bearer ${apiKey}`,
-                    "Content-Type": "application/json"
-                },
-                timeout: 30000
+        let response = null;
+        let lastError = null;
+
+        // Try candidate models in case of model deprecation or 404
+        for (const modelName of CANDIDATE_MODELS) {
+            try {
+                response = await axios.post(
+                    "https://api.groq.com/openai/v1/chat/completions",
+                    {
+                        model: modelName,
+                        messages: currentMessages,
+                        tools: TOOLS,
+                        tool_choice: "auto",
+                        temperature: 0.2
+                    },
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${apiKey}`,
+                            "Content-Type": "application/json"
+                        },
+                        timeout: 30000
+                    }
+                );
+                if (response && response.data) {
+                    break;
+                }
+            } catch (err) {
+                lastError = err;
+                const status = err.response ? err.response.status : null;
+                console.warn(`[Groq AI] Model ${modelName} call failed (${status || err.message}). Trying next candidate...`);
+                // If error is 401 Unauthorized, no need to try other models with same key
+                if (status === 401) {
+                    throw err;
+                }
             }
-        );
+        }
+
+        if (!response || !response.data) {
+            throw lastError || new Error("Failed to get response from Groq API candidates.");
+        }
 
         const choice = response.data.choices[0];
         if (!choice || !choice.message) {
