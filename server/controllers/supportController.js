@@ -345,26 +345,26 @@ const generateFallbackResponse = (message, userProfile, role, location) => {
         if (location) {
             return `Nearest stops around your location are available on your live dashboard map.\nACTION: {"type": "VIEW_LIVE_MAP"}`;
         }
-        return "Please enable GPS location to view bus stops near your current location.\nACTION: {"type": "VIEW_LIVE_MAP"}";
+        return `Please enable GPS location to view bus stops near your current location.\nACTION: {"type": "VIEW_LIVE_MAP"}`;
     }
 
     if (lowerMsg.includes("sos") || lowerMsg.includes("emergency") || lowerMsg.includes("police") || lowerMsg.includes("help") || lowerMsg.includes("ambulance")) {
-        return "For emergency assistance, dial 112 or use the SOS panel in the sidebar.\nACTION: {"type": "OPEN_SOS"}";
+        return `For emergency assistance, dial 112 or use the SOS panel in the sidebar.\nACTION: {"type": "OPEN_SOS"}`;
     }
 
     if (lowerMsg.includes("profile") || lowerMsg.includes("name") || lowerMsg.includes("photo")) {
-        return "You can edit your profile details and photo in Account Settings.\nACTION: {"type": "OPEN_SETTINGS", "view": "editProfileView"}";
+        return `You can edit your profile details and photo in Account Settings.\nACTION: {"type": "OPEN_SETTINGS", "view": "editProfileView"}`;
     }
 
     if (lowerMsg.includes("language") || lowerMsg.includes("hindi")) {
-        return "You can toggle between English and Hindi in Language Settings.\nACTION: {"type": "OPEN_SETTINGS", "view": "languageView"}";
+        return `You can toggle between English and Hindi in Language Settings.\nACTION: {"type": "OPEN_SETTINGS", "view": "languageView"}`;
     }
 
     if (role === "driver" && (lowerMsg.includes("trip") || lowerMsg.includes("broadcast") || lowerMsg.includes("start"))) {
-        return "To broadcast your location, tap Start Trip on your driver dashboard.\nACTION: {"type": "DRIVER_START_TRIP"}";
+        return `To broadcast your location, tap Start Trip on your driver dashboard.\nACTION: {"type": "DRIVER_START_TRIP"}`;
     }
 
-    return "Live bus positions and stops can be viewed directly on your interactive map.\nACTION: {"type": "VIEW_LIVE_MAP"}";
+    return `Live bus positions and stops can be viewed directly on your interactive map.\nACTION: {"type": "VIEW_LIVE_MAP"}`;
 };
 
 module.exports = {
