@@ -4,6 +4,25 @@ const Route = require("../models/routeModel");
 const RouteStop = require("../models/routeStopModel");
 const busService = require("../services/busService");
 
+const LANDMARK_MAP = {
+    "acropolis": ["mangliya", "radisson", "mr 10", "bypass", "vijay nagar"],
+    "medicaps": ["rau", "ab road", "rajendra nagar"],
+    "iim": ["pigdamber", "rau", "rajendra nagar"],
+    "c21": ["vijay nagar", "radisson"],
+    "malhar": ["vijay nagar", "radisson"],
+    "phoenix": ["radisson", "mr 10", "khajrana", "bypass"],
+    "sarafa": ["rajwada", "bada ganpati"],
+    "davv": ["bhawarkua", "tower chouraha", "naulakha"],
+    "holkar": ["bhawarkua", "bhanwarkua", "navlakha"],
+    "ips": ["rajendra nagar", "rau"],
+    "chhappan": ["56 dukan", "palasiya", "geeta bhavan"],
+    "56 dukan": ["56 dukan", "palasiya", "geeta bhavan"],
+    "ti mall": ["palasiya", "geeta bhavan", "regal"],
+    "treasure island": ["palasiya", "geeta bhavan", "regal"],
+    "sarwate": ["railway station", "chhoti gwaltoli"],
+    "gangwal": ["gangwal bus stand", "mhow naka"]
+};
+
 /**
  * Helper to normalize spelling variations for Indore transit locations.
  */
@@ -52,6 +71,16 @@ const resolveStopFlexible = async (nameOrQuery, lat, lng) => {
         const tokenEscaped = token.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
         stop = await Stop.findOne({ stationName: { $regex: tokenEscaped, $options: "i" } }).lean();
         if (stop) return stop;
+    }
+
+    // 3. Landmark / Institute alias match
+    for (const [landmarkKey, hubList] of Object.entries(LANDMARK_MAP)) {
+        if (clean.includes(landmarkKey)) {
+            for (const hubName of hubList) {
+                stop = await Stop.findOne({ stationName: { $regex: hubName, $options: "i" } }).lean();
+                if (stop) return stop;
+            }
+        }
     }
 
     return null;
@@ -156,6 +185,24 @@ const searchStopsTool = async (req, res) => {
                 if (matched.length > 0) {
                     stops = matched;
                     break;
+                }
+            }
+        }
+
+        // 3. If still nothing found, check landmark aliases
+        if (stops.length === 0) {
+            for (const [landmarkKey, hubList] of Object.entries(LANDMARK_MAP)) {
+                if (clean.includes(landmarkKey)) {
+                    for (const hubName of hubList) {
+                        const hubMatched = await Stop.find({
+                            stationName: { $regex: hubName, $options: "i" }
+                        }).limit(3).lean();
+                        if (hubMatched.length > 0) {
+                            stops = hubMatched;
+                            break;
+                        }
+                    }
+                    if (stops.length > 0) break;
                 }
             }
         }

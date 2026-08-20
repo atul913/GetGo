@@ -185,10 +185,11 @@ const executeTool = async (toolName, args) => {
  * @param {Array} messages - Full conversation context (system, history, new user message)
  */
 const CANDIDATE_MODELS = [
-    "openai/gpt-oss-120b",
-    "openai/gpt-oss-20b",
-    "qwen/qwen3.6-27b",
-    "groq/compound"
+    "llama-3.3-70b-versatile",
+    "llama-3.1-8b-instant",
+    "llama3-70b-8192",
+    "llama3-8b-8192",
+    "gemma2-9b-it"
 ];
 
 const getChatResponse = async (messages) => {
@@ -199,7 +200,7 @@ const getChatResponse = async (messages) => {
 
     let currentMessages = [...messages];
     let loopCount = 0;
-    const maxLoops = 8;
+    const maxLoops = 3;
 
     while (loopCount < maxLoops) {
         console.log(`[Groq AI] Sending chat completion request (loop turn ${loopCount + 1})...`);
@@ -207,8 +208,9 @@ const getChatResponse = async (messages) => {
         let response = null;
         let lastError = null;
 
-        // Try candidate models in case of model deprecation or 404
-        for (const modelName of CANDIDATE_MODELS) {
+        // Try candidate models in case of rate limit (429) or model unavailability
+        for (let i = 0; i < CANDIDATE_MODELS.length; i++) {
+            const modelName = CANDIDATE_MODELS[i];
             try {
                 response = await axios.post(
                     "https://api.groq.com/openai/v1/chat/completions",
@@ -218,14 +220,14 @@ const getChatResponse = async (messages) => {
                         tools: TOOLS,
                         tool_choice: "auto",
                         temperature: 0.15,
-                        max_tokens: 400
+                        max_tokens: 450
                     },
                     {
                         headers: {
                             "Authorization": `Bearer ${apiKey}`,
                             "Content-Type": "application/json"
                         },
-                        timeout: 30000
+                        timeout: 25000
                     }
                 );
                 if (response && response.data) {
@@ -240,7 +242,9 @@ const getChatResponse = async (messages) => {
                     throw err;
                 }
                 if (status === 429) {
-                    await new Promise(r => setTimeout(r, 600));
+                    // Exponential backoff for rate limits
+                    const delay = Math.min(2500, 800 * (i + 1));
+                    await new Promise(r => setTimeout(r, delay));
                 }
             }
         }
@@ -287,6 +291,34 @@ const getChatResponse = async (messages) => {
                 newMessages: currentMessages.slice(messages.length)
             };
         }
+    }
+
+    // If max loops reached, do one final simple completion without tools to summarize
+    try {
+        console.log("[Groq AI] Finalizing response after reaching tool loop limit...");
+        const finalModel = CANDIDATE_MODELS[0];
+        const finalRes = await axios.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            {
+                model: finalModel,
+                messages: currentMessages,
+                temperature: 0.2,
+                max_tokens: 300
+            },
+            {
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json"
+                },
+                timeout: 15000
+            }
+        );
+        const finalChoice = finalRes.data?.choices?.[0]?.message?.content;
+        if (finalChoice) {
+            return { text: finalChoice, newMessages: currentMessages.slice(messages.length) };
+        }
+    } catch (finalErr) {
+        console.warn("[Groq AI] Final response generation failed:", finalErr.message);
     }
 
     throw new Error("Max tool call loop execution reached without resolving final response.");

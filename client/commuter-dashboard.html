@@ -260,6 +260,88 @@
             }
         }
 
+        /* Chat Action Cards */
+        .chat-action-container {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .chat-action-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #000000;
+            color: #ffffff !important;
+            border: 1.5px solid #27272a;
+            border-radius: var(--r-md);
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            text-align: left;
+            width: 100%;
+        }
+
+        .chat-action-card:hover {
+            transform: translateY(-2px);
+            background: #18181b;
+            border-color: #3f3f46;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+        }
+
+        .chat-action-card:active {
+            transform: translateY(0);
+        }
+
+        .chat-action-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: var(--r-sm);
+            background: rgba(255, 255, 255, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--fs-base);
+            color: #ffffff;
+            flex-shrink: 0;
+        }
+
+        .chat-action-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .chat-action-title {
+            font-size: var(--fs-sm);
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-action-sub {
+            font-size: var(--fs-xs);
+            color: #a1a1aa;
+            font-weight: 500;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-action-arrow {
+            font-size: var(--fs-xs);
+            color: #a1a1aa;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
         /* Traffic legend */
         .traffic-legend {
             position: absolute;
@@ -2363,7 +2445,7 @@
                         isSendingMessage = false;
                         if (sendBtn) sendBtn.disabled = false;
                         if (data.success) {
-                            appendSupportMessage(data.response, "bot");
+                            appendSupportMessage(data.response, "bot", data.action);
                         } else {
                             appendSupportMessage(data.message || "Something went wrong.", "bot");
                         }
@@ -2399,7 +2481,7 @@
             }
         }
 
-        function appendSupportMessage(text, sender) {
+        function appendSupportMessage(text, sender, action = null) {
             const body = document.getElementById("supportChatBody");
             if (!body) return;
 
@@ -2418,6 +2500,52 @@
                 const contentDiv = document.createElement("div");
                 contentDiv.className = "message-content";
                 contentDiv.innerHTML = parseMarkdown(text);
+
+                // Render Action Card if provided
+                if (action && action.type) {
+                    const actionContainer = document.createElement("div");
+                    actionContainer.className = "chat-action-container";
+
+                    let iconHtml = '<i class="fa-solid fa-arrow-right"></i>';
+                    let titleText = "Action";
+                    let subText = "Tap to view";
+
+                    if (action.type === "PLAN_ROUTE") {
+                        iconHtml = '<i class="fa-solid fa-route" style="color: #38bdf8;"></i>';
+                        titleText = `Open Route Planner`;
+                        subText = `Destination: ${action.destination || 'Indore'}`;
+                    } else if (action.type === "VIEW_STOP") {
+                        iconHtml = '<i class="fa-solid fa-bus-simple" style="color: #4ade80;"></i>';
+                        titleText = `Explore Bus Stop`;
+                        subText = `Stop: ${action.stopName || 'Live Schedule'}`;
+                    } else if (action.type === "VIEW_LIVE_MAP") {
+                        iconHtml = '<i class="fa-solid fa-map-location-dot" style="color: #facc15;"></i>';
+                        titleText = `Open Live Bus Map`;
+                        subText = `Track active buses across Indore`;
+                    } else if (action.type === "OPEN_SOS") {
+                        iconHtml = '<i class="fa-solid fa-phone-volume" style="color: #f87171;"></i>';
+                        titleText = `Emergency SOS Panel`;
+                        subText = `Police 112 • Women 1090 • Ambulance 108`;
+                    } else if (action.type === "OPEN_SETTINGS") {
+                        iconHtml = '<i class="fa-solid fa-gear" style="color: #a78bfa;"></i>';
+                        titleText = `Open Settings`;
+                        subText = action.view === 'editProfileView' ? 'Edit profile and photo' : action.view === 'languageView' ? 'Switch language' : 'Privacy preferences';
+                    }
+
+                    const actionCard = document.createElement("button");
+                    actionCard.className = "chat-action-card";
+                    actionCard.innerHTML = `
+                        <div class="chat-action-icon">${iconHtml}</div>
+                        <div class="chat-action-info">
+                            <span class="chat-action-title">${titleText}</span>
+                            <span class="chat-action-sub">${subText}</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right chat-action-arrow"></i>
+                    `;
+                    actionCard.onclick = () => executeGoBuddyAction(action);
+                    actionContainer.appendChild(actionCard);
+                    contentDiv.appendChild(actionContainer);
+                }
 
                 rowDiv.appendChild(avatar);
                 rowDiv.appendChild(contentDiv);
@@ -2438,6 +2566,51 @@
 
             // Scroll to bottom with smooth behavior
             body.scrollTop = body.scrollHeight;
+        }
+
+        function executeGoBuddyAction(action) {
+            if (!action || !action.type) return;
+
+            if (action.type === "PLAN_ROUTE") {
+                closeSidePanel();
+                const destination = action.destination || "Indore";
+
+                // Pre-populate planner destination
+                const endInput = document.getElementById('planner-end');
+                if (endInput) endInput.value = destination;
+
+                plannerEndLocation = {
+                    name: destination,
+                    coords: null,
+                    isStop: false,
+                    stopId: null
+                };
+
+                // Show trip planner overlay
+                showPlannerPanel();
+
+                // Autocomplete/resolve destination coordinates
+                fetchLocationSearchSuggestions(destination).then(() => {
+                    calculateTrip();
+                });
+            } else if (action.type === "VIEW_STOP") {
+                closeSidePanel();
+                openStopSearchPanel();
+                const stopInput = document.getElementById('stop-search-input');
+                if (stopInput && action.stopName) {
+                    stopInput.value = action.stopName;
+                    onStopSearchInput(action.stopName);
+                }
+            } else if (action.type === "VIEW_LIVE_MAP") {
+                closeSidePanel();
+                showMapPanel(false, 'feed');
+            } else if (action.type === "OPEN_SOS") {
+                showSosView();
+            } else if (action.type === "OPEN_SETTINGS") {
+                if (action.view === 'editProfileView') showEditProfileView();
+                else if (action.view === 'languageView') showLanguageView();
+                else if (action.view === 'consentView') showConsentView();
+            }
         }
 
         function parseMarkdown(text) {

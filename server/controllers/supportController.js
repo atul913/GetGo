@@ -60,7 +60,7 @@ const getDriverTripContext = async (phone) => {
 };
 
 /**
- * Build the system prompt with full user context.
+ * Build the system prompt with full user context and platform knowledge.
  */
 const buildSystemPrompt = (userProfile, phone, role, normalizedLocation, tripContext) => {
     const { timeStr, period } = getISTContext();
@@ -85,7 +85,7 @@ Driver's Active Trip:
         }
     }
 
-    return `You are GoBuddy, the GetGo transit support assistant for Indore, India. You are concise, precise, and direct.
+    return `You are GoBuddy, the intelligent AI transit & navigation copilot for the GetGo platform in Indore, India. You are concise, helpful, and precise.
 
 User Profile:
 - Name: ${userName}
@@ -99,39 +99,73 @@ Context:
 - User's GPS Location: ${normalizedLocation ? `${normalizedLocation.lat}, ${normalizedLocation.lng}` : "22.7196, 75.8577 (Central Indore default)"}
 ${tripBlock}
 
-Indore transit route types:
-- M-xx (Metro/Main Routes)
-- R-xx (Ring Road Routes)
-- C-xx (City Core Routes)
-- N-xx (Night Routes)
+GETGO PLATFORM CAPABILITIES & FEATURES:
+1. Commuter Dashboard Features:
+   - Trip/Route Planner: Connects any two points in Indore, computes multimodal route combinations (walking/auto + bus), calculates transit fares (₹10 base + ₹2 per stop), estimates travel times, and draws interactive Google-Maps styled paths on the Leaflet map.
+   - Live Interactive Map: Real-time GPS bus tracking with live position indicators and animated route polylines.
+   - Stop Explorer: Live arrival board for all stops in Indore (Palasia, Bhanwarkua, Vijay Nagar, Geeta Bhawan, Rajwada, Radisson, MR 10, Chhappan, etc.) with minute-by-minute countdowns.
+   - Live Bus Progress Sheet: Stop-by-stop vertical progress line tracking the active bus.
+   - Emergency SOS Panel: Direct one-tap helplines for Police (112 / 100), Women's Helpline (1090), Ambulance (108), and Indore City Bus Transit Helpline (0731-4045210).
+   - Profile & Preferences: Profile photo crop & upload, name/age/gender edit, Language switch (English / Hindi), and Privacy/Consent toggle controls.
 
-Available tools:
+2. Driver Dashboard Features:
+   - Live Location Broadcasting: Shift management with assigned routes (e.g. Route 3, 11A, 303), bus license plate registration, and real-time GPS telemetry broadcast to commuters.
+   - Driver Telemetry: Speedometer, passenger load counter, route adherence alerts, and depot helpline dispatch.
+
+3. Indore Transit Geography & Major Corridors:
+   - Route Types: M-xx (Metro/Main Routes), R-xx (Ring Road Routes), C-xx (City Core Routes), N-xx (Night Routes).
+   - Major Landmarks & Colleges: Acropolis Institute (near Bypass / Mangliya / Radisson hub), Medicaps University (Rau / AB Road), IIM Indore (Pigdamber / Rau), DAVV & Holkar College (Bhanwarkuan), C21 & Malhar Mega Mall (Vijay Nagar), Phoenix Citadel (MR 10 / Bypass), Sarafa Bazaar & Rajwada, Chhappan 56 Dukan (Palasia), Sarwate Bus Stand & Railway Station, Gangwal Bus Stand.
+
+Available Tools:
 1. \`getNearestStops\`: Finds nearest stops to a lat/lng.
 2. \`searchStops\`: Finds stops matching text or landmark queries.
 3. \`getRouteStops\`: Lists stops for a route ID.
-4. \`planRoute\`: Connects two stops (by name or coordinates) and resolves routes.
+4. \`planRoute\`: Connects two stops (by name or coordinates) and resolves routes & active buses.
 5. \`getLiveBuses\`: Gets real-time active buses and their arrival window.
 
-CORE DIRECTIVES:
-1. NO EMOJIS: Never output any emojis under any circumstances.
+CORE DIRECTIVES & FORMATTING:
+1. NO EMOJIS: Never output any emojis in your response text under any circumstances.
 2. ONE-LINER GREETINGS: When the user says hi/hello or a basic greeting, reply with a single concise sentence (e.g. "Hello ${userName}, how can I help you navigate Indore transit today?").
-3. ONE-LINER INSTRUCTIONS: Any instructional or informational advice must be a crisp one-liner.
-4. AUTOMATED DESTINATION NAVIGATION (CRITICAL):
-   - When a user asks how to get to any place, landmark, shop, or area in Indore (e.g. "how can i go to madhuram sandwich, bhawarkuan", "how to reach Vijay Nagar", etc.):
-   - DO NOT ASK the user for their starting location or any other details.
-   - Immediately use the User's GPS Location from context as the starting point (e.g., call \`getNearestStops\` or \`planRoute\` with start coordinates).
-   - Search the destination (e.g., "bhawarkuan") to resolve the destination stop.
-   - Identify the bus route connecting the nearest start stop to the destination stop.
-   - Check \`getLiveBuses\` for active buses on that route.
-   - In your final response:
-     - Name the nearest start stop to board and the destination stop.
-     - Name the route to take.
-     - State the arrival time of the next bus.
-     - If no active buses are currently tracked on that route within the next 20 minutes, explicitly state: "No active buses are currently tracked on this route in the next 20 minutes."
-5. NO DATABASE KEYS OR OBJECTIDS: Never display raw MongoDB ObjectIDs. Use bold stop and route names only.
-6. NO BULLET POINTS OR NUMBERED LISTS: Keep paragraphs short (1-2 sentences maximum).
-7. DRIVER QUERIES: If a driver asks about their active trip or route, use the Driver's Active Trip context above directly.
-8. ACCURACY: If no route connects the stops, state that no direct route was found and suggest the closest major transit hub.`;
+3. AUTOMATED DESTINATION NAVIGATION & TRIP PLANNING:
+   - When a user asks how to go to any place, landmark, college, or area (e.g. "take me to Acropolis", "how to reach Vijay Nagar", "how can i go to 56 dukan"):
+   - Do NOT ask for starting location. Immediately use the User's GPS Location from context.
+   - Use \`planRoute\` or \`searchStops\` to identify the route and next bus arrival.
+   - In your final response text:
+     - Name the boarding stop, destination/hub stop, and route name.
+     - State next bus arrival time (or "No active buses are currently tracked on this route in the next 20 minutes" if none are active).
+   - MUST append the action directive on a new line:
+     ACTION: {"type": "PLAN_ROUTE", "destination": "<Destination Name>"}
+4. UI ACTION DIRECTIVES:
+   Whenever appropriate, you can trigger UI redirection on the user's dashboard by placing an action directive on the last line of your response:
+   - Route Planning: ACTION: {"type": "PLAN_ROUTE", "destination": "Acropolis"}
+   - View Specific Stop: ACTION: {"type": "VIEW_STOP", "stopName": "Palasia"}
+   - Open Live Map / Live Buses: ACTION: {"type": "VIEW_LIVE_MAP"}
+   - Emergency / SOS: ACTION: {"type": "OPEN_SOS"}
+   - Settings / Profile / Language / Privacy: ACTION: {"type": "OPEN_SETTINGS", "view": "editProfileView" | "languageView" | "consentView" | "settingsView"}
+   - Driver Shift Broadcast: ACTION: {"type": "DRIVER_START_TRIP"}
+5. SHORT PARAGRAPHS: Keep responses crisp and direct (1-3 sentences maximum). No raw database keys or ObjectIDs.`;
+};
+
+/**
+ * Helper to extract action directive from AI response.
+ */
+const extractActionFromText = (text) => {
+    if (!text) return { cleanText: "", action: null };
+
+    const actionRegex = /ACTION:\s*(\{.*?\})/i;
+    const match = text.match(actionRegex);
+
+    if (match) {
+        try {
+            const action = JSON.parse(match[1]);
+            const cleanText = text.replace(actionRegex, '').trim();
+            return { cleanText, action };
+        } catch (e) {
+            console.warn("[Support API] Failed to parse action JSON:", e.message);
+        }
+    }
+
+    return { cleanText: text.trim(), action: null };
 };
 
 /**
@@ -191,9 +225,9 @@ const sendMessage = async (req, res) => {
             chatHistoryDoc = new ChatHistory({ sessionId: sessionKey, messages: [] });
         }
 
-        // Prune message history to keep it under 20 messages (prevents context window bloating)
-        if (chatHistoryDoc.messages && chatHistoryDoc.messages.length > 20) {
-            chatHistoryDoc.messages = chatHistoryDoc.messages.slice(-20);
+        // Prune message history to keep it under 14 messages (prevents context window bloating)
+        if (chatHistoryDoc.messages && chatHistoryDoc.messages.length > 14) {
+            chatHistoryDoc.messages = chatHistoryDoc.messages.slice(-14);
         }
 
         // Build enriched system prompt
@@ -219,17 +253,21 @@ const sendMessage = async (req, res) => {
 
         console.log(`[Support API] Forwarding query to Groq agent for user ${phone} (${role})`);
 
-        let responseText = "";
+        let rawResponseText = "";
         try {
             // Execute AI response loop with local tool calling
             const chatResponse = await aiService.getChatResponse(apiMessages);
-            responseText = chatResponse.text;
+            rawResponseText = chatResponse.text;
             // Clean any residual emojis
-            responseText = responseText.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}]/gu, '').trim();
+            rawResponseText = rawResponseText.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}]/gu, '').trim();
         } catch (aiError) {
             console.warn("[Support API] AI Service unavailable, generating fallback response:", aiError.message);
-            responseText = generateFallbackResponse(message, userProfile, role, normalizedLocation);
+            rawResponseText = generateFallbackResponse(message, userProfile, role, normalizedLocation);
         }
+
+        // Extract any action payload
+        const { cleanText, action } = extractActionFromText(rawResponseText);
+        const finalResponseText = cleanText || rawResponseText;
 
         // Update database chat history in human/ai format
         chatHistoryDoc.messages.push({
@@ -238,7 +276,7 @@ const sendMessage = async (req, res) => {
         });
         chatHistoryDoc.messages.push({
             type: "ai",
-            data: { content: responseText }
+            data: { content: finalResponseText }
         });
 
         try {
@@ -249,7 +287,8 @@ const sendMessage = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            response: responseText
+            response: finalResponseText,
+            action: action || null
         });
 
     } catch (error) {
@@ -257,7 +296,8 @@ const sendMessage = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            response: "I am having a brief technical delay. Please check your dashboard map for live bus routes."
+            response: "I am having a brief technical delay. Please check your dashboard map for live bus routes.",
+            action: { type: "VIEW_LIVE_MAP" }
         });
     }
 };
@@ -291,26 +331,40 @@ const generateFallbackResponse = (message, userProfile, role, location) => {
         return `Hello ${name}, how can I help you navigate Indore transit today?`;
     }
 
+    if (lowerMsg.includes("acropolis") || lowerMsg.includes("medicaps") || lowerMsg.includes("college") || lowerMsg.includes("plan") || lowerMsg.includes("reach") || lowerMsg.includes("go to") || lowerMsg.includes("route")) {
+        let dest = "Indore";
+        if (lowerMsg.includes("acropolis")) dest = "Acropolis";
+        else if (lowerMsg.includes("medicaps")) dest = "Medicaps";
+        else if (lowerMsg.includes("vijay nagar")) dest = "Vijay Nagar";
+        else if (lowerMsg.includes("palasia")) dest = "Palasia";
+        else if (lowerMsg.includes("56 dukan") || lowerMsg.includes("chhappan")) dest = "56 Dukan";
+        return `You can plan your transit to ${dest} directly using our interactive Route Planner.\nACTION: {"type": "PLAN_ROUTE", "destination": "${dest}"}`;
+    }
+
     if (lowerMsg.includes("stop") || lowerMsg.includes("near")) {
         if (location) {
-            return `Nearest stops around your location are available on your live dashboard map.`;
+            return `Nearest stops around your location are available on your live dashboard map.\nACTION: {"type": "VIEW_LIVE_MAP"}`;
         }
-        return "Please enable GPS location to view bus stops near your current location.";
+        return "Please enable GPS location to view bus stops near your current location.\nACTION: {"type": "VIEW_LIVE_MAP"}";
     }
 
-    if (lowerMsg.includes("route") || lowerMsg.includes("bus")) {
-        return "Major active corridors include Palasia, Vijay Nagar, Geeta Bhawan, and Rajwada.";
+    if (lowerMsg.includes("sos") || lowerMsg.includes("emergency") || lowerMsg.includes("police") || lowerMsg.includes("help") || lowerMsg.includes("ambulance")) {
+        return "For emergency assistance, dial 112 or use the SOS panel in the sidebar.\nACTION: {"type": "OPEN_SOS"}";
     }
 
-    if (lowerMsg.includes("sos") || lowerMsg.includes("emergency") || lowerMsg.includes("police")) {
-        return "For emergency assistance, dial 112 or use the SOS panel in the sidebar.";
+    if (lowerMsg.includes("profile") || lowerMsg.includes("name") || lowerMsg.includes("photo")) {
+        return "You can edit your profile details and photo in Account Settings.\nACTION: {"type": "OPEN_SETTINGS", "view": "editProfileView"}";
     }
 
-    if (role === "driver" && (lowerMsg.includes("trip") || lowerMsg.includes("broadcast"))) {
-        return "To broadcast your location, tap Start Trip on your driver dashboard.";
+    if (lowerMsg.includes("language") || lowerMsg.includes("hindi")) {
+        return "You can toggle between English and Hindi in Language Settings.\nACTION: {"type": "OPEN_SETTINGS", "view": "languageView"}";
     }
 
-    return "Live bus positions and stops can be viewed directly on your interactive map.";
+    if (role === "driver" && (lowerMsg.includes("trip") || lowerMsg.includes("broadcast") || lowerMsg.includes("start"))) {
+        return "To broadcast your location, tap Start Trip on your driver dashboard.\nACTION: {"type": "DRIVER_START_TRIP"}";
+    }
+
+    return "Live bus positions and stops can be viewed directly on your interactive map.\nACTION: {"type": "VIEW_LIVE_MAP"}";
 };
 
 module.exports = {

@@ -241,6 +241,88 @@
             }
         }
 
+        /* Chat Action Cards */
+        .chat-action-container {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .chat-action-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #000000;
+            color: #ffffff !important;
+            border: 1.5px solid #27272a;
+            border-radius: var(--r-md);
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            text-align: left;
+            width: 100%;
+        }
+
+        .chat-action-card:hover {
+            transform: translateY(-2px);
+            background: #18181b;
+            border-color: #3f3f46;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+        }
+
+        .chat-action-card:active {
+            transform: translateY(0);
+        }
+
+        .chat-action-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: var(--r-sm);
+            background: rgba(255, 255, 255, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--fs-base);
+            color: #ffffff;
+            flex-shrink: 0;
+        }
+
+        .chat-action-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .chat-action-title {
+            font-size: var(--fs-sm);
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-action-sub {
+            font-size: var(--fs-xs);
+            color: #a1a1aa;
+            font-weight: 500;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-action-arrow {
+            font-size: var(--fs-xs);
+            color: #a1a1aa;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
         /* Traffic legend */
         .traffic-legend {
             position: absolute;
@@ -1898,8 +1980,7 @@
 
             appendSupportMessage(text, "user");
             showSupportTyping(true);
-
-            let userLocation = null;
+                    let userLocation = null;
             if (typeof userMarker !== 'undefined' && userMarker && typeof userMarker.getLatLng === 'function') {
                 const latlng = userMarker.getLatLng();
                 userLocation = { latitude: latlng.lat, longitude: latlng.lng };
@@ -1924,7 +2005,7 @@
                     isSendingMessage = false;
                     if (sendBtn) sendBtn.disabled = false;
                     if (data.success) {
-                        appendSupportMessage(data.response, "bot");
+                        appendSupportMessage(data.response, "bot", data.action);
                     } else {
                         appendSupportMessage(data.message || "Something went wrong.", "bot");
                     }
@@ -1938,7 +2019,7 @@
                 });
         }
 
-        function appendSupportMessage(text, sender) {
+        function appendSupportMessage(text, sender, action = null) {
             const body = document.getElementById("supportChatBody");
             if (!body) return;
 
@@ -1956,6 +2037,44 @@
                 const contentDiv = document.createElement("div");
                 contentDiv.className = "message-content";
                 contentDiv.innerHTML = parseMarkdown(text);
+
+                // Render Action Card if provided
+                if (action && action.type) {
+                    const actionContainer = document.createElement("div");
+                    actionContainer.className = "chat-action-container";
+
+                    let iconHtml = '<i class="fa-solid fa-arrow-right"></i>';
+                    let titleText = "Action";
+                    let subText = "Tap to view";
+
+                    if (action.type === "DRIVER_START_TRIP") {
+                        iconHtml = '<i class="fa-solid fa-play" style="color: #22c55e;"></i>';
+                        titleText = `Start Trip Broadcast`;
+                        subText = `Begin GPS transmission for your route`;
+                    } else if (action.type === "OPEN_SOS") {
+                        iconHtml = '<i class="fa-solid fa-phone-volume" style="color: #f87171;"></i>';
+                        titleText = `Emergency & Depot Helpline`;
+                        subText = `Police 112 • Transit Depot 0731-4045210`;
+                    } else if (action.type === "OPEN_SETTINGS") {
+                        iconHtml = '<i class="fa-solid fa-gear" style="color: #a78bfa;"></i>';
+                        titleText = `Driver Settings`;
+                        subText = action.view === 'editProfileView' ? 'Edit operator profile' : action.view === 'languageView' ? 'Switch language' : 'Privacy & permissions';
+                    }
+
+                    const actionCard = document.createElement("button");
+                    actionCard.className = "chat-action-card";
+                    actionCard.innerHTML = `
+                        <div class="chat-action-icon">${iconHtml}</div>
+                        <div class="chat-action-info">
+                            <span class="chat-action-title">${titleText}</span>
+                            <span class="chat-action-sub">${subText}</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right chat-action-arrow"></i>
+                    `;
+                    actionCard.onclick = () => executeGoBuddyAction(action);
+                    actionContainer.appendChild(actionCard);
+                    contentDiv.appendChild(actionContainer);
+                }
 
                 rowDiv.appendChild(avatar);
                 rowDiv.appendChild(contentDiv);
@@ -1975,6 +2094,26 @@
             body.appendChild(msgDiv);
 
             body.scrollTop = body.scrollHeight;
+        }
+
+        function executeGoBuddyAction(action) {
+            if (!action || !action.type) return;
+
+            if (action.type === "DRIVER_START_TRIP") {
+                closeSidePanel();
+                const routeSelect = document.getElementById('routeSelect');
+                if (routeSelect) {
+                    routeSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    routeSelect.focus();
+                }
+            } else if (action.type === "OPEN_SOS") {
+                showSosView();
+            } else if (action.type === "OPEN_SETTINGS") {
+                if (action.view === 'editProfileView') showEditProfileView();
+                else if (action.view === 'languageView') showLanguageView();
+                else if (action.view === 'consentView') showConsentView();
+                else showSettingsView();
+            }
         }
 
         function parseMarkdown(text) {
