@@ -1997,97 +1997,34 @@
         <!-- VIEW 7: ACCOUNT SETTINGS -->
         <div class="side-panel-view" id="settingsView">
             <header class="side-panel-header">
-                <button class="side-panel-back-btn" onclick="showAccountView()">
+                <button class="side-panel-back-btn" onclick="showAccountView()" aria-label="Back">
                     <i class="fa-solid fa-arrow-left"></i>
                 </button>
                 <div class="side-panel-title">Account Settings</div>
             </header>
-            <div class="side-panel-body" style="padding:0;">
+            <div class="side-panel-body">
 
-                <div style="padding:10px 0;">
-                    <div
-                        style="padding:8px 20px 6px;font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-500);">
-                        Profile</div>
-                    <div class="side-panel-item" onclick="showEditProfileView();" style="cursor:pointer;">
-                        <i class="fa-solid fa-user side-panel-item-icon"></i>
-                        <span class="side-panel-item-text">Edit profile</span>
-                        <i class="fa-solid fa-chevron-right"
-                            style="margin-left:auto;font-size:12px;color:var(--text-500);"></i>
-                    </div>
-                    <span class="stop-card-divider"></span>
-                    <div class="side-panel-item" onclick="showEditProfileView(); triggerProfileUpload();"
-                        style="cursor:pointer;">
-                        <i class="fa-solid fa-camera side-panel-item-icon"></i>
-                        <span class="side-panel-item-text">Change profile photo</span>
-                        <i class="fa-solid fa-chevron-right"
-                            style="margin-left:auto;font-size:12px;color:var(--text-500);"></i>
-                    </div>
-                </div>
-
-                <div style="height:2px;background:var(--surface-2);"></div>
-
-                <div style="padding:10px 0;">
-                    <div
-                        style="padding:8px 20px 6px;font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-500);">
-                        Preferences</div>
-                    <div class="side-panel-item" onclick="showLanguageView()">
-                        <i class="fa-solid fa-language side-panel-item-icon"></i>
-                        <span class="side-panel-item-text">Language</span>
-                        <span id="currentLangLabel"
-                            style="margin-left:auto;font-size:var(--fs-sm);color:var(--text-400);font-weight:600;margin-right:6px;">English</span>
-                        <i class="fa-solid fa-chevron-right" style="font-size:12px;color:var(--text-500);"></i>
-                    </div>
-                    <span class="stop-card-divider"></span>
-                    <div class="side-panel-item" onclick="showConsentView()">
-                        <i class="fa-solid fa-file-shield side-panel-item-icon"></i>
-                        <span class="side-panel-item-text">Privacy &amp; Consent</span>
-                        <i class="fa-solid fa-chevron-right"
-                            style="margin-left:auto;font-size:12px;color:var(--text-500);"></i>
-                    </div>
-                </div>
-
-                <div style="height:2px;background:var(--surface-2);"></div>
-
-                <div style="padding:10px 0;">
-                    <div
-                        style="padding:8px 20px 6px;font-size:var(--fs-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-500);">
-                        About</div>
-                    <div class="side-panel-item" onclick="showVersionInfo()" style="cursor:pointer;">
-                        <i class="fa-solid fa-circle-info side-panel-item-icon"></i>
-                        <span class="side-panel-item-text">App version</span>
-                        <span
-                            style="margin-left:auto;font-size:var(--fs-sm);color:var(--text-400);font-weight:600;">2.0.79</span>
-                    </div>
-                    <span class="stop-card-divider"></span>
+                <div class="side-panel-list">
                     <div class="side-panel-item" onclick="showTermsModal()" style="cursor:pointer;">
                         <i class="fa-solid fa-scroll side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Terms &amp; Conditions</span>
-                        <i class="fa-solid fa-chevron-right"
-                            style="margin-left:auto;font-size:12px;color:var(--text-500);"></i>
+                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
                     </div>
                     <span class="stop-card-divider"></span>
                     <div class="side-panel-item" onclick="showPrivacyModal()" style="cursor:pointer;">
                         <i class="fa-solid fa-shield side-panel-item-icon"></i>
                         <span class="side-panel-item-text">Privacy policy</span>
-                        <i class="fa-solid fa-chevron-right"
-                            style="margin-left:auto;font-size:12px;color:var(--text-500);"></i>
+                        <i class="fa-solid fa-chevron-right side-panel-item-chevron"></i>
+                    </div>
+                    <span class="stop-card-divider"></span>
+                    <div class="side-panel-item" onclick="showVersionInfo()" style="cursor:pointer;">
+                        <i class="fa-solid fa-circle-info side-panel-item-icon"></i>
+                        <span class="side-panel-item-text">App version</span>
+                        <span class="settings-value-label" style="margin-right:0;">2.0.79</span>
                     </div>
                 </div>
 
-                <div style="height:2px;background:var(--surface-2);"></div>
 
-                <div style="padding:16px 20px;">
-                    <button onclick="handleLogout()"
-                        style="width:100%;height:48px;background:#FEF2F2;border:1.5px solid #FECACA;border-radius:var(--r-sm);color:#DC2626;font-family:var(--font-head);font-size:var(--fs-base);font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .15s;"
-                        onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FEF2F2'">
-                        <i class="fa-solid fa-right-from-bracket"></i> Sign out
-                    </button>
-                    <button onclick="deleteAccount()"
-                        style="width:100%;height:44px;background:none;border:none;color:var(--text-500);font-family:var(--font-head);font-size:var(--fs-sm);font-weight:600;cursor:pointer;margin-top:8px;transition:color .15s;"
-                        onmouseover="this.style.color='#DC2626'" onmouseout="this.style.color='var(--text-500)'">
-                        Delete account
-                    </button>
-                </div>
             </div>
         </div>
     </div>

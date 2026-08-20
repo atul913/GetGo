@@ -2324,9 +2324,85 @@ body {
 
 /* Options Lists */
 .side-panel-list {
+    background: var(--surface-0) !important;
     border-radius: var(--r-lg) !important;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08) !important;
     padding: 6px 0 !important;
+    overflow: hidden !important;
+}
+
+.settings-group {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+}
+
+.side-panel-section-title {
+    font-size: var(--fs-xs) !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    color: var(--text-500) !important;
+    padding: 0 4px !important;
+}
+
+.settings-value-label {
+    margin-left: auto !important;
+    font-size: var(--fs-sm) !important;
+    color: var(--text-400) !important;
+    font-weight: 600 !important;
+    margin-right: 8px !important;
+}
+
+.settings-actions-group {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    padding-top: 8px !important;
+    margin-top: 4px !important;
+}
+
+.settings-signout-btn {
+    width: 100% !important;
+    height: 48px !important;
+    background: #FEF2F2 !important;
+    border: 1.5px solid #FECACA !important;
+    border-radius: var(--r-md, 12px) !important;
+    color: #DC2626 !important;
+    font-family: var(--font-head) !important;
+    font-size: var(--fs-base) !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    transition: all 0.2s ease !important;
+}
+
+.settings-signout-btn:hover {
+    background: #FEE2E2 !important;
+    border-color: #F87171 !important;
+}
+
+.settings-delete-btn {
+    width: 100% !important;
+    height: 40px !important;
+    background: none !important;
+    border: none !important;
+    color: var(--text-500) !important;
+    font-family: var(--font-head) !important;
+    font-size: var(--fs-sm) !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: color 0.2s ease !important;
+}
+
+.settings-delete-btn:hover {
+    color: #DC2626 !important;
 }
 
 .side-panel-item {
