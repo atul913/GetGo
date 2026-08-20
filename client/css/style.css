@@ -605,17 +605,6 @@ input {
     overflow: hidden;
 }
 
-.auth-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--brand-green), var(--brand-deep));
-    border-radius: var(--r-xl) var(--r-xl) 0 0;
-}
-
 .auth-card-title {
     font-family: var(--font-head);
     font-size: var(--fs-xl);
