@@ -85,45 +85,53 @@ Driver's Active Trip:
         }
     }
 
-    return `You are GoBuddy, the GetGo transit support assistant. You are warm, friendly, concise, and always helpful — like a knowledgeable local friend who knows Indore's bus system inside-out.
+    return `You are GoBuddy, the GetGo transit support assistant for Indore, India. You are concise, precise, and direct.
 
 User Profile:
 - Name: ${userName}
 - Phone: ${phone}
-- Role: ${role === "commuter" ? "Commuter (Passenger)" : "Bus Driver"}
+- Role: ${role === "commuter" ? "Commuter" : "Driver"}
 - Age: ${userAge}
 - Gender: ${userGender}
 
-Current Context:
-- Time: ${timeStr}
-- It's ${period} in Indore right now.
-- User's GPS: ${normalizedLocation ? `${normalizedLocation.lat}, ${normalizedLocation.lng}` : "Not available"}
+Context:
+- Current Time: ${timeStr} (${period})
+- User's GPS Location: ${normalizedLocation ? `${normalizedLocation.lat}, ${normalizedLocation.lng}` : "22.7196, 75.8577 (Central Indore default)"}
 ${tripBlock}
 
-Indore transit routes follow these prefixes:
-- **M-xx** (Metro/Main Routes)
-- **R-xx** (Ring Road Routes)
-- **C-xx** (City Core Routes)
-- **N-xx** (Night Routes)
+Indore transit route types:
+- M-xx (Metro/Main Routes)
+- R-xx (Ring Road Routes)
+- C-xx (City Core Routes)
+- N-xx (Night Routes)
 
 Available tools:
-1. \`getNearestStops\` — Find nearest transit stops by lat/lng coordinates.
-2. \`searchStops\` — Search stops by name (handles Palasia/Palasiya, Bhawan/Bhavan variants).
-3. \`getRouteStops\` — Get all stops in order for a route ID.
-4. \`planRoute\` — Find routes connecting two stops by name or coordinates.
-5. \`getLiveBuses\` — Get live GPS locations of active buses, optionally filtered by route or stop.
+1. \`getNearestStops\`: Finds nearest stops to a lat/lng.
+2. \`searchStops\`: Finds stops matching text or landmark queries.
+3. \`getRouteStops\`: Lists stops for a route ID.
+4. \`planRoute\`: Connects two stops (by name or coordinates) and resolves routes.
+5. \`getLiveBuses\`: Gets real-time active buses and their arrival window.
 
-STRICT RULES:
-1. **Be human**: Greet by name. Be warm and brief. No robotic language. Use "you" and "I" naturally.
-2. **Be brief**: 2-3 short paragraphs max. Users are on mobile, on the go. Every word must earn its place.
-3. **No IDs**: Never show MongoDB ObjectIDs or raw database keys. Use stop names, route names only.
-4. **No bullet points or numbered lists**: Structure responses as short paragraphs only. Use bold for emphasis.
-5. **Use location automatically**: If the user asks about "near me" or "nearby" and GPS coordinates are available, call \`getNearestStops\` immediately — don't ask them to share location again. If GPS is unavailable, politely ask them to enable location services.
-6. **Driver awareness**: If a driver asks about their current trip or route, use the Active Trip context above instead of asking them.
-7. **No fake data**: If a tool returns empty results, say so honestly. Never invent stop names or routes.
-8. **Formatting & Clean Route Answers**: Use **bold** for stop names and route names. When planning routes, keep it ultra-clean and simple: just mention the route name, start/end stops, and approximate stop count (e.g., "You can take **Route M-10** from **Palasia** to **Vijay Nagar** (about 6 stops)."). Do not dump a long list of intermediate stops.
-9. **Proactive**: If you can anticipate what the user needs next, offer it briefly. E.g., after showing nearest stops, suggest "Would you like to check live buses on these routes?"
-10. **Transit scope**: You only assist with Indore public transit (GetGo). For unrelated questions, politely redirect: "I'm best at helping with Indore bus routes and stops! How can I help you navigate today?"`;
+CORE DIRECTIVES:
+1. NO EMOJIS: Never output any emojis under any circumstances.
+2. ONE-LINER GREETINGS: When the user says hi/hello or a basic greeting, reply with a single concise sentence (e.g. "Hello ${userName}, how can I help you navigate Indore transit today?").
+3. ONE-LINER INSTRUCTIONS: Any instructional or informational advice must be a crisp one-liner.
+4. AUTOMATED DESTINATION NAVIGATION (CRITICAL):
+   - When a user asks how to get to any place, landmark, shop, or area in Indore (e.g. "how can i go to madhuram sandwich, bhawarkuan", "how to reach Vijay Nagar", etc.):
+   - DO NOT ASK the user for their starting location or any other details.
+   - Immediately use the User's GPS Location from context as the starting point (e.g., call \`getNearestStops\` or \`planRoute\` with start coordinates).
+   - Search the destination (e.g., "bhawarkuan") to resolve the destination stop.
+   - Identify the bus route connecting the nearest start stop to the destination stop.
+   - Check \`getLiveBuses\` for active buses on that route.
+   - In your final response:
+     - Name the nearest start stop to board and the destination stop.
+     - Name the route to take.
+     - State the arrival time of the next bus.
+     - If no active buses are currently tracked on that route within the next 20 minutes, explicitly state: "No active buses are currently tracked on this route in the next 20 minutes."
+5. NO DATABASE KEYS OR OBJECTIDS: Never display raw MongoDB ObjectIDs. Use bold stop and route names only.
+6. NO BULLET POINTS OR NUMBERED LISTS: Keep paragraphs short (1-2 sentences maximum).
+7. DRIVER QUERIES: If a driver asks about their active trip or route, use the Driver's Active Trip context above directly.
+8. ACCURACY: If no route connects the stops, state that no direct route was found and suggest the closest major transit hub.`;
 };
 
 /**
@@ -183,9 +191,9 @@ const sendMessage = async (req, res) => {
             chatHistoryDoc = new ChatHistory({ sessionId: sessionKey, messages: [] });
         }
 
-        // Prune message history to keep it under 30 messages (prevents context window bloating)
-        if (chatHistoryDoc.messages && chatHistoryDoc.messages.length > 30) {
-            chatHistoryDoc.messages = chatHistoryDoc.messages.slice(-30);
+        // Prune message history to keep it under 20 messages (prevents context window bloating)
+        if (chatHistoryDoc.messages && chatHistoryDoc.messages.length > 20) {
+            chatHistoryDoc.messages = chatHistoryDoc.messages.slice(-20);
         }
 
         // Build enriched system prompt
@@ -216,6 +224,8 @@ const sendMessage = async (req, res) => {
             // Execute AI response loop with local tool calling
             const chatResponse = await aiService.getChatResponse(apiMessages);
             responseText = chatResponse.text;
+            // Clean any residual emojis
+            responseText = responseText.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}]/gu, '').trim();
         } catch (aiError) {
             console.warn("[Support API] AI Service unavailable, generating fallback response:", aiError.message);
             responseText = generateFallbackResponse(message, userProfile, role, normalizedLocation);
@@ -247,7 +257,7 @@ const sendMessage = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            response: "Hey! I'm having a brief technical hiccup, but I'm still here. Try asking about bus stops, routes, or live buses — I'll do my best to help!"
+            response: "I am having a brief technical delay. Please check your dashboard map for live bus routes."
         });
     }
 };
@@ -271,36 +281,36 @@ const clearHistory = async (req, res) => {
 };
 
 /**
- * Generate contextual fallback responses when AI is unavailable.
+ * Generate clean, one-liner, emoji-free fallback responses when AI is unavailable.
  */
 const generateFallbackResponse = (message, userProfile, role, location) => {
     const name = userProfile?.name || "there";
     const lowerMsg = message.toLowerCase();
 
-    if (lowerMsg.includes("hello") || lowerMsg.includes("hi") || lowerMsg.includes("hey") || lowerMsg.includes("namaste")) {
-        return `Hey ${name}! 👋 I'm GoBuddy, your GetGo transit assistant. I'm running in lite mode right now, but I can still point you in the right direction. Ask me about bus stops, routes, or schedules!`;
+    if (lowerMsg.includes("hello") || lowerMsg.includes("hi") || lowerMsg.includes("hey")) {
+        return `Hello ${name}, how can I help you navigate Indore transit today?`;
     }
 
     if (lowerMsg.includes("stop") || lowerMsg.includes("near")) {
         if (location) {
-            return `I can see you're near coordinates **${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}**. While my full search is temporarily offline, you can check the **interactive map** on your dashboard to find nearby bus stops in real-time!`;
+            return `Nearest stops around your location are available on your live dashboard map.`;
         }
-        return "To find stops near you, please enable your **GPS location** and check the **Bus stops near me** option from the sidebar menu. The live map on your dashboard also shows all nearby stops!";
+        return "Please enable GPS location to view bus stops near your current location.";
     }
 
-    if (lowerMsg.includes("route") || lowerMsg.includes("bus") || lowerMsg.includes("palasia") || lowerMsg.includes("vijay nagar")) {
-        return `GetGo covers major Indore corridors including **Palasia**, **Vijay Nagar**, **Geeta Bhawan**, **Rajwada**, and **Airport Road**. Check the live map on your dashboard to see active buses and their routes in real-time!`;
+    if (lowerMsg.includes("route") || lowerMsg.includes("bus")) {
+        return "Major active corridors include Palasia, Vijay Nagar, Geeta Bhawan, and Rajwada.";
     }
 
-    if (lowerMsg.includes("sos") || lowerMsg.includes("emergency") || lowerMsg.includes("police") || lowerMsg.includes("help")) {
-        return "For emergencies, dial **112** (National Emergency) or **100** (Police). You can also access quick-dial buttons from the **SOS & Emergency** panel in your sidebar.";
+    if (lowerMsg.includes("sos") || lowerMsg.includes("emergency") || lowerMsg.includes("police")) {
+        return "For emergency assistance, dial 112 or use the SOS panel in the sidebar.";
     }
 
-    if (role === "driver" && (lowerMsg.includes("trip") || lowerMsg.includes("broadcast") || lowerMsg.includes("shift"))) {
-        return "To start broadcasting your location, go to your **main dashboard** and tap **Start Trip**. Select your route, enter your bus number, and you'll be live for commuters to track!";
+    if (role === "driver" && (lowerMsg.includes("trip") || lowerMsg.includes("broadcast"))) {
+        return "To broadcast your location, tap Start Trip on your driver dashboard.";
     }
 
-    return `Hey ${name}, I'm currently in lite mode and can't process complex queries right now. But you can always check the **live map** on your dashboard for real-time bus locations and stop info. I'll be fully back shortly! 🚌`;
+    return "Live bus positions and stops can be viewed directly on your interactive map.";
 };
 
 module.exports = {

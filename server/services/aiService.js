@@ -69,33 +69,33 @@ const TOOLS = [
         type: "function",
         function: {
             name: "planRoute",
-            description: "Plan transit journeys between stops by providing stop names or coordinates. Resolves matching routes.",
+            description: "Plan transit journey to a destination in Indore. Accepts start coordinates (startLat, startLng) or start stop name, plus destination stop name or landmark (endStopName). Returns matching routes and live bus arrival status.",
             parameters: {
                 type: "object",
                 properties: {
                     startStopName: {
                         type: "string",
-                        description: "Name of starting stop (e.g., 'Palasia')"
+                        description: "Name of starting stop (optional if startLat/startLng are provided)"
                     },
                     endStopName: {
                         type: "string",
-                        description: "Name of destination stop (e.g., 'Geeta Bhawan')"
+                        description: "Name of destination stop, area, or landmark (e.g. 'Bhawarkuan', 'Vijay Nagar')"
                     },
                     startLat: {
                         type: "number",
-                        description: "Starting latitude (if stop name is not known)"
+                        description: "Starting latitude (from User's GPS coordinates)"
                     },
                     startLng: {
                         type: "number",
-                        description: "Starting longitude (if stop name is not known)"
+                        description: "Starting longitude (from User's GPS coordinates)"
                     },
                     endLat: {
                         type: "number",
-                        description: "Destination latitude (if stop name is not known)"
+                        description: "Destination latitude (if known)"
                     },
                     endLng: {
                         type: "number",
-                        description: "Destination longitude (if stop name is not known)"
+                        description: "Destination longitude (if known)"
                     }
                 }
             }
@@ -199,7 +199,7 @@ const getChatResponse = async (messages) => {
 
     let currentMessages = [...messages];
     let loopCount = 0;
-    const maxLoops = 5;
+    const maxLoops = 8;
 
     while (loopCount < maxLoops) {
         console.log(`[Groq AI] Sending chat completion request (loop turn ${loopCount + 1})...`);
@@ -236,9 +236,11 @@ const getChatResponse = async (messages) => {
                 lastError = err;
                 const status = err.response ? err.response.status : null;
                 console.warn(`[Groq AI] Model ${modelName} call failed (${status || err.message}). Trying next candidate...`);
-                // If error is 401 Unauthorized, no need to try other models with same key
                 if (status === 401) {
                     throw err;
+                }
+                if (status === 429) {
+                    await new Promise(r => setTimeout(r, 600));
                 }
             }
         }

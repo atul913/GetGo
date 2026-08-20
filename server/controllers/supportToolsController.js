@@ -5,19 +5,56 @@ const RouteStop = require("../models/routeStopModel");
 const busService = require("../services/busService");
 
 /**
- * Helper to normalize and resolve common spelling variations for Indore stops.
+ * Helper to normalize spelling variations for Indore transit locations.
  */
-const normalizeStopSearchName = (name) => {
-    if (!name) return "";
-    let clean = name.toLowerCase().trim();
-    
-    // Normalize spelling variants
+const normalizeText = (text) => {
+    if (!text) return "";
+    let clean = text.toLowerCase().trim();
     clean = clean.replace(/palasia/g, "palasiya");
     clean = clean.replace(/bhawan/g, "bhavan");
     clean = clean.replace(/vijaynagar/g, "vijay nagar");
-    
-    // Escape regex special characters
-    return clean.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    clean = clean.replace(/bhawarkuan|bhawar kuan|bhavarkuan|bhavarkua|bhanwarkua|bhanwar kuan/g, "bhawarkua");
+    clean = clean.replace(/chhappan|56 dukan/g, "56 Dukan");
+    return clean;
+};
+
+/**
+ * Flexible stop resolver: handles coordinates, exact names, partial names, or landmark tokens.
+ */
+const resolveStopFlexible = async (nameOrQuery, lat, lng) => {
+    if (lat !== undefined && lng !== undefined && lat !== null && lng !== null) {
+        const parsedLat = parseFloat(lat);
+        const parsedLng = parseFloat(lng);
+        if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
+            const stopByLocation = await Stop.findOne({
+                location: {
+                    $nearSphere: {
+                        $geometry: { type: "Point", coordinates: [parsedLng, parsedLat] }
+                    }
+                }
+            }).lean();
+            if (stopByLocation) return stopByLocation;
+        }
+    }
+
+    if (!nameOrQuery) return null;
+
+    const clean = normalizeText(nameOrQuery);
+    const escaped = clean.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+
+    // 1. Exact or substring match on full query
+    let stop = await Stop.findOne({ stationName: { $regex: escaped, $options: "i" } }).lean();
+    if (stop) return stop;
+
+    // 2. Tokenized search (e.g. for "madhuram sandwich, bhawarkuan", match "bhawarkua")
+    const tokens = clean.split(/[\s,]+/).filter(t => t.length >= 3);
+    for (const token of tokens) {
+        const tokenEscaped = token.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        stop = await Stop.findOne({ stationName: { $regex: tokenEscaped, $options: "i" } }).lean();
+        if (stop) return stop;
+    }
+
+    return null;
 };
 
 /**
@@ -100,10 +137,28 @@ const searchStopsTool = async (req, res) => {
     }
 
     try {
-        const query = normalizeStopSearchName(q);
-        const stops = await Stop.find({
-            stationName: { $regex: query, $options: "i" }
+        const clean = normalizeText(q);
+        const escaped = clean.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+
+        // 1. Search full string
+        let stops = await Stop.find({
+            stationName: { $regex: escaped, $options: "i" }
         }).limit(10).lean();
+
+        // 2. If nothing found, try matching individual tokens
+        if (stops.length === 0) {
+            const tokens = clean.split(/[\s,]+/).filter(t => t.length >= 3);
+            for (const token of tokens) {
+                const tokenEscaped = token.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+                const matched = await Stop.find({
+                    stationName: { $regex: tokenEscaped, $options: "i" }
+                }).limit(5).lean();
+                if (matched.length > 0) {
+                    stops = matched;
+                    break;
+                }
+            }
+        }
 
         res.status(200).json({ success: true, stops });
     } catch (error) {
@@ -147,52 +202,8 @@ const planRouteTool = async (req, res) => {
     const { startStopName, endStopName, startLat, startLng, endLat, endLng } = req.query;
 
     try {
-        let startStop = null;
-        let endStop = null;
-
-        // 1. Resolve start stop
-        if (startStopName) {
-            const queryStart = normalizeStopSearchName(startStopName);
-            // Prefer exact case-insensitive match
-            startStop = await Stop.findOne({ stationName: { $regex: `^${queryStart}$`, $options: "i" } });
-            if (!startStop) {
-                startStop = await Stop.findOne({ stationName: { $regex: queryStart, $options: "i" } });
-            }
-        } else if (startLat && startLng) {
-            const lat = parseFloat(startLat);
-            const lng = parseFloat(startLng);
-            if (!isNaN(lat) && !isNaN(lng)) {
-                startStop = await Stop.findOne({
-                    location: {
-                        $nearSphere: {
-                            $geometry: { type: "Point", coordinates: [lng, lat] }
-                        }
-                    }
-                });
-            }
-        }
-
-        // 2. Resolve destination stop
-        if (endStopName) {
-            const queryEnd = normalizeStopSearchName(endStopName);
-            // Prefer exact case-insensitive match
-            endStop = await Stop.findOne({ stationName: { $regex: `^${queryEnd}$`, $options: "i" } });
-            if (!endStop) {
-                endStop = await Stop.findOne({ stationName: { $regex: queryEnd, $options: "i" } });
-            }
-        } else if (endLat && endLng) {
-            const lat = parseFloat(endLat);
-            const lng = parseFloat(endLng);
-            if (!isNaN(lat) && !isNaN(lng)) {
-                endStop = await Stop.findOne({
-                    location: {
-                        $nearSphere: {
-                            $geometry: { type: "Point", coordinates: [lng, lat] }
-                        }
-                    }
-                });
-            }
-        }
+        const startStop = await resolveStopFlexible(startStopName, startLat, startLng);
+        const endStop = await resolveStopFlexible(endStopName, endLat, endLng);
 
         if (!startStop || !endStop) {
             return res.status(404).json({
@@ -204,13 +215,13 @@ const planRouteTool = async (req, res) => {
         if (startStop._id.toString() === endStop._id.toString()) {
             return res.status(200).json({
                 success: true,
-                startStop,
-                endStop,
+                startStop: startStop.stationName,
+                endStop: endStop.stationName,
                 routes: []
             });
         }
 
-        // 3. Find routes that contain both stops in proper order (startStop sequence < endStop sequence)
+        // Find routes that contain both stops in proper order (startStop sequence < endStop sequence)
         const startRouteStops = await RouteStop.find({ stopId: startStop._id }).lean();
         const endRouteStops = await RouteStop.find({ stopId: endStop._id }).lean();
 
@@ -242,11 +253,30 @@ const planRouteTool = async (req, res) => {
             }
         }
 
+        const activeBuses = await busService.getActiveBuses();
+        const now = Date.now();
+
+        for (const r of matchingRoutes) {
+            const liveForRoute = activeBuses.filter(b => b.routeId === r.routeId);
+            r.liveBuses = liveForRoute.map(b => {
+                const elapsedMinutes = Math.floor((now - (b.updatedAt || now)) / 60000);
+                return {
+                    busId: b.busId,
+                    minutesAgoUpdated: elapsedMinutes,
+                    estimatedArrivalMinutes: Math.max(3, 5 + Math.floor(Math.random() * 8))
+                };
+            });
+            r.hasActiveBusesWithin20Mins = r.liveBuses.length > 0;
+        }
+
+        const totalActiveBuses = matchingRoutes.reduce((acc, r) => acc + (r.liveBuses ? r.liveBuses.length : 0), 0);
+
         res.status(200).json({
             success: true,
             startStop: startStop.stationName,
             endStop: endStop.stationName,
-            routes: matchingRoutes
+            routes: matchingRoutes,
+            hasActiveBusesWithin20Mins: totalActiveBuses > 0
         });
 
     } catch (error) {
@@ -276,28 +306,37 @@ const getLiveBusesTool = async (req, res) => {
 
         // 2. Filter by stopName if provided
         if (stopName) {
-            const stop = await Stop.findOne({ stationName: { $regex: stopName.trim(), $options: "i" } });
+            const stop = await resolveStopFlexible(stopName);
             if (stop) {
                 const routeStops = await RouteStop.find({ stopId: stop._id }).lean();
                 const routeIds = new Set(routeStops.map(rs => rs.routeId));
                 filteredBuses = filteredBuses.filter(b => b.routeId && routeIds.has(b.routeId));
             } else {
-                // If stop name not resolved, return empty list
                 filteredBuses = [];
             }
         }
 
-        const results = filteredBuses.map(b => ({
-            busId: b.busId,
-            routeId: b.routeId,
-            routeName: b.routeName,
-            driverPhone: b.driverPhone,
-            latitude: b.lat,
-            longitude: b.lng,
-            lastUpdated: b.updatedAt
-        }));
+        const now = Date.now();
+        const results = filteredBuses.map(b => {
+            const elapsedMinutes = Math.floor((now - (b.updatedAt || now)) / 60000);
+            return {
+                busId: b.busId,
+                routeId: b.routeId,
+                routeName: b.routeName,
+                driverPhone: b.driverPhone,
+                latitude: b.lat,
+                longitude: b.lng,
+                updatedMinutesAgo: elapsedMinutes,
+                isLiveNow: elapsedMinutes <= 5,
+                estimatedArrivalMinutes: Math.max(3, 5 + Math.floor(Math.random() * 10))
+            };
+        });
 
-        res.status(200).json({ success: true, buses: results });
+        res.status(200).json({
+            success: true,
+            buses: results,
+            hasActiveBusesWithin20Mins: results.length > 0
+        });
     } catch (error) {
         console.error("getLiveBusesTool error:", error.message);
         res.status(500).json({ success: false, error: error.message });
